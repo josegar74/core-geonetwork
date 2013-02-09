@@ -29,6 +29,7 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.utils.CSRFUtil;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.jdom.Element;
@@ -100,6 +101,7 @@ public class Get implements Service
 		//--- return data
 
 			elUser.addContent(elGroups);
+
 			return elUser;
 		} else {
 			throw new IllegalArgumentException("You don't have rights to do this");

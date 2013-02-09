@@ -14,7 +14,9 @@
 		<script type="text/javascript" language="JavaScript">
 			function delete1(url)
 			{
-				if(confirm("<xsl:value-of select="/root/gui/strings/deleteCategory"/>"))
+                url = url + '&amp;_tk=<xsl:value-of select="/root/response/_tk" />';
+
+                if(confirm("<xsl:value-of select="/root/gui/strings/deleteCategory"/>"))
 					load(url);
 			}
 		</script>

@@ -28,6 +28,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.utils.CSRFUtil;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.lib.Lib;
 import org.jdom.Element;
@@ -51,8 +52,12 @@ public class List implements Service
 	{
 		Dbms dbms = (Dbms) context.getResourceManager().open (Geonet.Res.MAIN_DB);
 
-		return Lib.local.retrieve(dbms, "Categories").setName(Jeeves.Elem.RESPONSE);
-	}
+		Element elCategories = Lib.local.retrieve(dbms, "Categories").setName(Jeeves.Elem.RESPONSE);
+
+        CSRFUtil.addTokenToServiceResponse(elCategories, context);
+
+        return elCategories;
+    }
 }
 
 //=============================================================================

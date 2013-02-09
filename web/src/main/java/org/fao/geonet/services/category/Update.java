@@ -28,6 +28,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
@@ -39,7 +40,7 @@ import org.jdom.Element;
 /** Update the information of a category
   */
 
-public class Update implements Service
+public class Update extends BaseSecureService
 {
 	public void init(String appPath, ServiceConfig params) throws Exception {}
 
@@ -49,7 +50,7 @@ public class Update implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		String id   = params.getChildText(Params.ID);
 		String name = Util.getParam(params, Params.NAME);

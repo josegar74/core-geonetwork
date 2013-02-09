@@ -28,6 +28,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.utils.CSRFUtil;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.fao.geonet.lib.Lib;
@@ -52,13 +53,21 @@ public class Get implements Service
 	{
 		String id = params.getChildText(Params.ID);
 
-		if (id == null)
-			return new Element(Jeeves.Elem.RESPONSE);
+        Element elResponse;
 
-		Dbms dbms = (Dbms) context.getResourceManager().open (Geonet.Res.MAIN_DB);
+		if (id == null) {
+            elResponse =  new Element(Jeeves.Elem.RESPONSE);
+        } else {
+            Dbms dbms = (Dbms) context.getResourceManager().open (Geonet.Res.MAIN_DB);
 
-		return Lib.local.retrieveById(dbms, "Groups", id).setName(Jeeves.Elem.RESPONSE);
-	}
+            elResponse = Lib.local.retrieveById(dbms, "Groups", id).setName(Jeeves.Elem.RESPONSE);
+
+        }
+
+        CSRFUtil.addTokenToServiceResponse(elResponse, context);
+
+        return elResponse;
+    }
 }
 
 //=============================================================================

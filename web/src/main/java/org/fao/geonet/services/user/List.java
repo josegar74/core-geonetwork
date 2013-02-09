@@ -29,6 +29,7 @@ import jeeves.server.ProfileManager;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.utils.CSRFUtil;
 import org.fao.geonet.constants.Geonet;
 import org.jdom.Element;
 
@@ -109,8 +110,9 @@ public class List implements Service
 		for (Element elem : alToRemove) elem.detach();
 
 		//--- return result
+        CSRFUtil.addTokenToServiceResponse(elUsers, context);
 
-		return elUsers;
+        return elUsers;
 	}
 
 	//--------------------------------------------------------------------------

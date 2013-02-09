@@ -78,7 +78,9 @@
 			<input type="hidden" name="name" value="alice"/>
 			<input type="hidden" name="profile" value="cheshire"/>
 			<input type="hidden" name="groups" value="cat"/>
-			<table>
+            <input type="hidden" name="_tk" value="{/root/response/_tk}"/>
+
+            <table>
 				<tr>
 					<th class="padded"><xsl:value-of select="/root/gui/strings/username"/></th>
 					<td class="padded"><xsl:value-of select="/root/response/record/username"/></td>
