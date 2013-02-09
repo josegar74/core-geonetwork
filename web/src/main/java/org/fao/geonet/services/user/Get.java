@@ -65,7 +65,12 @@ public class Get implements Service
 		String      myProfile = usrSess.getProfile();
 		String      myUserId  = usrSess.getUserId();
 
-		if (id == null) return new Element(Jeeves.Elem.RESPONSE);
+		if (id == null) {
+            Element elResponse = new Element(Jeeves.Elem.RESPONSE);
+            CSRFUtil.addTokenToServiceResponse(elResponse, context);
+
+            return elResponse;
+        }
 
 		if (myProfile.equals(Geonet.Profile.ADMINISTRATOR) || myProfile.equals(Geonet.Profile.USER_ADMIN) || myUserId.equals(id)) {
 
@@ -102,7 +107,9 @@ public class Get implements Service
 
 			elUser.addContent(elGroups);
 
-			return elUser;
+            CSRFUtil.addTokenToServiceResponse(elUser, context);
+
+            return elUser;
 		} else {
 			throw new IllegalArgumentException("You don't have rights to do this");
 		}
