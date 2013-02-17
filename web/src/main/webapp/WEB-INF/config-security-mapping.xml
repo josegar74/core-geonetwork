@@ -221,6 +221,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans
                 <sec:intercept-url pattern="/srv/.*/user.pwupdate!?.*" access="hasRole('RegisteredUser')"></sec:intercept-url>
                 <sec:intercept-url pattern="/srv/.*/user.infoedit!?.*" access="hasRole('RegisteredUser')"></sec:intercept-url>
                 <sec:intercept-url pattern="/srv/.*/user.infoupdate!?.*" access="hasRole('RegisteredUser')"></sec:intercept-url>
+                <sec:intercept-url pattern="/srv/.*/secure.token!?.*" access="hasRole('RegisteredUser')"></sec:intercept-url>
                 <sec:intercept-url pattern="/srv/.*/home!?.*" access="permitAll"></sec:intercept-url>
                 <sec:intercept-url pattern="/srv/.*/main.home!?.*" access="permitAll"></sec:intercept-url>
                 <sec:intercept-url pattern="/srv/.*/main.error!?.*" access="permitAll"></sec:intercept-url>

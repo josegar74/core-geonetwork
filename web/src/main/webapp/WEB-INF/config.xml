@@ -709,7 +709,15 @@
 			</error>
 		</service>
 
-		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+        <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+        <!-- CSRF token services                                              -->
+        <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+        <service name="secure.token">
+            <class name="jeeves.services.GetSecureToken" />
+        </service>
+
+        <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 		<!-- Forgotten password services -->
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
@@ -1444,6 +1452,8 @@
 		<service name="isolanguages">
 			<class name="org.fao.geonet.guiservices.isolanguages.Get" />
 		</service>
+
+
 	</services>
 
 	<!-- ====================================================================== -->
