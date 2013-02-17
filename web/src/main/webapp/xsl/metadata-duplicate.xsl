@@ -28,7 +28,9 @@
 			<input name="id" type="hidden" value="{/root/response/id}"/>
 			<input name="uuid" type="hidden" value="{/root/response/uuid}"/>
 			<input name="child" type="hidden" value="{/root/response/child}"/>
-			<table>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+
+            <table>
 				<tr>
 					<td colspan="2">
 						<xsl:value-of select="/root/gui/create/message"/>

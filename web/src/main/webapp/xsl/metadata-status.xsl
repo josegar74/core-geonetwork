@@ -14,8 +14,10 @@
 				<div id="status" align="center">
 					<xsl:if test="/root/response/statusvalues/*">
 							
-							<input name="id" type="hidden" value="{/root/response/id}"/>
-							<table>
+                        <input name="id" type="hidden" value="{/root/response/id}"/>
+                        <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+
+                        <table>
 								<tr>
 									<th class="padded" align="center" colspan="2"><xsl:value-of select="/root/gui/strings/status"/></th>
 								</tr>

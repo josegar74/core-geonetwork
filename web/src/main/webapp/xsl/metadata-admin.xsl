@@ -22,6 +22,7 @@
 				
 				<div id="privileges">
 					<input name="metadataid" id="metadataid" type="hidden" value="{/root/response/id}"/>
+                    <input type="hidden" id="_tk" name="_tk" value="{/root/gui/_tk}"/>
 					<table>
 						<tr>
 							<th class="padded"><xsl:value-of select="/root/gui/strings/groups"/></th>

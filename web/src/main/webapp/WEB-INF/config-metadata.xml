@@ -41,6 +41,7 @@
 				<call name="sources"  class=".guiservices.util.Sources"/>
 				<call name="isoLang"  class=".guiservices.isolanguages.Get"/>
 				<call name="clear"  class=".services.metadata.ClearCachedShowMetadata"/>
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 
 			<error id="operation-not-allowed" sheet="error.xsl" statusCode="403">
@@ -353,7 +354,9 @@
 		<service name="metadata.batch.status.form">
 			<class name=".services.metadata.PrepareBatchUpdateStatus"/>
 
-			<output sheet="metadata-status.xsl"/>
+            <output sheet="metadata-status.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -371,8 +374,10 @@
 		<service name="metadata.batch.category.form">
 			<class name=".services.metadata.PrepareBatchUpdateCategories"/>
 
-			<output sheet="metadata-category.xsl"/>
-		</service>
+            <output sheet="metadata-category.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
+    </service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
@@ -388,9 +393,11 @@
 
 		<service name="metadata.batch.admin.form">
 			<class name=".services.metadata.PrepareBatchUpdatePrivileges"/>
-			
-			<output sheet="metadata-admin.xsl"/>
-		</service>
+
+            <output sheet="metadata-admin.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
+    </service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
@@ -447,6 +454,8 @@
 			<output sheet="metadata-create.xsl">
 				<call name="groups"    class=".guiservices.groups.GetMine"/>
 				<call name="templates" class=".guiservices.templates.Get"/>
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+
 				<xml name="create" file="xml/metadata-create.xml" />
 			</output>
 		</service>
@@ -464,6 +473,7 @@
 		<service name="metadata.duplicate.form">
 			<output sheet="metadata-duplicate.xsl">
 				<call name="groups" class=".guiservices.groups.GetMine"/>
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 				<xml  name="create" file ="xml/metadata-create.xml" />
 			</output>
 
@@ -512,7 +522,9 @@
 		<service name="metadata.admin.form">
 			<class name=".services.metadata.GetAdminOper"/>
 
-			<output sheet="metadata-admin.xsl"/>
+			<output sheet="metadata-admin.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -527,7 +539,9 @@
 		<service name="metadata.status.form">
 			<class name=".services.metadata.GetStatus"/>
 
-			<output sheet="metadata-status.xsl"/>
+			<output sheet="metadata-status.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -542,7 +556,9 @@
 		<service name="metadata.category.form">
 			<class name=".services.metadata.GetCategories"/>
 
-			<output sheet="metadata-category.xsl"/>
+			<output sheet="metadata-category.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->

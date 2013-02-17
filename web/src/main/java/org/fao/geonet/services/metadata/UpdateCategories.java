@@ -29,6 +29,8 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
+import jeeves.utils.CSRFUtil;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.kernel.DataManager;
@@ -40,7 +42,7 @@ import java.util.List;
 /**
  * Stores all operations allowed for a metadata. Called by the metadata.admin service.
  */
-public class UpdateCategories implements Service {
+public class UpdateCategories extends BaseSecureService {
 
     /**
      *
@@ -57,7 +59,7 @@ public class UpdateCategories implements Service {
      * @return
      * @throws Exception
      */
-	public Element exec(Element params, ServiceContext context) throws Exception {
+	public Element doExec(Element params, ServiceContext context) throws Exception {
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 
 		DataManager dataMan = gc.getDataManager();
@@ -79,7 +81,7 @@ public class UpdateCategories implements Service {
 			Element el = (Element) list.get(i);
 			String name = el.getName();
 
-			if (name.startsWith("_"))
+			if (name.startsWith("_") && !name.equals(CSRFUtil.TOKEN_PARAMETER_NAME))
 				dataMan.setCategory(context, dbms, id, name.substring(1));
 		}
 

@@ -96,7 +96,7 @@
 		<!-- delete button -->
 		<xsl:if test="geonet:info/owner='true'">
 			&#160;
-			<button class="content" onclick="return doConfirmDelete('{/root/gui/locService}/metadata.delete?id={$metadata/geonet:info/id}', '{/root/gui/strings/confirmDelete}','{$ltitle}','{$metadata/geonet:info/id}', '{/root/gui/strings/deleteConfirmationTitle}')"><xsl:value-of select="/root/gui/strings/delete"/></button>
+			<button class="content" onclick="return doConfirmDelete('{/root/gui/locService}/metadata.delete?id={$metadata/geonet:info/id}&amp;_tk={/root/gui/_tk}', '{/root/gui/strings/confirmDelete}','{$ltitle}','{$metadata/geonet:info/id}', '{/root/gui/strings/deleteConfirmationTitle}')"><xsl:value-of select="/root/gui/strings/delete"/></button>
 		</xsl:if>
 						
 		<xsl:if test="geonet:info/edit='true'">
@@ -130,7 +130,7 @@
 				<!-- versioning button -->
 				<xsl:if test="java:isAccessibleService('metadata.version') and /root/gui/svnmanager/enabled='true'">
 					<xsl:variable name="versionTitle" select="concat(/root/gui/strings/versionTitle,': ',$ltitle)"/>
-					<button onclick="doOtherButton('{/root/gui/locService}/metadata.version?id={$metadata/geonet:info/id}','{$versionTitle}',300)"><xsl:value-of select="/root/gui/strings/startVersion"/></button>
+					<button onclick="doOtherButton('{/root/gui/locService}/metadata.version?id={$metadata/geonet:info/id}&amp;_tk={/root/gui/_tk}','{$versionTitle}',300)"><xsl:value-of select="/root/gui/strings/startVersion"/></button>
 				</xsl:if>
 
 				<!-- Create child option only for iso19139 schema based metadata -->

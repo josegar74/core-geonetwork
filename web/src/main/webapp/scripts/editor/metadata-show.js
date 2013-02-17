@@ -67,6 +67,11 @@
 					}
 				});
 
+                var tk = $("_tk");
+                if (tk) {
+                    pars += "&_tk="+ tk.value;
+                }
+
 				if (modalbox != null && modalbox) {
 					service = getGNServiceURL(service) + '?' + pars;
 					Modalbox.show(service,{title: title, width: 600} );
