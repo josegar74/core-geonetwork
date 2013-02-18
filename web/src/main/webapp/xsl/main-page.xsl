@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:exslt="http://exslt.org/common" xmlns:geonet="http://www.fao.org/geonetwork"
+    xmlns:java="java:org.fao.geonet.util.XslUtil"
 	exclude-result-prefixes="xsl exslt geonet">
 
 	<xsl:include href="main.xsl"/>
@@ -12,7 +13,7 @@
 		<xsl:call-template name="geoCssHeader"/>
 		<xsl:call-template name="ext-ux-css"/>
 	</xsl:template>
-	
+
 	<!--
 		additional scripts
 	-->
@@ -106,13 +107,10 @@
 
 		<script type="text/javascript" src="{/root/gui/url}/scripts/core/kernel/kernel.js"/><xsl:text>&#10;</xsl:text>
 
-		<xsl:variable name="wmc"><xsl:copy-of select="/root/request/wmc"/></xsl:variable>
-		<xsl:variable name="uuid"><xsl:copy-of select="/root/request/uuid"/></xsl:variable>
-		<xsl:variable name="id"><xsl:copy-of select="/root/request/id"/></xsl:variable>
-		<xsl:variable name="urlWMS"><xsl:copy-of select="/root/request/url"/></xsl:variable>
-		<xsl:variable name="typeWMS"><xsl:copy-of select="/root/request/type"/></xsl:variable>
-		<xsl:variable name="tab"><xsl:copy-of select="/root/request/tab"/></xsl:variable>
-		<xsl:variable name="search"><xsl:copy-of select="/root/request/search"/></xsl:variable>
+		<xsl:variable name="uuid"><xsl:value-of select="java:escapeForHtml(/root/request/uuid)" /></xsl:variable>
+		<xsl:variable name="id"><xsl:copy-of select="java:escapeForHtml(/root/request/id)"/></xsl:variable>
+		<xsl:variable name="tab"><xsl:copy-of select="java:escapeForHtml(/root/request/tab)"/></xsl:variable>
+		<xsl:variable name="search"><xsl:copy-of select="java:escapeForHtml(/root/request/search)"/></xsl:variable>
 
 		<script type="text/javascript">
 
@@ -337,23 +335,6 @@
 				var id="<xsl:value-of select="$id"/>";
 				if (id!='') {
 					gn_showSingleMetadata(id);
-				}
-
-				<!-- If a WMS server & layername(s) are passed, it will be opened 
-					 in the map viewer the large map viewer will also be opened -->
-				var urlWMS="<xsl:value-of select="$urlWMS"/>";
-				var typeWMS="<xsl:value-of select="$typeWMS"/>";
-				servicesWMS = new Array();
-				<xsl:for-each select="/root/request/service">
-					<xsl:text>servicesWMS.push("</xsl:text><xsl:value-of select="."/><xsl:text>");</xsl:text>
-				</xsl:for-each>
-				if (urlWMS!='') {
-				if (servicesWMS.length!=null || servicesWMS.length>0) {
-						if (typeWMS!='') {
-							imc_addServices(urlWMS, servicesWMS, typeWMS, im_servicesAdded);
-							openIntermap();
-						}
-					}
 				}
 			});
 

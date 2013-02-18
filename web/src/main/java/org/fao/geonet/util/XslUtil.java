@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import jeeves.server.ProfileManager;
 import jeeves.utils.Log;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.kernel.search.LuceneSearcher;
 import org.fao.geonet.languages.IsoLanguagesMapper;
@@ -289,4 +290,13 @@ public final class XslUtil
 		return src.toString().matches(pattern.toString());
 	}
 
+    /**
+     * Escapes the characters in a String using HTML entities.
+     *
+     * @param str
+     * @return
+     */
+    public static String escapeForHtml(String str) {
+        return StringEscapeUtils.escapeHtml(str);
+    }
 }
