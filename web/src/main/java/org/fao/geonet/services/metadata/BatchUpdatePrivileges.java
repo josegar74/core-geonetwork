@@ -29,6 +29,8 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
+import jeeves.utils.CSRFUtil;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.kernel.AccessManager;
@@ -48,7 +50,7 @@ import java.util.StringTokenizer;
 /** Stores all operations allowed for a metadata
   */
 
-public class BatchUpdatePrivileges implements Service
+public class BatchUpdatePrivileges extends BaseSecureService
 {
 	//--------------------------------------------------------------------------
 	//---
@@ -64,7 +66,7 @@ public class BatchUpdatePrivileges implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		DataManager   dm = gc.getDataManager();
@@ -115,7 +117,7 @@ public class BatchUpdatePrivileges implements Service
 
 					String name  = el.getName();
 
-					if (name.startsWith("_")) {
+                    if (name.startsWith("_") && !name.equals(CSRFUtil.TOKEN_PARAMETER_NAME)) {
 						StringTokenizer st = new StringTokenizer(name, "_");
 
 						String groupId = st.nextToken();

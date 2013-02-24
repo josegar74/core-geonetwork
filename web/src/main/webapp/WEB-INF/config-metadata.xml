@@ -346,6 +346,7 @@
 
 			<output sheet="metadata-batchownership.xsl">
 				<xml name="info" file="xml/metadata-batchNewOwner.xml" />
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 

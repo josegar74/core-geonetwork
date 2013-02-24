@@ -132,7 +132,7 @@
 		
 						<div id="oAcOsEle" name="oAcOsEle" class="oAcEle" style="display:none;" onClick="oActions('oAcOs');">
 						<xsl:if test="java:isAccessibleService('metadata.batch.delete')">
-							<button onclick="batchOperation('metadata.batch.delete','{/root/gui/strings/batchDeleteTitle}',600,
+							<button onclick="batchOperation('metadata.batch.delete?_tk={/root/gui/_tk}','{/root/gui/strings/batchDeleteTitle}',600,
 							    replaceStringParams('{/root/gui/strings/confirmBatchDelete}',[$('nbselected').innerHTML]))">
 								<xsl:value-of select="/root/gui/strings/delete"/>
 							</button>
@@ -163,7 +163,7 @@
 						</xsl:if>
 						<xsl:if test="java:isAccessibleService('metadata.batch.version') and /root/gui/svnmanager/enabled='true'">
 						<!--xsl:text>&#160;</xsl:text-->
-							<button onclick="batchOperation('metadata.batch.version','{/root/gui/strings/batchStartVersionTitle}',600, null)">
+							<button onclick="batchOperation('metadata.batch.version?_tk={/root/gui/_tk}','{/root/gui/strings/batchStartVersionTitle}',600, null)">
 								<xsl:value-of select="/root/gui/strings/startVersion"/>
 							</button>
 						</xsl:if>

@@ -29,6 +29,7 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -49,7 +50,7 @@ import java.util.Set;
 
 /** Assigns status to metadata.  */
 
-public class BatchUpdateStatus implements Service
+public class BatchUpdateStatus extends BaseSecureService
 {
 	//--------------------------------------------------------------------------
 	//---
@@ -65,7 +66,7 @@ public class BatchUpdateStatus implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		String status = Util.getParam(params, Params.STATUS);
 		String changeMessage = Util.getParam(params, Params.CHANGE_MESSAGE);
