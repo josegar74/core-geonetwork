@@ -147,6 +147,8 @@
 
 			
 		<form name="schema-ops" id="schema-ops">
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+
 			<div class="table-container" id="formContent">
 			<div class="table-row">
 				<xsl:choose>

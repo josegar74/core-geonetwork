@@ -616,7 +616,9 @@
 		</service>
 
 		<service name="metadata.schema.add.form">
-			<output sheet="metadata-schema-ops.xsl"/>
+			<output sheet="metadata-schema-ops.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<service name="metadata.schema.delete">
@@ -625,7 +627,9 @@
 		</service>
 
 		<service name="metadata.schema.delete.form">
-			<output sheet="metadata-schema-ops.xsl"/>
+			<output sheet="metadata-schema-ops.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<service name="metadata.schema.update">
@@ -634,7 +638,9 @@
 		</service>
 
 		<service name="metadata.schema.update.form">
-			<output sheet="metadata-schema-ops.xsl"/>
+			<output sheet="metadata-schema-ops.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->

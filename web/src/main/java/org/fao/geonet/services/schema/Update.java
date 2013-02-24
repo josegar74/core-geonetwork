@@ -29,6 +29,7 @@ import jeeves.exceptions.OperationAbortedEx;
 import jeeves.interfaces.Service;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -38,7 +39,7 @@ import org.jdom.Element;
 
 //=============================================================================
 
-public class Update implements Service {
+public class Update extends BaseSecureService {
 	// --------------------------------------------------------------------------
 	// ---
 	// --- Init
@@ -53,7 +54,7 @@ public class Update implements Service {
 	// ---
 	// --------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception {
+	public Element doExec(Element params, ServiceContext context) throws Exception {
 
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		SchemaManager scm = gc.getSchemamanager();

@@ -29,6 +29,7 @@ import jeeves.exceptions.OperationAbortedEx;
 import jeeves.interfaces.Service;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 
 import org.fao.geonet.GeonetContext;
@@ -43,7 +44,7 @@ import java.util.List;
 
 //=============================================================================
 
-public class Delete implements Service {
+public class Delete extends BaseSecureService {
 	// --------------------------------------------------------------------------
 	// ---
 	// --- Init
@@ -58,7 +59,7 @@ public class Delete implements Service {
 	// ---
 	// --------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception {
+	public Element doExec(Element params, ServiceContext context) throws Exception {
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		SchemaManager scm = gc.getSchemamanager();
 
