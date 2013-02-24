@@ -27,6 +27,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -38,11 +39,11 @@ import org.jdom.Element;
 import java.util.Map;
 
 
-public class Set implements Service {
+public class Set extends BaseSecureService {
 
 	public void init(String appPath, ServiceConfig params) throws Exception {}
 
-	public Element exec(Element params, ServiceContext context) throws Exception {
+	public Element doExec(Element params, ServiceContext context) throws Exception {
 	    GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
         Dbms dbms = (Dbms) context.getResourceManager().open (Geonet.Res.MAIN_DB);
 

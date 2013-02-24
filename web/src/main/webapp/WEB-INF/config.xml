@@ -594,7 +594,9 @@
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 		<service name="feedback">
-			<output sheet="feedback.xsl" />
+			<output sheet="feedback.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -754,7 +756,7 @@
 			<output sheet="password-change.xsl"/>
 		</service>
 
-		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - -->
 
 		<service name="password.change.submit">
 			<class name=".services.password.Change" />
@@ -787,6 +789,7 @@
 
 			<output sheet="user-list.xsl">
 				<xml name="strings" file="xml/confirm.xml" />
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 
@@ -798,6 +801,7 @@
 			<output sheet="user-new.xsl">
 				<call name="groups" class=".guiservices.groups.GetMine" />
 				<call name="profiles" class="jeeves.guiservices.profiles.Get" />
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 
@@ -810,6 +814,7 @@
 				<call name="groups" class=".guiservices.groups.GetMine" />
 				<call name="groupsAndProfiles" class=".guiservices.groups.GetMineWithProfiles" />
 				<call name="profiles" class="jeeves.guiservices.profiles.Get" />
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 
@@ -821,6 +826,7 @@
 			<output sheet="user-resetpw.xsl">
 				<call name="groups" class=".guiservices.groups.GetMine" />
 				<call name="profiles" class="jeeves.guiservices.profiles.Get" />
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 
@@ -843,7 +849,9 @@
 		<service name="user.pwedit">
 			<class name=".services.user.Get" />
 
-			<output sheet="user-pwupdate.xsl" />
+			<output sheet="user-pwupdate.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -864,6 +872,7 @@
 			<output sheet="user-infoupdate.xsl">
 				<call name="groups" class=".guiservices.groups.GetMine" />
 				<call name="profiles" class="jeeves.guiservices.profiles.Get" />
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 
@@ -904,7 +913,9 @@
 		<service name="group.list">
 			<class name=".services.group.List" />
 
-			<output sheet="group-list.xsl" />
+			<output sheet="group-list.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -912,7 +923,9 @@
 		<service name="group.get">
 			<class name=".services.group.Get" />
 
-			<output sheet="group-update.xsl" />
+			<output sheet="group-update.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -942,7 +955,8 @@
 		<service name="category.list">
 			<class name=".services.category.List" />
 
-			<output sheet="category-list.xsl" >
+			<output sheet="category-list.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 
@@ -951,7 +965,9 @@
 		<service name="category.get">
 			<class name=".services.category.Get" />
 
-			<output sheet="category-update.xsl" />
+			<output sheet="category-update.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -979,7 +995,9 @@
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 		<service name="notifications.list">
 			<class name=".services.notifications.List" />
-			<output sheet="notifications-list.xsl" />
+			<output sheet="notifications-list.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<service name="notifications.save">
@@ -1114,7 +1132,9 @@
 
 		<service name="file.disclaimer">
 			<class name=".services.feedback.AddLimitations" />
-			<output sheet="file-download-disclaimer.xsl" />
+			<output sheet="file-download-disclaimer.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -1291,6 +1311,8 @@
 					<param name="db" value="main-db" />
 					<param name="query" value="SELECT * FROM Users ORDER BY name" />
 				</call>
+
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 
@@ -1304,6 +1326,7 @@
 		<service name="csw.customelementset.get">
 			<output sheet="csw/customize-elementset.xsl">
 				<call name="customelementsets" class=".guiservices.csw.customelementset.Get"/>
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 

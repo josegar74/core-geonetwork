@@ -78,7 +78,7 @@
 			<input type="hidden" name="name" value="alice"/>
 			<input type="hidden" name="profile" value="cheshire"/>
 			<input type="hidden" name="groups" value="cat"/>
-            <input type="hidden" name="_tk" value="{/root/response/_tk}"/>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 
             <table>
 				<tr>

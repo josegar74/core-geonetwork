@@ -101,7 +101,7 @@
 	<xsl:template name="form">
 		<form name="userupdateform" accept-charset="UTF-8" action="{/root/gui/locService}/user.update?operation=newuser" method="post">
 			<input type="hidden" name="id" value="{/root/response/record/id}"/>
-            <input type="hidden" name="_tk" value="{/root/response/_tk}"/>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 
             <table class="text-aligned-left">
 				<tr>

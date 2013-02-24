@@ -28,7 +28,6 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
-import jeeves.utils.CSRFUtil;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.lib.Lib;
 import org.jdom.Element;
@@ -57,8 +56,6 @@ public class List implements Service
 
 		if (elOper != null)
 			elRes.addContent(elOper.detach());
-
-        CSRFUtil.addTokenToServiceResponse(elRes, context);
 
         return elRes.setName(Jeeves.Elem.RESPONSE);
 	}

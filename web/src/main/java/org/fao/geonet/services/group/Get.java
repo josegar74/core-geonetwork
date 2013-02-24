@@ -28,7 +28,6 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
-import jeeves.utils.CSRFUtil;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.fao.geonet.lib.Lib;
@@ -63,8 +62,6 @@ public class Get implements Service
             elResponse = Lib.local.retrieveById(dbms, "Groups", id).setName(Jeeves.Elem.RESPONSE);
 
         }
-
-        CSRFUtil.addTokenToServiceResponse(elResponse, context);
 
         return elResponse;
     }

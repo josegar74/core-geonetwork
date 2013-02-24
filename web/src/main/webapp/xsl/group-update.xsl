@@ -54,7 +54,7 @@
 		<div class="important"><xsl:value-of select="/root/gui/strings/localizationHelp"/></div>
 		<form name="groupUpdateForm" accept-charset="UTF-8" action="{/root/gui/locService}/group.update" method="post">
 
-            <input type="hidden" name="_tk" value="{/root/response/_tk}"/>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 
             <input type="submit" style="display: none;" />
 			<xsl:if test="/root/response/record/id">

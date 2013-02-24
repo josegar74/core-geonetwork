@@ -29,7 +29,7 @@
 			<input type="hidden" name="id" value="{/root/response/record/id}"/>
 			<input type="hidden" name="username" value="{/root/response/record/username}"/>
 			<input type="hidden" name="password" value="password"/>
-            <input type="hidden" name="_tk" value="{/root/response/_tk}"/>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 
             <input type="submit" style="display: none;" />
 			<table class="text-aligned-left">

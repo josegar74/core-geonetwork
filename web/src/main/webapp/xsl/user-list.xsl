@@ -29,7 +29,7 @@
 			function deleteUser(service, message, id){
                 var cswContactId = '<xsl:value-of select="/root/gui/env/csw/contactId"/>';
 
-                service = service + '&amp;_tk=<xsl:value-of select="/root/response/_tk" />';
+                service = service + '&amp;_tk=<xsl:value-of select="/root/gui/_tk" />';
 
 				if (id == cswContactId) {
 					if (!confirm("<xsl:value-of select="/root/gui/strings/delUserCsw"/>"))

@@ -82,7 +82,9 @@
 	<xsl:template name="custom-elementset-list-form">
 		<div id="search-results-content">
 			<form id="customElementsetForm" name="customElementsetForm" accept-charset="UTF-8" action="{/root/gui/locService}/csw.customelementset.set" method="post">
-				<xsl:comment>list of elementsets</xsl:comment>
+                <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+
+                <xsl:comment>list of elementsets</xsl:comment>
 				<xsl:call-template name="display-elementsets"/>
 			</form>
 		</div>

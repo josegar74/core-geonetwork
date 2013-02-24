@@ -29,7 +29,6 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
-import jeeves.utils.CSRFUtil;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.jdom.Element;
@@ -67,7 +66,6 @@ public class Get implements Service
 
 		if (id == null) {
             Element elResponse = new Element(Jeeves.Elem.RESPONSE);
-            CSRFUtil.addTokenToServiceResponse(elResponse, context);
 
             return elResponse;
         }
@@ -106,8 +104,6 @@ public class Get implements Service
 		//--- return data
 
 			elUser.addContent(elGroups);
-
-            CSRFUtil.addTokenToServiceResponse(elUser, context);
 
             return elUser;
 		} else {

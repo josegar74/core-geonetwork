@@ -53,7 +53,7 @@
 	<xsl:template name="form">
 		<div class="important"><xsl:copy-of select="/root/gui/strings/localizationHelp"/></div>
 		<form name="categoryUpdateForm" accept-charset="UTF-8" action="{/root/gui/locService}/category.update" method="post">
-            <input type="hidden" name="_tk" value="{/root/response/_tk}"/>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 
             <input type="submit" style="display: none;" />
 			<xsl:if test="/root/response/record/id">

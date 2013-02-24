@@ -27,6 +27,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Log;
 import jeeves.utils.Xml;
 import org.fao.geonet.GeonetContext;
@@ -40,7 +41,7 @@ import java.util.List;
  * Save custom element sets.
  *
  */
-public class Set implements Service {
+public class Set extends BaseSecureService {
     /**
      * No specific initialization.
      *
@@ -58,7 +59,7 @@ public class Set implements Service {
      * @return
      * @throws Exception
      */
-	public Element exec(Element params, ServiceContext context) throws Exception {
+	public Element doExec(Element params, ServiceContext context) throws Exception {
 	    GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
         Dbms dbms = (Dbms) context.getResourceManager().open (Geonet.Res.MAIN_DB);
         saveCustomElementSets(params, gc, dbms);

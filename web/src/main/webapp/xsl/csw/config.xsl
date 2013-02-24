@@ -86,7 +86,9 @@
 	<xsl:template name="form">
 
 		<form name="cswCapabilitiesForm" accept-charset="UTF-8" action="{/root/gui/locService}/csw.config.set" method="post">
-		<div align="left" style="{$style}">
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+
+            <div align="left" style="{$style}">
             <a href="{/root/gui/locService}/csw.customelementset.get" style="margin:20px 0px 20px 0px;display:block;outline:none;"><xsl:value-of select="/root/gui/strings/customize-elementset"/></a>
 
             <table>
