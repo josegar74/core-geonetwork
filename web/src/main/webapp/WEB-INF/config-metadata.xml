@@ -672,7 +672,9 @@
 		<service name="transfer.ownership">
 			<output sheet="ownership/transfer-ownership.xsl">
 				<xml name="ownership" file="xml/transfer-ownership.xml" />
-			</output>
+
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->

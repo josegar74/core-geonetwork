@@ -23,7 +23,9 @@
 			<xsl:with-param name="title" select="/root/gui/strings/transferOwnership"/>
 
 			<xsl:with-param name="content">
-				<xsl:call-template name="sourceUser"/>
+                <input type="hidden" id="_tk" name="_tk" value="{/root/gui/_tk}"/>
+
+                <xsl:call-template name="sourceUser"/>
 				<xsl:call-template name="groupList"/>
 			</xsl:with-param>
 
