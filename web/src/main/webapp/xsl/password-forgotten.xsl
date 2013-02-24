@@ -10,7 +10,9 @@
 		<xsl:call-template name="formLayout">
 			<xsl:with-param name="content">
 				<form id="forgottenpwd" name="forgottenpwd" accept-charset="UTF-8" action="{/root/gui/locService}/password.forgotten.submit" method="post">
-					<table align="center">
+                    <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+
+                    <table align="center">
 						<tr>
 							<th class="padded"><xsl:value-of select="/root/gui/strings/username"/></th>
 							<td class="padded"><input class="content" type="text" name="username" size="20"/></td>

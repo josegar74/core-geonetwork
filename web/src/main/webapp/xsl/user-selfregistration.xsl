@@ -29,7 +29,9 @@
     -->
     <xsl:template name="form">
         <form id="userregisterform" name="userregisterform" accept-charset="UTF-8" action="{/root/gui/locService}/user.register.submit" method="post">
-             <table align="center">                
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+
+            <table align="center">
                 <tr>
                     <th class="padded"><xsl:value-of select="/root/gui/strings/firstName"/> (*)</th>
                     <td class="padded"><input class="content" type="text" name="name" value=""/></td>

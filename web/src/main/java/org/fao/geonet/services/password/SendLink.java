@@ -51,6 +51,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.PasswordUtil;
 import jeeves.utils.Util;
 import jeeves.utils.Xml;
@@ -69,7 +70,7 @@ import org.jdom.Element;
  * Send change password link email
  */
 
-public class SendLink implements Service {
+public class SendLink extends BaseSecureService {
 
 	// --------------------------------------------------------------------------
 	// ---
@@ -88,7 +89,7 @@ public class SendLink implements Service {
 	// ---
 	// --------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context)
+	public Element doExec(Element params, ServiceContext context)
 			throws Exception {
 
 		String username = Util.getParam(params, Params.USERNAME);

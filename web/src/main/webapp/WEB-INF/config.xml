@@ -727,7 +727,9 @@
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 		<service name="password.forgotten.form">
-			<output sheet="password-forgotten.xsl"/>
+			<output sheet="password-forgotten.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -891,7 +893,9 @@
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 		<service name="user.register.get">
-			<output sheet="user-selfregistration.xsl" />
+			<output sheet="user-selfregistration.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -1050,7 +1054,7 @@
 					<param name="db" value="main-db" />
 					<param name="query" value="SELECT * FROM Groups WHERE ID > 1 ORDER BY name" />
 				</call>
-			</output>
+            </output>
 		</service>
 
 		<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->

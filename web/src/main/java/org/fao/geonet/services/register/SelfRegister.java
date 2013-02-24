@@ -42,6 +42,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.PasswordUtil;
 import jeeves.utils.Util;
 import jeeves.utils.Xml;
@@ -59,7 +60,7 @@ import org.jdom.Element;
  * Register user.
  */
 
-public class SelfRegister implements Service {
+public class SelfRegister extends BaseSecureService {
 
 	private static final String PROFILE_TEMPLATE = "profileTemplate";
 	private static final String PROFILE = "RegisteredUser";
@@ -85,7 +86,7 @@ public class SelfRegister implements Service {
 	// ---
 	// --------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context)
+	public Element doExec(Element params, ServiceContext context)
 			throws Exception {
 
 		String surname = Util.getParam(params, Params.SURNAME);
