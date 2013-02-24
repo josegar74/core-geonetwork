@@ -375,8 +375,9 @@ ConfigView.prototype.getData = function()
         SHIB_ATTRIB_GROUP     : $('shib.attrib.group').value,
         SHIB_DEF_GROUP    : $F('shib.defGroup'),
 
-		USERSELFREGISTRATION_ENABLE : $('userSelfRegistration.enable').checked
+		USERSELFREGISTRATION_ENABLE : $('userSelfRegistration.enable').checked,
 
+        TOKEN     : $('_tk').value
 	}
 	
 	return data;

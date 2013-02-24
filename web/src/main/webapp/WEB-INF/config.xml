@@ -1054,6 +1054,8 @@
 					<param name="db" value="main-db" />
 					<param name="query" value="SELECT * FROM Groups WHERE ID > 1 ORDER BY name" />
 				</call>
+
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
             </output>
 		</service>
 

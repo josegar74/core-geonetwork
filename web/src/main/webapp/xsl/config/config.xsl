@@ -43,7 +43,9 @@
 	<!-- ============================================================================================= -->
 
 	<xsl:template name="panel">
-		<xsl:call-template name="site"/>
+        <input type="hidden" id="_tk" name="_tk" value="{/root/gui/_tk}"/>
+
+        <xsl:call-template name="site"/>
 		<xsl:call-template name="server"/>
 		<xsl:call-template name="intranet"/>
 		<xsl:call-template name="selectionmanager"/>

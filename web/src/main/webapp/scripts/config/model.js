@@ -267,6 +267,7 @@ ConfigModel.updateTemp =
 ' <userSelfRegistration>'+
 '		<enable>{USERSELFREGISTRATION_ENABLE}</enable>'+
 ' </userSelfRegistration>'+
+' <_tk>{TOKEN}</_tk>'+
 '</config>';
 
 //=====================================================================================
