@@ -143,7 +143,7 @@ public class SelfRegister implements Service {
 		dbms.execute(query, new Integer(id), username, passwordHash , surname, name, PROFILE, address,
 				city, state, zip, country, email, organ, kind);
 
-		dbms.execute("INSERT INTO UserGroups(userId, groupId) VALUES (?, ?)", new Integer(id), new Integer(group));
+		dbms.execute("INSERT INTO UserGroups(userId, groupId, profile) VALUES (?, ?, ?)", new Integer(id), new Integer(group), PROFILE);
 
 		// Send email to user confirming registration
 
