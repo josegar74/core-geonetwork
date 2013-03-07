@@ -62,6 +62,8 @@
 			</div>
 			<div>
 				<select class="content" size="20" style="width: 200px" id="entity.list"/>
+
+                <input type="hidden" name="_tk" id="_tk" value="{/root/gui/_tk}" />
 			</div>
 		</div>
 	</xsl:template>

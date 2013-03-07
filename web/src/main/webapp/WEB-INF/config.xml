@@ -1107,6 +1107,7 @@
 			<output sheet="localization/localization.xsl">
 				<call name="languages" class=".guiservices.languages.Get" />
 				<xml name="localiz" file="xml/localization.xml" />
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 

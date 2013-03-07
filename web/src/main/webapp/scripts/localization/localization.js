@@ -94,7 +94,8 @@ Localiz.prototype.saveIfDirty = function()
 		ID   : this.view.getSelectedID(),
 		LANG : this.view.getPrevLang(),
 		TEXT : this.view.getTargetText(),
-		TYPE : this.view.getEntityType()
+		TYPE : this.view.getEntityType(),
+        TOKEN: this.view.getToken()
 	};
 	
 	this.view.updateTargetText();
@@ -116,7 +117,8 @@ Localiz.prototype.save = function()
 			ID   : this.view.getSelectedID(),
 			LANG : this.view.getTargetLanguage(),
 			TEXT : this.view.getTargetText(),
-			TYPE : this.view.getEntityType()
+			TYPE : this.view.getEntityType(),
+            TOKEN: this.view.getToken()
 	};
 	
 	this.model.update(data, ker.wrap(this, this.save_OK));
