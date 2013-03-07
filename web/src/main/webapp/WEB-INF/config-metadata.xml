@@ -578,6 +578,7 @@
 				</call>
 				<call name="categories"        class=".services.category.List"/>
 				<call name="importStyleSheets" class=".guiservices.util.GetImportXSLs"/>
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 
@@ -588,6 +589,7 @@
 				<call name="groups"            class=".guiservices.groups.GetMine"/>
 				<call name="categories"        class=".services.category.List"/>
 				<call name="importStyleSheets" class=".guiservices.util.GetImportXSLs"/>
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 
@@ -653,6 +655,7 @@
 
 			<output sheet="metadata-thumbnail.xsl">
 				<xml name="thumbnail" file="xml/metadata-thumbnail.xml" />
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 			</output>
 		</service>
 

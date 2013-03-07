@@ -27,6 +27,7 @@ import jeeves.constants.Jeeves;
 import jeeves.interfaces.Service;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
@@ -41,7 +42,7 @@ import java.util.List;
  * Import MEF file.
  * 
  */
-public class Import implements Service {
+public class Import extends BaseSecureService {
 	private String stylePath;
 
 	public void init(String appPath, ServiceConfig params) throws Exception {
@@ -63,7 +64,7 @@ public class Import implements Service {
 	 * @return List of imported ids.
 	 * 
 	 */
-	public Element exec(Element params, ServiceContext context)
+	public Element doExec(Element params, ServiceContext context)
 			throws Exception {
 		String mefFile = Util.getParam(params, "mefFile");
         String fileType = Util.getParam(params, "file_type", "mef");
