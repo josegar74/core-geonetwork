@@ -97,8 +97,9 @@
 			<input type="hidden" name="id"      value="{/root/thumbnail/id}"/>
 			<input type="hidden" name="version" value="{/root/thumbnail/version}"/>
 			<input type="hidden" name="type"    value="{$type}"/>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 
-			<tr>
+            <tr>
 				<td>
 					<a href="javascript:popWindow('{$urlAnc}')">
 						<img width="{$IMG_SIZE}" src="{$urlImg}" alt="{/root/gui/strings/thumbnail}"/>
@@ -132,8 +133,9 @@
 			<input type="hidden" name="id"      value="{/root/thumbnail/id}"/>
 			<input type="hidden" name="version" value="{/root/thumbnail/version}"/>
 			<input type="hidden" name="type"    value="{$type}"/>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 
-			<tr>			
+            <tr>
 				<td>
 					<img width="{$IMG_SIZE}" src="{/root/gui/locUrl}/images/nopreview.gif" alt="{/root/gui/strings/thumbnail}"/>
 				</td>
