@@ -30,6 +30,7 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
@@ -40,7 +41,7 @@ import org.jdom.Element;
 /** Update the profile of logged user
   */
 
-public class InfoUpdate implements Service
+public class InfoUpdate extends BaseSecureService
 {
 	//--------------------------------------------------------------------------
 	//---
@@ -56,7 +57,7 @@ public class InfoUpdate implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		String surname  = Util.getParam(params, Params.SURNAME);
 		String name     = Util.getParam(params, Params.NAME);

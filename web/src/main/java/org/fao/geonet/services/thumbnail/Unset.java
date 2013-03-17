@@ -28,6 +28,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -41,7 +42,7 @@ import java.io.File;
 
 //=============================================================================
 
-public class Unset implements Service
+public class Unset extends BaseSecureService
 {
 	//--------------------------------------------------------------------------
 	//---
@@ -57,7 +58,7 @@ public class Unset implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		String id      = Util.getParam(params, Params.ID);
 		String type    = Util.getParam(params, Params.TYPE);

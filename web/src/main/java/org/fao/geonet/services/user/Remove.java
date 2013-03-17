@@ -29,6 +29,7 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
@@ -39,7 +40,7 @@ import org.jdom.Element;
 /** Removes a user from the system. It removes the relationship to a group too
   */
 
-public class Remove implements Service
+public class Remove extends BaseSecureService
 {
 	//--------------------------------------------------------------------------
 	//---
@@ -55,7 +56,7 @@ public class Remove implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		String id = Util.getParam(params, Params.ID);
 

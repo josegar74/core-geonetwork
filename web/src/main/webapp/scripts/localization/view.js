@@ -37,6 +37,13 @@ View.prototype.getEntityType = function()
 }
 
 //=====================================================================================
+
+View.prototype.getToken = function()
+{
+    return $F('_tk');
+}
+
+//=====================================================================================
  
 View.prototype.getSelectedID = function()
 {

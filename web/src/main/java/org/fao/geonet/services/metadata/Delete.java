@@ -30,6 +30,7 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.BinaryFile;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -52,7 +53,7 @@ import java.io.FileOutputStream;
 /** Removes a metadata from the system
   */
 
-public class Delete implements Service
+public class Delete extends BaseSecureService
 {
 	public void init(String appPath, ServiceConfig params) throws Exception {}
 
@@ -62,7 +63,7 @@ public class Delete implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		DataManager   dataMan   = gc.getDataManager();

@@ -28,6 +28,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -44,7 +45,7 @@ import java.util.List;
   * associated
   */
 
-public class Remove implements Service
+public class Remove extends BaseSecureService
 {
 	public void init(String appPath, ServiceConfig params) throws Exception {}
 
@@ -54,7 +55,7 @@ public class Remove implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		String id = Util.getParam(params, Params.ID);
 

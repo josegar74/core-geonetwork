@@ -29,6 +29,7 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -50,7 +51,7 @@ import java.util.Vector;
 /** Sets new owner for a set of metadata records
   */
 
-public class MassiveNewOwner implements Service
+public class MassiveNewOwner extends BaseSecureService
 {
 	public void init(String appPath, ServiceConfig params) throws Exception {}
 
@@ -60,7 +61,7 @@ public class MassiveNewOwner implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		DataManager   dm   = gc.getDataManager();

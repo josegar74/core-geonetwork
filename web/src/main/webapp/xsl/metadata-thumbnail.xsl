@@ -88,6 +88,7 @@
 			<input type="hidden" name="id"      value="{/root/thumbnail/id}"/>
 			<input type="hidden" name="version" value="{/root/thumbnail/version}"/>
 			<input type="hidden" name="type"    value="{$type}"/>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 
 			<tr>
 				<td>
@@ -123,6 +124,7 @@
 			<input type="hidden" name="id"      value="{/root/thumbnail/id}"/>
 			<input type="hidden" name="version" value="{/root/thumbnail/version}"/>
 			<input type="hidden" name="type"    value="{$type}"/>
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 
 			<tr>			
 				<td>

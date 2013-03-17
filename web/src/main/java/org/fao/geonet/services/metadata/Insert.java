@@ -30,6 +30,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import jeeves.utils.Xml;
 import org.fao.geonet.GeonetContext;
@@ -50,7 +51,7 @@ import java.util.UUID;
 /** Inserts a new metadata to the system (data is validated)
   */
 
-public class Insert implements Service
+public class Insert extends BaseSecureService
 {
 	//--------------------------------------------------------------------------
 	//---
@@ -71,7 +72,7 @@ public class Insert implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 

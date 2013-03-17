@@ -67,11 +67,12 @@ function transfer(groupId)
 	var sourceUsr = $F('source.user');
 	var targetGrp = $F(xml.getElementById(tr, 'target.group'));
 	var targetUsr = $F(xml.getElementById(tr, 'target.user'));
-	
+    var _tk = $F('_tk');
+
 	if (targetUsr == null)
 		alert(loader.getText('noUser'));
 	else
-		model.transfer(sourceUsr, sourceGrp, targetUsr, targetGrp, ker.wrap(this, function(xmlRes)
+		model.transfer(sourceUsr, sourceGrp, targetUsr, targetGrp, _tk, ker.wrap(this, function(xmlRes)
 		{
 			var data =
 			{

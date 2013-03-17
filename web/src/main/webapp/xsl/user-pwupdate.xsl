@@ -80,7 +80,8 @@
 	-->
 	<xsl:template name="form">
 		<form name="userupdateform" accept-charset="UTF-8" action="{/root/gui/locService}/user.pwupdate" method="post">
-			<input type="submit" style="display: none;" />
+            <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+            <input type="submit" style="display: none;" />
 			<table>
 				<tr>
 					<th class="padded"><xsl:value-of select="/root/gui/strings/password"/></th>

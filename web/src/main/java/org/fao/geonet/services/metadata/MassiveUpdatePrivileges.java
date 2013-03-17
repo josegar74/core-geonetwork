@@ -29,6 +29,7 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.kernel.AccessManager;
@@ -48,7 +49,7 @@ import java.util.StringTokenizer;
 /** Stores all operations allowed for a metadata
   */
 
-public class MassiveUpdatePrivileges implements Service
+public class MassiveUpdatePrivileges extends BaseSecureService
 {
 	//--------------------------------------------------------------------------
 	//---
@@ -64,7 +65,7 @@ public class MassiveUpdatePrivileges implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		DataManager   dm = gc.getDataManager();

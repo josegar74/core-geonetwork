@@ -19,7 +19,8 @@
 
 				<div id="privileges">
 					<input name="metadataid" id="metadataid" type="hidden" value="{/root/response/id}"/>
-					<table>
+                    <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+                    <table>
 						<tr>
 							<th class="padded"><xsl:value-of select="/root/gui/strings/groups"/></th>
 							<!-- loop on all operations leaving editing and notify to last -->

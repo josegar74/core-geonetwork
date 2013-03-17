@@ -27,6 +27,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -41,7 +42,7 @@ import java.util.StringTokenizer;
 
 //=============================================================================
 
-public class Transfer implements Service
+public class Transfer extends BaseSecureService
 {
 	public void init(String appPath, ServiceConfig params) throws Exception {}
 
@@ -51,7 +52,7 @@ public class Transfer implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		int sourceUsr = Util.getParamAsInt(params, "sourceUser");
 		int sourceGrp = Util.getParamAsInt(params, "sourceGroup");

@@ -69,7 +69,7 @@ function getUserGroups_OK(xmlRes)
 
 //=====================================================================================
 
-function transfer(sourceUsr, sourceGrp, targetUsr, targetGrp, callBack)
+function transfer(sourceUsr, sourceGrp, targetUsr, targetGrp, tk, callBack)
 {
 	callBackF = callBack;	
 
@@ -78,7 +78,8 @@ function transfer(sourceUsr, sourceGrp, targetUsr, targetGrp, callBack)
 		SOURCE_USR : sourceUsr,
 		SOURCE_GRP : sourceGrp,
 		TARGET_USR : targetUsr,
-		TARGET_GRP : targetGrp 
+		TARGET_GRP : targetGrp,
+        TK         : tk
 	};
 
 	var request = str.substitute(transferTemp, data);

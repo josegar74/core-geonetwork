@@ -20,7 +20,8 @@
 			<xsl:with-param name="content">
 				<form id="feedbackf" name="feedbackf" accept-charset="UTF-8" method="post">
 					<input type="hidden" name="id" value="{/root/response/id}"/>
-					<xsl:for-each select="/root/response/fname">
+                    <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+                    <xsl:for-each select="/root/response/fname">
 						<input type="hidden" name="fname" value="{.}"/>
 					</xsl:for-each>
 					<table align="center">

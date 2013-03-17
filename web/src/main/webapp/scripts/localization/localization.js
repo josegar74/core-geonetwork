@@ -89,7 +89,8 @@ Localiz.prototype.save = function()
 		ID   : this.view.getSelectedID(),
 		LANG : this.view.getTargetLanguage(),
 		TEXT : this.view.getTargetText(),
-		TYPE : this.view.getEntityType()
+		TYPE : this.view.getEntityType(),
+        TOKEN: this.view.getToken()
 	};
 	
 	this.model.update(data, ker.wrap(this, this.save_OK));

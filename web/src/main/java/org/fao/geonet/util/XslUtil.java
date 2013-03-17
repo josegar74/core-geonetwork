@@ -1,6 +1,7 @@
 package org.fao.geonet.util;
 
 import jeeves.utils.Log;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.kernel.search.LuceneSearcher;
 
@@ -159,5 +160,15 @@ public final class XslUtil
 			Log.debug(Geonet.GEONETWORK, "Failed to get index field value caused by " + e.getMessage());
     		return "";
 		}
+    }
+
+    /**
+     * Escapes the characters in a String using HTML entities.
+     *
+     * @param str
+     * @return
+     */
+    public static String escapeForHtml(String str) {
+        return StringEscapeUtils.escapeHtml(str);
     }
 }

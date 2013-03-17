@@ -28,8 +28,10 @@
 		<script type="text/javascript">
 			function deleteUser(service, message, id){
 				var cswContactId = '<xsl:value-of select="/root/gui/env/csw/contactId"/>';
-				
-				if (id == cswContactId) {
+
+                service = service + '&amp;_tk=<xsl:value-of select="/root/gui/_tk" />';
+
+                if (id == cswContactId) {
 					if (!confirm("<xsl:value-of select="/root/gui/strings/delUserCsw"/>"))
 						return null;
 				}

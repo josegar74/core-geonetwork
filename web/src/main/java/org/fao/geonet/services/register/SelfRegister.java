@@ -28,6 +28,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Util;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -55,7 +56,7 @@ import java.util.Random;
  * Register user.
  */
 
-public class SelfRegister implements Service {
+public class SelfRegister extends BaseSecureService {
 
 	private static final String PROFILE = "RegisteredUser";
 	private static final String PROTOCOL = "smtp";
@@ -75,7 +76,7 @@ public class SelfRegister implements Service {
 	// ---
 	// --------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context)
+	public Element doExec(Element params, ServiceContext context)
 			throws Exception {
 
 		String surname = Util.getParam(params, Params.SURNAME);

@@ -29,6 +29,7 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.kernel.AccessManager;
@@ -46,7 +47,7 @@ import java.util.Set;
 
 /** Assigns categories to metadata.  */
 
-public class MassiveUpdateCategories implements Service
+public class MassiveUpdateCategories extends BaseSecureService
 {
 	//--------------------------------------------------------------------------
 	//---
@@ -62,7 +63,7 @@ public class MassiveUpdateCategories implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 

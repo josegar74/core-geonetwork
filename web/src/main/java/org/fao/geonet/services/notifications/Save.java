@@ -27,6 +27,7 @@ import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
 import jeeves.utils.Xml;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -44,7 +45,7 @@ import java.util.Map;
  *
  * @author heikki doeleman
  */
-public class Save implements Service {
+public class Save extends BaseSecureService {
 
     /**
      *
@@ -118,7 +119,7 @@ public class Save implements Service {
      * @return
      * @throws Exception
      */
-	public Element exec(Element params, ServiceContext context) throws Exception {
+	public Element doExec(Element params, ServiceContext context) throws Exception {
         System.out.println("notifications save:\n"+ Xml.getString(params));
         Map<String, NotificationTarget> notificationTargets = new HashMap<String, NotificationTarget>();
         List<Element> parameters = params.getChildren();

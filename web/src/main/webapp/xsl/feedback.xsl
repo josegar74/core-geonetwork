@@ -44,7 +44,8 @@
 					<input type="submit" style="display: none;" />
 					<input type="hidden" name="id" value="{/root/response/id}"/>
 					<input type="hidden" name="fname" value="{/root/response/fname}"/>
-					<table>
+                    <input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
+                    <table>
 						<tr>
 							<th class="padded"><xsl:value-of select="/root/gui/strings/name"/></th>
 							<td class="padded"><input class="content" type="text" name="name" size="60"/></td>
