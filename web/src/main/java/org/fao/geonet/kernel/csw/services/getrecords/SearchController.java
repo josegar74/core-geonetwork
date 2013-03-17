@@ -25,8 +25,12 @@ package org.fao.geonet.kernel.csw.services.getrecords;
 
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.utils.Log;
 import jeeves.utils.Util;
 import jeeves.utils.Xml;
+import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.document.FieldSelector;
+import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.search.Sort;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Edit;
@@ -40,15 +44,18 @@ import org.fao.geonet.csw.common.exceptions.InvalidParameterValueEx;
 import org.fao.geonet.csw.common.exceptions.NoApplicableCodeEx;
 import org.fao.geonet.kernel.SelectionManager;
 import org.fao.geonet.kernel.search.spatial.Pair;
-import org.fao.geonet.util.spring.StringUtils;
+//import org.fao.geonet.util.spring.StringUtils;
 import org.jdom.Element;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -58,10 +65,98 @@ import java.util.Set;
 public class SearchController
 {
     
-	private final CatalogSearcher _searcher;
-    public SearchController(File summaryConfig, File luceneConfig)
-    {
-        _searcher = new CatalogSearcher(summaryConfig, luceneConfig);
+    private final Element _summaryConfig;
+	private final FieldSelector _selector;
+	private final FieldSelector _uuidselector;
+	private HashSet<String> _tokenizedFieldSet;
+	private HashSet<String> _integerFieldSet;
+	private HashSet<String> _longFieldSet;
+	private HashSet<String> _floatFieldSet;
+	private HashSet<String> _doubleFieldSet;
+
+	public SearchController(File summaryConfig, File luceneConfig) {
+		try {
+			if (summaryConfig != null) {
+				_summaryConfig = Xml.loadStream(new FileInputStream(
+						summaryConfig));
+			} else {
+				_summaryConfig = null;
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(
+					"Error reading summary configuration file", e);
+		}
+
+		_tokenizedFieldSet = new HashSet<String>();
+		try {
+			if (luceneConfig != null) {
+				Element config = Xml.loadStream(new FileInputStream(luceneConfig));
+				Element fields = config.getChild("tokenized");
+				for ( int i = 0; i < fields.getContentSize(); i++ ) {
+					Object o = fields.getContent(i);
+					if (o instanceof Element) {
+						Element elem = (Element)o;
+						_tokenizedFieldSet.add(elem.getAttributeValue("name")); 
+					}
+				}
+                Element numericFields = config.getChild("numeric");
+                // build numeric field sets
+                for ( int i = 0; i < numericFields.getContentSize(); i++ ) {
+                    Object o = numericFields.getContent(i);
+                    if (o instanceof Element) {
+                        Element elem = (Element)o;
+                        if(elem.getAttributeValue("type").equals("integer")) {
+                            if(_integerFieldSet == null) {
+                                _integerFieldSet = new HashSet<String>();
+                            }
+                            _integerFieldSet.add(elem.getAttributeValue("name"));
+                        }
+                        if(elem.getAttributeValue("type").equals("long")) {
+                            if(_longFieldSet == null) {
+                                _longFieldSet = new HashSet<String>();
+                            }
+                            _longFieldSet.add(elem.getAttributeValue("name"));
+                        }
+                        if(elem.getAttributeValue("type").equals("float")) {
+                            if(_floatFieldSet == null) {
+                                _floatFieldSet = new HashSet<String>();
+                            }
+                            _floatFieldSet.add(elem.getAttributeValue("name"));
+                        }
+                        if(elem.getAttributeValue("type").equals("double")) {
+                            if(_doubleFieldSet == null) {
+                                _doubleFieldSet = new HashSet<String>();
+                            }
+                            _doubleFieldSet.add(elem.getAttributeValue("name"));
+                        }
+                    }
+                }
+
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(
+					"Error reading tokenized fields file", e);
+		}
+		
+		_selector = new FieldSelector() {
+			private static final long serialVersionUID = 1L;
+
+			public final FieldSelectorResult accept(String name) {
+				if (name.equals("_id")) return FieldSelectorResult.LOAD;
+				else return FieldSelectorResult.NO_LOAD;
+			}
+		};
+		
+
+		_uuidselector = new FieldSelector() {
+			private static final long serialVersionUID = 1L;
+
+			public final FieldSelectorResult accept(String name) {
+				if (name.equals("_uuid")) return FieldSelectorResult.LOAD;
+				else return FieldSelectorResult.NO_LOAD;
+			}
+		};
+		
     }
 	
 	//---------------------------------------------------------------------------
@@ -71,7 +166,26 @@ public class SearchController
     //---------------------------------------------------------------------------
 
     /**
-     * Performs the general search tasks.
+     * Performs the general search tasks. Brief explanation of what happens 
+		 * here: 
+		 *
+		 * This is a stateful search because when a search is
+		 * first initiated a snapshot of the Lucene index must be captured (via an 
+		 * IndexSearcher session id) and held in the user session
+		 * so that the user can page through/request pages of results from the
+		 * original search result without effects being introduced by changes to
+		 * the Lucene index after the original search (eg. user adds a new 
+		 * metadata record, makes changes, deletes one or more records -
+		 * these should not appear in the search results otherwise funny
+		 * things happen such as more or less records returned than the number 
+		 * originally found etc).
+		 *
+		 * If no previous search in this user session then create a new 
+		 * CatalogSearcher (which captures a view of the Index). If there is a
+		 * previous CatalogSearcher in the session then retrieve and use it.
+		 * If the query is different from the one we have in the user session
+		 * then we throw away the CatalogSearcher and get a new one with a new view
+		 * of the Lucene index.
      *
      * @param context
      * @param startPos
@@ -87,30 +201,44 @@ public class SearchController
      * @return
      * @throws CatalogException
      */
-    public Pair<Element, Element> search(ServiceContext context, int startPos, int maxRecords,
-                                         ResultType resultType, OutputSchema outSchema, ElementSetName setName,
-                                         Element filterExpr, String filterVersion, Sort sort,
-                                         Set<String> elemNames, int maxHitsFromSummary) throws CatalogException {
+    public Pair<Element, Element> search(ServiceContext context, int startPos, int maxRecords, ResultType resultType, OutputSchema outSchema, ElementSetName setName, Element filterExpr, String filterVersion, Sort sort, Set<String> elemNames, int maxHitsFromSummary) throws CatalogException {
+
+
 	Element results = new Element("SearchResults", Csw.NAMESPACE_CSW);
-
-	Pair<Element, List<ResultItem>> summaryAndSearchResults = _searcher.search(context, filterExpr, filterVersion, sort, resultType, startPos, maxRecords, maxHitsFromSummary);
-	
-	UserSession session = context.getUserSession();
-	session.setProperty(Geonet.Session.SEARCH_RESULT, _searcher);
-
-	// clear selection from session when query filter change
+  UserSession session = context.getUserSession();
+        
+	// build an id from the query filter to see whether the filter has changed
+	// from the one we already had
 	String requestId = Util.scramble(Xml.getString(filterExpr));
 	String sessionRequestId = (String) session.getProperty(Geonet.Session.SEARCH_REQUEST_ID);
+
+	// possibly close old selection if at least one previous search
 	if (sessionRequestId != null && !sessionRequestId.equals(requestId)) {
-		// possibly close old selection
-		SelectionManager oldSelection = (SelectionManager)session.getProperty(Geonet.Session.SELECTED_RESULT);
+		if (sessionRequestId != null) {
+			SelectionManager oldSelection = (SelectionManager)session.getProperty(Geonet.Session.SELECTED_RESULT);
+			
+			if (oldSelection != null){
+				oldSelection.close();
+				oldSelection = null;
+			}	
+		}
+	}
+
+	// initialize catalog searcher and a new view of the index and set into
+	// user session if there is no session or this is a new query
+	CatalogSearcher searcher = (CatalogSearcher)session.getProperty(Geonet.Session.SEARCH_RESULT);
+	if (searcher == null || !sessionRequestId.equals(requestId)) {
+		Log.debug(Geonet.CSW_SEARCH,"Creating new catalog searcher");
 		
-		if (oldSelection != null){
-			oldSelection.close();
-			oldSelection = null;
-		}	
+		searcher = new CatalogSearcher(_summaryConfig, _selector, _uuidselector, _tokenizedFieldSet, _longFieldSet, _integerFieldSet, _floatFieldSet, _doubleFieldSet);
+		session.setProperty(Geonet.Session.SEARCH_RESULT, searcher);
+	}	else {
+		Log.debug(Geonet.CSW_SEARCH,"Using existing catalog searcher");
 	}
 	session.setProperty(Geonet.Session.SEARCH_REQUEST_ID, requestId);
+
+	// search for results, filtered and sorted
+  Pair<Element, List<ResultItem>> summaryAndSearchResults = searcher.search(context, filterExpr, filterVersion, sort, resultType, startPos, maxRecords, maxHitsFromSummary);
 	
 	List<ResultItem> resultsList = summaryAndSearchResults.two();
 	int counter = Math.min(maxRecords,resultsList.size());
@@ -280,7 +408,7 @@ public class SearchController
                 "<xsl:copy>\n";
 
         for (String xpath : elemNames) {
-            if(StringUtils.hasLength(xpath)) {
+            if(org.fao.geonet.util.spring.StringUtils.hasLength(xpath)) {
                 result += "<xsl:apply-templates select=\"" + xpath + "\"/>\n";
             }
         }

@@ -42,7 +42,9 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermEnum;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.store.FSDirectory;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.csw.common.Csw;
@@ -55,6 +57,7 @@ import org.fao.geonet.kernel.search.spatial.IntersectionFilter;
 import org.fao.geonet.kernel.search.spatial.IsFullyOutsideOfFilter;
 import org.fao.geonet.kernel.search.spatial.OgcGenericFilters;
 import org.fao.geonet.kernel.search.spatial.OverlapsFilter;
+import org.fao.geonet.kernel.search.spatial.Pair;
 import org.fao.geonet.kernel.search.spatial.SpatialFilter;
 import org.fao.geonet.kernel.search.spatial.SpatialIndexWriter;
 import org.fao.geonet.kernel.search.spatial.TouchesFilter;
@@ -70,6 +73,8 @@ import org.geotools.gml3.GMLConfiguration;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
 import org.jdom.Element;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -662,7 +667,8 @@ public class SearchManager
      */
 	public ArrayList<Integer> getDocsWithXLinks() throws Exception
 	{
-		IndexReader reader = getIndexReader();
+		IndexSearcher searcher = getNewIndexSearcher().two();
+		IndexReader reader = searcher.getIndexReader();
 
 		try {
 			FieldSelector idXLinkSelector = new FieldSelector() {
@@ -689,7 +695,7 @@ public class SearchManager
 			}
 			return docs;
 		} finally {
-			releaseIndexReader(reader);
+			releaseIndexSearcher(searcher);
 		}
 	}
 
@@ -703,7 +709,8 @@ public class SearchManager
      */
 	public HashMap<String,String> getDocsChangeDate() throws Exception
 	{
-		IndexReader reader = getIndexReader();
+		IndexSearcher searcher = getNewIndexSearcher().two();
+		IndexReader reader = searcher.getIndexReader();
 
 		try {
 			FieldSelector idChangeDateSelector = new FieldSelector() {
@@ -727,7 +734,7 @@ public class SearchManager
 			}
 			return docs;
 		} finally {
-			releaseIndexReader(reader);
+			releaseIndexSearcher(searcher);
 		}
 	
 	}
@@ -743,19 +750,20 @@ public class SearchManager
 	{
 		Vector<String> terms = new Vector<String>();
 
-		IndexReader reader = getIndexReader();
+		IndexSearcher searcher = getNewIndexSearcher().two();
+		IndexReader reader = searcher.getIndexReader();
 
 		try {
 			TermEnum enu = reader.terms(new Term(fld, ""));
 			if (enu.term()==null) return terms;
 			do	{
 				Term term = enu.term();
-				if (!term.field().equals(fld)) break;
+				if (term == null || !term.field().equals(fld)) break;
 				terms.add(enu.term().text());
 			} while (enu.next());
 			return terms;
 		} finally {
-			releaseIndexReader(reader);
+			releaseIndexSearcher(searcher);
 		}
 	}
 
@@ -777,7 +785,9 @@ public class SearchManager
 	public List<TermFrequency> getTermsFequency(String fieldName, String searchValue, int maxNumberOfTerms, int threshold) throws Exception
 	{
 		List<TermFrequency> termList = new ArrayList<TermFrequency>();
-		IndexReader reader = getIndexReader();
+
+		IndexSearcher searcher = getNewIndexSearcher().two();
+		IndexReader reader = searcher.getIndexReader();
 		TermEnum term = reader.terms();
 		int i = 0;
 		// TODO : we should apply the same Analyzer used for field indexing
@@ -798,7 +808,7 @@ public class SearchManager
 				}
 			}
 		} finally {
-			releaseIndexReader(reader);
+			releaseIndexSearcher(searcher);
 		}
 		return termList;
 	}
@@ -889,27 +899,34 @@ public class SearchManager
 		}
 	}
 
-    //-----------------------------------------------------------------------------
+	//----------------------------------------------------------------------------
 	/**
-	 * Returns a reopened index reader to do operations on
-	 * an up-to-date index.
+	 * Return a (refreshed) IndexSearcher to do search operations on.
 	 * 
 	 * @return
 	 */
-	public IndexReader getIndexReader() throws InterruptedException, IOException {
-		return _indexReader.getReader();
+	public Pair<Long,IndexSearcher> getIndexSearcher(long token) throws IOException, InterruptedException {
+		Pair<Long,IndexSearcher> result = _indexReader.getReader(token);
+		Log.debug(Geonet.INDEX_ENGINE,"Got index reader token "+result.one()+" index reader object: "+result.two());
+		return result;
 	}
 
-	//-----------------------------------------------------------------------------
-	
-    /**
-     * TODO javadoc.
-     *
-     * @param reader
-     * @throws IOException
-     */
-	public void releaseIndexReader(IndexReader reader) throws IOException {
-		_indexReader.releaseReader(reader);
+	//----------------------------------------------------------------------------
+	/**
+	 * Return a new IndexSearcher to do search operations on.
+	 * 
+	 * @return
+	 */
+	public Pair<Long,IndexSearcher> getNewIndexSearcher() throws IOException, InterruptedException {
+		Log.debug(Geonet.INDEX_ENGINE,"Ask for new searcher");
+		return getIndexSearcher(-1);
+	}
+
+	//----------------------------------------------------------------------------
+
+	public void releaseIndexSearcher(IndexSearcher searcher) throws IOException {
+		Log.debug(Geonet.INDEX_ENGINE,"Closing index reader object: "+searcher);
+	  _indexReader.releaseReader(searcher);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -923,7 +940,7 @@ public class SearchManager
 		boolean badIndex = true;
 		if (!rebuild) {
 			try {
-				IndexReader indexReader = IndexReader.open(_luceneDir);
+				IndexReader indexReader = IndexReader.open(FSDirectory.open(_luceneDir));
 				indexReader.close();
 				badIndex = false;
 			} catch (Exception e) {
@@ -936,7 +953,7 @@ public class SearchManager
 		if (rebuild || badIndex) {
 			Log.error(Geonet.INDEX_ENGINE, "Rebuilding lucene index");
 			if (_spatial != null) _spatial.writer().reset();
-			IndexWriter writer = new IndexWriter(_luceneDir, _analyzer, true);
+			IndexWriter writer = new IndexWriter(FSDirectory.open(_luceneDir), _analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 			writer.close();
 		}
 		
@@ -1029,10 +1046,10 @@ public class SearchManager
                 }
                 Field.Index index = null;
                 if (bIndex && token) {
-                    index = Field.Index.TOKENIZED;
+                    index = Field.Index.ANALYZED;
                 }
                 if (bIndex && !token) {
-                    index = Field.Index.UN_TOKENIZED;
+                    index = Field.Index.NOT_ANALYZED;
                 }
                 if (!bIndex) {
                     index = Field.Index.NO;
@@ -1201,22 +1218,20 @@ public class SearchManager
          * @return
          * @throws Exception
          */
-        public Filter filter(org.apache.lucene.search.Query query, Element filterExpr, String filterVersion)
-                throws Exception
-        {
-
+        public Filter filter(org.apache.lucene.search.Query query, int numHits, Element filterExpr, String filterVersion)
+                throws Exception {
             _lock.lock();
             try {
             	Parser filterParser = getFilterParser(filterVersion);
-            	FeatureSource featureSource = _writer.getFeatureSource();
-                SpatialIndex index = _writer.getIndex();
-                return OgcGenericFilters.create(query, filterExpr,
-                        featureSource, index, filterParser);
-            } catch (Exception e) {
-            	// TODO Handle NPE creating spatial filter (due to constraint language version). 
-    			throw new NoApplicableCodeEx("Error when parsing spatial filter (version: " + 
-            			filterVersion + "):" + Xml.getString(filterExpr) + ". Error is: " + e.toString());
-            } finally {
+                Pair<FeatureSource<SimpleFeatureType, SimpleFeature>, SpatialIndex> accessor = new SpatialIndexAccessor();
+                return OgcGenericFilters.create(query, numHits, filterExpr, accessor , filterParser);
+            }
+            catch (Exception e) {
+            	// TODO Handle NPE creating spatial filter (due to constraint language version).
+    			throw new NoApplicableCodeEx("Error when parsing spatial filter (version: " + filterVersion + "):" +
+                        Xml.getString(filterExpr) + ". Error is: " + e.toString());
+            }
+            finally {
                 _lock.unlock();
             }
         }
@@ -1230,20 +1245,16 @@ public class SearchManager
          * @return
          * @throws Exception
          */
-        public SpatialFilter filter(org.apache.lucene.search.Query query,
-                Geometry geom, Element request) throws Exception
-        {
+        public SpatialFilter filter(org.apache.lucene.search.Query query, int numHits,
+                Geometry geom, Element request) throws Exception {
             _lock.lock();
             try {
                 String relation = Util.getParam(request,
                         Geonet.SearchResult.RELATION,
                         Geonet.SearchResult.Relation.INTERSECTION);
-                SpatialIndexWriter writer = writerNoLocking();
-                SpatialIndex index = writer.getIndex();
-                FeatureSource featureSource = writer.getFeatureSource();
-                return _types.get(relation).newInstance(query, request, geom,
-                        featureSource, index);
-            } finally {
+                return _types.get(relation).newInstance(query, numHits, geom, new SpatialIndexAccessor());
+            }
+            finally {
                 _lock.unlock();
             }
         }
@@ -1295,7 +1306,25 @@ public class SearchManager
 			return new Parser(config);
 		}
 
-        /**
+        private final class SpatialIndexAccessor
+				extends
+				Pair<FeatureSource<SimpleFeatureType, SimpleFeature>, SpatialIndex> {
+			@Override
+			public FeatureSource<SimpleFeatureType, SimpleFeature> one() {
+			    return _writer.getFeatureSource();
+			}
+
+			@Override
+			public SpatialIndex two() {
+			    try {
+			        return _writer.getIndex();
+			    } catch (IOException e) {
+			        throw new RuntimeException(e);
+			    }
+			}
+		}
+
+		/**
          * TODO javadoc.
          *
          */
@@ -1331,10 +1360,9 @@ public class SearchManager
      * @throws SecurityException
      * @throws NoSuchMethodException
      */
-    private static Constructor<? extends SpatialFilter> constructor(
-            Class<? extends SpatialFilter> clazz) throws SecurityException, NoSuchMethodException {
-        return clazz.getConstructor(org.apache.lucene.search.Query.class, Element.class, Geometry.class,
-                FeatureSource.class, SpatialIndex.class);
-}
+    private static Constructor<? extends SpatialFilter> constructor(Class<? extends SpatialFilter> clazz)
+            throws SecurityException, NoSuchMethodException {
+        return clazz.getConstructor(org.apache.lucene.search.Query.class, int.class, Geometry.class, Pair.class);
+    }
 
 }

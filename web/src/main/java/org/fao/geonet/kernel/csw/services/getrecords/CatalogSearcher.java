@@ -39,6 +39,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.CachingWrapperFilter;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -51,6 +52,7 @@ import org.fao.geonet.csw.common.ResultType;
 import org.fao.geonet.csw.common.exceptions.CatalogException;
 import org.fao.geonet.csw.common.exceptions.InvalidParameterValueEx;
 import org.fao.geonet.csw.common.exceptions.NoApplicableCodeEx;
+import org.fao.geonet.exceptions.SearchExpiredEx;
 import org.fao.geonet.kernel.AccessManager;
 import org.fao.geonet.kernel.search.LuceneSearcher;
 import org.fao.geonet.kernel.search.LuceneUtils;
@@ -72,86 +74,34 @@ import java.util.StringTokenizer;
 //=============================================================================
 
 public class CatalogSearcher {
-	private Element _summaryConfig;
-	private HashSet<String> _tokenizedFieldSet;
-    private Set<String> _integerFieldSet;
-    private Set<String> _longFieldSet;
-    private Set<String> _floatFieldSet;
-    private Set<String> _doubleFieldSet;
-	private FieldSelector _selector;
+	private final Element _summaryConfig;
+	private final HashSet<String> _tokenizedFieldSet;
+    private final Set<String> _integerFieldSet;
+    private final Set<String> _longFieldSet;
+    private final Set<String> _floatFieldSet;
+    private final Set<String> _doubleFieldSet;
+	private final FieldSelector _selector;
+	private final FieldSelector _uuidselector;
 	private Query         _query;
-	private IndexReader   _reader;
 	private CachingWrapperFilter _filter;
 	private Sort          _sort;
 	private String        _lang;
-
-	public CatalogSearcher(File summaryConfig, File luceneConfig) {
-		try {
-			if (summaryConfig != null)
-				_summaryConfig = Xml.loadStream(new FileInputStream(
-						summaryConfig));
-		} catch (Exception e) {
-			throw new RuntimeException(
-					"Error reading summary configuration file", e);
-		}
-
-		_tokenizedFieldSet = new HashSet<String>();
-		try {
-			if (luceneConfig != null) {
-				Element config = Xml.loadStream(new FileInputStream(luceneConfig));
-				Element fields = config.getChild("tokenized");
-				for ( int i = 0; i < fields.getContentSize(); i++ ) {
-					Object o = fields.getContent(i);
-					if (o instanceof Element) {
-						Element elem = (Element)o;
-						_tokenizedFieldSet.add(elem.getAttributeValue("name")); 
-					}
-				}
-                Element numericFields = config.getChild("numeric");
-                // build numeric field sets
-                for ( int i = 0; i < numericFields.getContentSize(); i++ ) {
-                    Object o = numericFields.getContent(i);
-                    if (o instanceof Element) {
-                        Element elem = (Element)o;
-                        if(elem.getAttributeValue("type").equals("integer")) {
-                            if(_integerFieldSet == null) {
-                                _integerFieldSet = new HashSet<String>();
-                            }
-                            _integerFieldSet.add(elem.getAttributeValue("name"));
-                        }
-                        if(elem.getAttributeValue("type").equals("long")) {
-                            if(_longFieldSet == null) {
-                                _longFieldSet = new HashSet<String>();
-                            }
-                            _longFieldSet.add(elem.getAttributeValue("name"));
-                        }
-                        if(elem.getAttributeValue("type").equals("float")) {
-                            if(_floatFieldSet == null) {
-                                _floatFieldSet = new HashSet<String>();
-                            }
-                            _floatFieldSet.add(elem.getAttributeValue("name"));
-                        }
-                        if(elem.getAttributeValue("type").equals("double")) {
-                            if(_doubleFieldSet == null) {
-                                _doubleFieldSet = new HashSet<String>();
-                            }
-                            _doubleFieldSet.add(elem.getAttributeValue("name"));
-                        }
-                    }
-                }
-
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(
-					"Error reading tokenized fields file", e);
-		}
-
-		_selector = new FieldSelector() {
-			public final FieldSelectorResult accept(String name) {
-				if (name.equals("_id")) return FieldSelectorResult.LOAD;
-				else return FieldSelectorResult.NO_LOAD;
-			}
-		};
+	private long					_searchToken;
+	
+	public CatalogSearcher(Element summaryConfig, FieldSelector selector,
+			FieldSelector uuidselector, HashSet<String> tokenizedFieldSet,
+			Set<String> longFieldSet, Set<String> integerFieldSet,
+			Set<String> floatFieldSet, Set<String> doubleFieldSet) {
+		_tokenizedFieldSet = tokenizedFieldSet;
+		_longFieldSet = longFieldSet;
+		_integerFieldSet = integerFieldSet;
+		_floatFieldSet = floatFieldSet;
+		_doubleFieldSet = doubleFieldSet;
+		_selector = selector;
+		_uuidselector = uuidselector;
+		_summaryConfig = summaryConfig;
+		_searchToken = -1L;  // means we will get a new IndexSearcher when we 
+		                     // ask for it first time
 	}
 
 	// ---------------------------------------------------------------------------
@@ -176,15 +126,25 @@ public class CatalogSearcher {
 			checkForErrors(luceneExpr);
 			remapFields(luceneExpr);
 		}
-		
+	
+		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
+		SearchManager sm = gc.getSearchmanager();
+		IndexSearcher searcher = null;
 		try {
 			if (luceneExpr != null) {
 				convertPhrases(luceneExpr);
 			}
 
-            return performSearch(context,
+			Pair<Long,IndexSearcher> searcherPair = sm.getIndexSearcher(_searchToken);
+			Log.debug(Geonet.CSW_SEARCH,"Found searcher with "+searcherPair.one()+" comparing with "+_searchToken);
+			if (_searchToken != -1L && searcherPair.one() != _searchToken) {
+				throw new SearchExpiredEx("Search has expired/timed out - start a new search");
+			}
+			_searchToken = searcherPair.one();
+			searcher = searcherPair.two();
+      return performSearch(context,
                     luceneExpr, filterExpr, filterVersion, sort, resultType,
-                    startPosition, maxRecords, maxHitsInSummary);
+                    startPosition, maxRecords, maxHitsInSummary, searcher);
 		} catch (Exception e) {
 			Log.error(Geonet.CSW_SEARCH, "Error while searching metadata ");
 			Log.error(Geonet.CSW_SEARCH, "  (C) StackTrace:\n"
@@ -192,6 +152,15 @@ public class CatalogSearcher {
 
 			throw new NoApplicableCodeEx(
 					"Raised exception while searching metadata : " + e);
+		} finally {
+			try {
+				if (searcher != null) sm.releaseIndexSearcher(searcher);
+			} catch (Exception ex) { // eat it as it probably doesn't matter, 
+			                         // but say what happened anyway
+				Log.error(Geonet.CSW_SEARCH, "Error while releasing index searcher ");
+				Log.error(Geonet.CSW_SEARCH, "  (C) StackTrace:\n"
+													+ Util.getStackTrace(ex));
+			}
 		}
 	}
 
@@ -200,24 +169,23 @@ public class CatalogSearcher {
 	 * <p>
 	 * Gets results in current searcher
 	 * </p>
+	 * @param context 
 	 * 
 	 * @return current searcher result in "fast" mode
 	 * 
 	 * @throws IOException
 	 * @throws CorruptIndexException
 	 */
-	public List<String> getAllUuids(int maxHits) throws Exception {
+	public List<String> getAllUuids(int maxHits, ServiceContext context) throws Exception {
 
-		FieldSelector uuidselector = new FieldSelector() {
-			public final FieldSelectorResult accept(String name) {
-				if (name.equals("_uuid")) return FieldSelectorResult.LOAD;
-				else return FieldSelectorResult.NO_LOAD;
-			}
-		};
+		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
+		SearchManager sm = gc.getSearchmanager();
 
+		IndexSearcher searcher = sm.getIndexSearcher(_searchToken).two();
+		try {
         Pair<TopDocs, Element> searchResults =
 			LuceneSearcher.doSearchAndMakeSummary( 
-					maxHits, 0, maxHits, Integer.MAX_VALUE, _lang, ResultType.RESULTS.toString(), _summaryConfig, _reader, _query, _filter, _sort, false);
+					maxHits, 0, maxHits, Integer.MAX_VALUE, _lang, ResultType.RESULTS.toString(), _summaryConfig, searcher, _query, _filter, _sort, false);
 		TopDocs tdocs = searchResults.one();
 		Element summary = searchResults.two();
 
@@ -229,11 +197,14 @@ public class CatalogSearcher {
 		List<String> response = new ArrayList<String>();
 		
 		for ( ScoreDoc sdoc : tdocs.scoreDocs ) {
-			Document doc = _reader.document(sdoc.doc, uuidselector);
+			Document doc = searcher.getIndexReader().document(sdoc.doc, _uuidselector);
 			String uuid = doc.get("_uuid");
 			if (uuid != null) response.add(uuid);
 		}
 		return response;
+		} finally {
+			sm.releaseIndexSearcher(searcher);
+		}
 	}
 
 	// ---------------------------------------------------------------------------
@@ -356,21 +327,11 @@ public class CatalogSearcher {
 	private Pair<Element, List<ResultItem>> performSearch(
 			ServiceContext context, Element luceneExpr, Element filterExpr,
 			String filterVersion, Sort sort, ResultType resultType, 
-			int startPosition, int maxRecords, int maxHitsInSummary) throws Exception {
+			int startPosition, int maxRecords, int maxHitsInSummary, 
+			IndexSearcher searcher) throws Exception {
 
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		SearchManager sm = gc.getSearchmanager();
-		UserSession session = context.getUserSession();
-
-		// if this is a new search or request has changed them release indexreader
-		// and get a (reopened) indexreader
-		String requestId = Util.scramble(Xml.getString(filterExpr));
-		String sessionRequestId = (String) session.getProperty(Geonet.Session.SEARCH_REQUEST_ID);
-		if ((sessionRequestId != null && !sessionRequestId.equals(requestId)) || sessionRequestId == null) {
-			Log.debug(Geonet.CSW_SEARCH, "Query changed, reopening IndexReader");
-			if (_reader != null) sm.releaseIndexReader(_reader);
-			_reader = sm.getIndexReader();
-		}
 
 		if (luceneExpr != null) {
 			Log.debug(Geonet.CSW_SEARCH, "Search criteria:\n" + Xml.getString(luceneExpr));
@@ -407,13 +368,14 @@ public class CatalogSearcher {
 		// --- proper search
 		Log.debug(Geonet.CSW_SEARCH, "Lucene query: " + query.toString());
 
+        int numHits = startPosition + maxRecords;
+
 		// TODO Handle NPE creating spatial filter (due to constraint
 		// language version).
-		Filter spatialfilter = sm.getSpatial().filter(query, filterExpr, filterVersion);
+		Filter spatialfilter = sm.getSpatial().filter(query, Integer.MAX_VALUE, filterExpr, filterVersion);
 		CachingWrapperFilter cFilter = null;
 		if (spatialfilter != null) cFilter = new CachingWrapperFilter(spatialfilter);
 		boolean buildSummary = resultType == ResultType.RESULTS_WITH_SUMMARY;
-		int numHits = startPosition + maxRecords;
 
 			// get as many results as instructed or enough for search summary
 		if (buildSummary) {
@@ -426,7 +388,10 @@ public class CatalogSearcher {
 		_sort = sort;
 		_lang = context.getLanguage();
 	
-		Pair<TopDocs,Element> searchResults = LuceneSearcher.doSearchAndMakeSummary(numHits, startPosition - 1, maxRecords, Integer.MAX_VALUE, context.getLanguage(), resultType.toString(), _summaryConfig, _reader, query, cFilter, sort, buildSummary);
+		Pair<TopDocs,Element> searchResults = LuceneSearcher.doSearchAndMakeSummary(numHits, startPosition - 1,
+                maxRecords, Integer.MAX_VALUE, context.getLanguage(), resultType.toString(), _summaryConfig, searcher, query, cFilter,
+                sort, buildSummary
+		);
 		TopDocs hits = searchResults.one();
 		Element summary = searchResults.two();
 
@@ -448,7 +413,7 @@ public class CatalogSearcher {
 		}
 		
 		for (;i < iMax; i++) {
-			Document doc = _reader.document(hits.scoreDocs[i].doc, _selector);
+			Document doc = searcher.getIndexReader().document(hits.scoreDocs[i].doc, _selector);
 			String id = doc.get("_id");
 	
 			ResultItem ri = new ResultItem(id);
