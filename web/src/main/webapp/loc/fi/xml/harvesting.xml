@@ -247,7 +247,11 @@
 	</tipHeader>
 	
 	<notRun>Odottaa ensimmäistä ajoa.</notRun>
-	
+
+    <owner>Owner</owner>
+    <owneruser>User</owneruser>
+    <ownergroup>Group</ownergroup>
+
 	<tips>
 		<!-- geonetwork harvesting type - - - - - - - - - - - - - - - - - - - - - - -->
 		

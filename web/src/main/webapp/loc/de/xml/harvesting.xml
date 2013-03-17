@@ -9,6 +9,9 @@
 	<every>Alle</every>
 	<lastRun>Letztes Update</lastRun>
 	<operation>Operation</operation>
+    <owner>Owner</owner>
+    <owneruser>User</owneruser>
+    <ownergroup>Group</ownergroup>
 
 	<!-- harvesting types - - - - - - - - - - - - - - - - - - - - -->
 	

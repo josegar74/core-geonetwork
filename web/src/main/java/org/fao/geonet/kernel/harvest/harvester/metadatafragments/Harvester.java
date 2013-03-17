@@ -359,9 +359,10 @@ class Harvester
 				log.info("  - Adding metadata fragment with " + uuid + " schema is set to " + schema + " XML is "+ Xml.getString(md));
 				DateFormat df = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss");
 				Date date = new Date();
-		
-				String id = dataMan.insertMetadataExt(dbms, schema, md, context.getSerialFactory(), params.uuid, df.format(date), df.format(date), uuid, 1, null);
-		
+
+                String id = dataMan.insertMetadataExt(dbms, schema, md, context.getSerialFactory(), params.uuid,
+                                df.format(date), df.format(date), uuid,  new Integer(params.userOwner), params.groupOwner);
+
 				int iId = Integer.parseInt(id);
 
 				addPrivileges(id);
@@ -424,7 +425,7 @@ class Harvester
 
 		// find all elements that have an attribute id with the matchId
 		log.info("Attempting to search metadata for "+matchId);
-		List<Element> elems = (List<Element>) Xml.selectNodes(templateCopy,"*//*[@id='"+matchId+"']", theNss);
+		List<Element> elems = Xml.selectNodes(templateCopy,"*//*[@id='"+matchId+"']", theNss);
 
 		// for each of these elements...
 		for (Element elem : elems) {

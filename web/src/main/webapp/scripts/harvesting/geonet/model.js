@@ -12,11 +12,19 @@ gn.Model = function(xmlLoader)
 	var callBackStyleSheets = null;
 
 	this.retrieveImportXslts = retrieveImportXslts;
+    this.retrieveUsers    = retrieveUsers;
 	this.retrieveSources   = retrieveSources;
 	this.retrieveGroups    = retrieveGroups;
 	this.retrieveCategories= retrieveCategories;
 	this.getUpdateRequest  = getUpdateRequest;
-	
+
+//=====================================================================================
+
+function retrieveUsers(callBack)
+{
+    new InfoService(loader, 'users', callBack);
+}
+
 //=====================================================================================
 
 function retrieveSources(data, callBack)
@@ -138,6 +146,11 @@ var updateTemp =
 '      <validate>{VALIDATE}</validate>'+
 '      <importxslt>{IMPORTXSLT}</importxslt>'+
 '    </content>'+
+
+'    <owner>'+
+'       <user>{OWNER_USER}</user>'+
+'       <group>{OWNER_GROUP}</group>'+
+'    </owner>'+
 
 '    <searches>'+
 '       {SEARCH_LIST}'+

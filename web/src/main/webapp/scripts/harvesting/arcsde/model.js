@@ -12,10 +12,18 @@ arcsde.Model = function(xmlLoader)
 	var callBackF = null;
 
 	this.retrieveGroups    = retrieveGroups;
+    this.retrieveUsers    = retrieveUsers;
 	this.retrieveCategories = retrieveCategories;
 	this.retrieveIcons     = retrieveIcons;
 	this.getUpdateRequest = getUpdateRequest;
 	
+//=====================================================================================
+
+function retrieveUsers(callBack)
+{
+    new InfoService(loader, 'users', callBack);
+}
+
 //=====================================================================================
 
 function retrieveGroups(callBack)
@@ -88,6 +96,11 @@ var updateTemp =
 '    <content>'+
 '      <validate>{VALIDATE}</validate>'+
 '    </content>'+
+
+'    <owner>'+
+'       <user>{OWNER_USER}</user>'+
+'       <group>{OWNER_GROUP}</group>'+
+'    </owner>'+
 
 '    <privileges>'+
 '       {PRIVIL_LIST}'+

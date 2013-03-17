@@ -9,6 +9,9 @@
 	<every>Cada</every>
 	<lastRun>Última execució</lastRun>
 	<operation>Operació</operation>
+    <owner>Owner</owner>
+    <owneruser>User</owneruser>
+    <ownergroup>Group</ownergroup>
 
 	<!-- harvesting types - - - - - - - - - - - - - - - - - - - - -->
 	

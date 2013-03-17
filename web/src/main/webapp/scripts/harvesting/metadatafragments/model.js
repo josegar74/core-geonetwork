@@ -12,11 +12,19 @@ metadatafragments.Model = function(xmlLoader)
 	var callBackF = null;
 	
 	this.retrieveStylesheets = retrieveStylesheets;
+    this.retrieveUsers    = retrieveUsers;
 	this.retrieveGroups    = retrieveGroups;
 	this.retrieveCategories= retrieveCategories;
 	this.getUpdateRequest  = getUpdateRequest;
 	this.retrieveIcons  	 = retrieveIcons;
 	this.retrieveTemplates = retrieveTemplates;
+
+//=====================================================================================
+
+function retrieveUsers(callBack)
+{
+    new InfoService(loader, 'users', callBack);
+}
 
 //=====================================================================================
 
@@ -113,6 +121,11 @@ var updateTemp =
 '      <validate>{VALIDATE}</validate>'+
 '      <importxslt>{IMPORTXSLT}</importxslt>'+
 '    </content>'+
+
+'    <owner>'+
+'       <user>{OWNER_USER}</user>'+
+'       <group>{OWNER_GROUP}</group>'+
+'    </owner>'+
 
 '    <privileges>'+
 '       {PRIVIL_LIST}'+

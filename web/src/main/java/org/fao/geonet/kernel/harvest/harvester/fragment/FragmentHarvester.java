@@ -179,8 +179,10 @@ public class FragmentHarvester {
 					DateFormat df = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss");
 					Date date = new Date();
 			
-					String id = dataMan.insertMetadataExt(dbms, schema, md, context.getSerialFactory(), params.uuid, df.format(date), df.format(date), uuid, 1, null);
-			
+					String id = dataMan.insertMetadataExt(dbms, schema, md, context.getSerialFactory(),
+                            params.uuid, df.format(date), df.format(date), uuid,
+                            new Integer(params.userOwner), params.groupOwner);
+
 					int iId = Integer.parseInt(id);
 	
 					addPrivileges(id);
@@ -214,8 +216,9 @@ public class FragmentHarvester {
 			String templateSchema = dataMan.autodetectSchema(templateCopy);
 			templateCopy = dataMan.setUUID(templateSchema, recUuid, templateCopy); 
 		
-			String id = dataMan.insertMetadataExt(dbms, templateSchema, templateCopy, context.getSerialFactory(), params.uuid, df.format(date), df.format(date), recUuid, 1, null);
-		
+			String id = dataMan.insertMetadataExt(dbms, templateSchema, templateCopy, context.getSerialFactory(),
+                    params.uuid, df.format(date), df.format(date), recUuid, new Integer(params.userOwner), params.groupOwner);
+
 			int iId = Integer.parseInt(id);
 
 			log.info("	- Set privileges, category, template and harvested");
@@ -247,7 +250,7 @@ public class FragmentHarvester {
 
 		// find all elements that have an attribute id with the matchId
 		log.info("Attempting to search metadata for "+matchId);
-		List<Element> elems = (List<Element>) Xml.selectNodes(templateCopy,"*//*[@id='"+matchId+"']", metadataTemplateNamespaces);
+		List<Element> elems = Xml.selectNodes(templateCopy,"*//*[@id='"+matchId+"']", metadataTemplateNamespaces);
 
 		// for each of these elements...
 		for (Element elem : elems) {
@@ -278,7 +281,7 @@ public class FragmentHarvester {
 		// find all elements that have an attribute id with the matchId
 		
 		log.info("Attempting to search metadata for "+matchId);
-		List<Element> elems = (List<Element>) Xml.selectNodes(metadata,"*//*[@id='"+matchId+"']", metadataTemplateNamespaces);
+		List<Element> elems = Xml.selectNodes(metadata,"*//*[@id='"+matchId+"']", metadataTemplateNamespaces);
 
 		// for each of these elements...
 		
@@ -360,6 +363,8 @@ public class FragmentHarvester {
 		public String uuid;
 		public String templateId;
 		public String isoCategory;
+        public String userOwner;
+        public String groupOwner;
 		public Boolean createSubtemplates;
 		public Iterable<Privileges> privileges;
 		public Iterable<String> categories;

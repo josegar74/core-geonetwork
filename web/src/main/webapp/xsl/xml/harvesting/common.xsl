@@ -13,6 +13,7 @@
 		<xsl:variable name="priv"  select="children/privileges/children"/>
 		<xsl:variable name="categ" select="children/categories/children"/>
 		<xsl:variable name="info"  select="children/info/children"/>
+        <xsl:variable name="owner" select="children/owner/children"/>
 		
 		<node id="{@id}" type="{value}">
 			<site>
@@ -40,7 +41,13 @@
 				<xsl:apply-templates select="$opt" mode="options"/>
 			</options>
 			
-			<xsl:apply-templates select="."      mode="searches"/>			
+			<xsl:apply-templates select="."      mode="searches"/>
+
+            <owner>
+                <user><xsl:value-of select="$owner/user/value" /></user>
+                <group><xsl:value-of select="$owner/group/value" /></group>
+            </owner>
+
 			<xsl:apply-templates select="$priv"  mode="privileges"/>
 			<xsl:apply-templates select="$categ" mode="categories"/>
 			<xsl:apply-templates select="."      mode="other"/>			

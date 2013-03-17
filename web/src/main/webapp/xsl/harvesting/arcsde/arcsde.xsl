@@ -14,6 +14,8 @@
             <div class="dots"/>
 			<xsl:call-template name="content-Arcsde"/>
 			<div class="dots"/>
+            <xsl:call-template name="owner-Arcsde"/>
+			<div class="dots"/>
 			<xsl:call-template name="privileges-Arcsde"/>
 			<div class="dots"/>
 			<xsl:call-template name="categories-Arcsde"/>			
@@ -116,6 +118,28 @@
     </div>
     </xsl:template>
 
+    <!-- ============================================================================================= -->
+
+	<xsl:template name="owner-Arcsde">
+		<h1 align="left"><xsl:value-of select="/root/gui/harvesting/owner"/></h1>
+
+		<table>
+			<tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/owneruser"/></td>
+				<td class="padded"><select id="arcsde.owner" class="content" onchange="harvesting.arcsde.loadUserGroups()" /></td>
+			</tr>
+
+			<tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/ownergroup"/></td>
+
+				<td class="padded">
+                    <input type="hidden" id="arcsde.ownergroup" value="" />
+                    <select id="arcsde.ownergroup_sel" class="content" onchange="harvesting.arcsde.updateUserGroupSelection()" />
+                    <img id="arcsde.loading_groups" style="display: none" src="{/root/gui/url}/images/loading.gif" width="20" height="21"/>
+                </td>
+			</tr>
+		</table>
+	</xsl:template>
 
 	<!-- ============================================================================================= -->
 

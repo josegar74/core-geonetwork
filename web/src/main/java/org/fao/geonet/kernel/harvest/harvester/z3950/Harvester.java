@@ -208,7 +208,7 @@ class Harvester {
 
 				String id = dataMan.insertMetadataExt(dbms, schema, md, context
 						.getSerialFactory(), params.uuid, df.format(date), df
-						.format(date), uuid, 1, null, "n");
+						.format(date), uuid, new Integer(params.userOwner), params.groupOwner, "n");
 
 				int iId = Integer.parseInt(id);
 

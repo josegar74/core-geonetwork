@@ -14,6 +14,8 @@
 			<div class="dots"/>
 			<xsl:call-template name="content-WD"/>
 			<div class="dots"/>
+            <xsl:call-template name="owner-WD"/>
+			<div class="dots"/>
 			<xsl:call-template name="privileges-WD"/>
 			<div class="dots"/>
 			<xsl:call-template name="categories-WD"/>
@@ -126,6 +128,28 @@
 		</table>
 	</div>
 	</xsl:template>
+
+    <!-- ============================================================================================= -->
+
+     <xsl:template name="owner-WD">
+        <h1 align="left"><xsl:value-of select="/root/gui/harvesting/owner"/></h1>
+         <table>
+             <tr>
+                 <td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/owneruser"/></td>
+                 <td class="padded"><select id="wd.owner" class="content" onchange="harvesting.webdav.loadUserGroups()" /></td>
+             </tr>
+
+             <tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/ownergroup"/></td>
+
+				<td class="padded">
+                    <input type="hidden" id="wd.ownergroup" value="" />
+                    <select id="wd.ownergroup_sel" class="content" onchange="harvesting.webdav.updateUserGroupSelection()" />
+                    <img id="wd.loading_groups" style="display: none" src="{/root/gui/url}/images/loading.gif" width="20" height="21"/>
+                </td>
+			</tr>
+         </table>
+     </xsl:template>
 
 	<!-- ============================================================================================= -->
 

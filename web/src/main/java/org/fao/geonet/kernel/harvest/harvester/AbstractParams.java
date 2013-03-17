@@ -60,6 +60,7 @@ public abstract class AbstractParams
 		Element site    = node.getChild("site");
 		Element opt     = node.getChild("options");
 		Element content = node.getChild("content");
+        Element owner   = node.getChild("owner");
 
 		Element account = (site == null) ? null : site.getChild("account");
 
@@ -76,6 +77,9 @@ public abstract class AbstractParams
 		importXslt = Util.getParam(content, "importxslt", "none");
 		validate = Util.getParam(content, "validate", false);
 
+        userOwner = Util.getParam(owner, "user", "1");
+        groupOwner = Util.getParam(owner, "group", null);
+
 		checkEvery(every);
 
 		addPrivileges(node.getChild("privileges"));
@@ -89,6 +93,7 @@ public abstract class AbstractParams
 		Element site    = node.getChild("site");
 		Element opt     = node.getChild("options");
 		Element content = node.getChild("content");
+        Element owner   = node.getChild("owner");
 
 		Element account = (site == null) ? null : site.getChild("account");
 		Element privil  = node.getChild("privileges");
@@ -105,6 +110,9 @@ public abstract class AbstractParams
 
 		importXslt = Util.getParam(content, "importxslt", importXslt);
 		validate = Util.getParam(content, "validate", validate);
+
+        userOwner = Util.getParam(owner, "user", userOwner);
+        groupOwner = Util.getParam(owner, "group", groupOwner);
 
 		checkEvery(every);
 
@@ -140,6 +148,9 @@ public abstract class AbstractParams
 
 		copy.importXslt = importXslt;
 		copy.validate   = validate;
+
+        copy.userOwner  = userOwner;
+        copy.groupOwner = groupOwner;
 
 		for (Privileges p : alPrivileges)
 			copy.alPrivileges.add(p.copy());
@@ -284,6 +295,9 @@ public abstract class AbstractParams
 
 	public boolean validate;
 	public String importXslt;
+
+    public String userOwner;
+    public String groupOwner;
 
 	//---------------------------------------------------------------------------
 

@@ -467,6 +467,7 @@ public abstract class AbstractHarvester
 		String optionsId = settingMan.add(dbms, path, "options", "");
 		String infoId    = settingMan.add(dbms, path, "info",    "");
 		String contentId = settingMan.add(dbms, path, "content", "");
+        String ownerId = settingMan.add(dbms, path, "owner", "");
 
 		//--- setup site node ----------------------------------------
 
@@ -492,6 +493,11 @@ public abstract class AbstractHarvester
 		//--- setup stats node ----------------------------------------
 
 		settingMan.add(dbms, "id:"+infoId, "lastRun", "");
+
+        //--- setup owner node ---------------------------------------
+        settingMan.add(dbms, "id:"+ownerId, "user", params.userOwner );
+        settingMan.add(dbms, "id:"+ownerId, "group",   params.groupOwner);
+
 
 		//--- store privileges and categories ------------------------
 

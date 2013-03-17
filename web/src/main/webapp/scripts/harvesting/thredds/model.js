@@ -11,7 +11,8 @@ thredds.Model = function(xmlLoader)
 	var loader    = xmlLoader;
 	var callBackIcons = null;
 	var callBackStylesheets = null;
-	
+
+    this.retrieveUsers    = retrieveUsers;
 	this.retrieveGroups    = retrieveGroups;
 	this.retrieveCategories= retrieveCategories;
 	this.retrieveIcons     = retrieveIcons;
@@ -47,6 +48,13 @@ function retrieveStylesheets_OK(xmlRes)
 		
 		callBackStylesheets(data);
 	}
+}
+
+//=====================================================================================
+
+function retrieveUsers(callBack)
+{
+    new InfoService(loader, 'users', callBack);
 }
 
 //=====================================================================================
@@ -151,6 +159,11 @@ var updateTemp =
 '      <validate>{VALIDATE}</validate>'+
 '      <importxslt>{IMPORTXSLT}</importxslt>'+
 '    </content>'+
+
+'    <owner>'+
+'       <user>{OWNER_USER}</user>'+
+'       <group>{OWNER_GROUP}</group>'+
+'    </owner>'+
 
 '    <privileges>'+
 '       {PRIVIL_LIST}'+

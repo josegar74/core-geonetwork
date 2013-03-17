@@ -9,7 +9,10 @@
 	<every>Fréquence (j:h:m)</every>
 	<lastRun>Dernière exécution</lastRun>
 	<operation>Opération</operation>
-	
+    <owner>Owner</owner>
+    <owneruser>User</owneruser>
+    <ownergroup>Group</ownergroup>
+
 	<!-- harvesting types - - - - - - - - - - - - - - - - - - - - -->
 	
 	<info type="geonetwork">

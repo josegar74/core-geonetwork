@@ -10,6 +10,10 @@
 	<lastRun>Последний запуск</lastRun>
 	<operation>Операция</operation>
 
+    <owner>Owner</owner>
+    <owneruser>User</owneruser>
+    <ownergroup>Group</ownergroup>
+
 	<!-- harvesting types - - - - - - - - - - - - - - - - - - - - -->
 
 	<info type="geonetwork">

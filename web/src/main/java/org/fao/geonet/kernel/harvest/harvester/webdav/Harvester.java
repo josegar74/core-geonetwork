@@ -154,7 +154,8 @@ class Harvester {
 		log.debug("  - Adding metadata with remote path : "+ rf.getPath());
 
 		String id = dataMan.insertMetadataExt(dbms, schema, md, context.getSerialFactory(),
-													 params.uuid, rf.getChangeDate(), rf.getChangeDate(), uuid, 1, null);
+													params.uuid, rf.getChangeDate(), rf.getChangeDate(), uuid,
+                                                    new Integer(params.userOwner).intValue(), params.groupOwner);
 
 		int iId = Integer.parseInt(id);
 
@@ -278,6 +279,8 @@ class Harvester {
 				return;
 			}
 			dataMan.updateMetadataExt(dbms, id, md, rf.getChangeDate());
+            dataMan.updateMetadataOwner(dbms, id, params.userOwner,  params.groupOwner);
+
 			//--- the administrator could change privileges and categories using the
 			//--- web interface so we have to re-set both
 			dbms.execute("DELETE FROM OperationAllowed WHERE metadataId=?", Integer.parseInt(id));

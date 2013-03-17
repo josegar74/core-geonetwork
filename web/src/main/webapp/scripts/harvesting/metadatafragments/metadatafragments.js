@@ -46,10 +46,21 @@ this.init = function()
 	this.view.init();
 	
 	model.retrieveStylesheets (ker.wrap(this, init_stylesheets_OK));
+    model.retrieveUsers    (ker.wrap(this, init_users_OK));
 	model.retrieveGroups      (ker.wrap(this, init_groups_OK));
 	model.retrieveCategories  (ker.wrap(this, init_categ_OK));
 	model.retrieveTemplates   (ker.wrap(this, init_templates_OK));
 	model.retrieveIcons       (ker.wrap(this, init_icons_OK)); // not used 
+}
+
+//-------------------------------------------------------------------------------------
+
+function init_users_OK(data)
+{
+    view.clearOwners();
+
+    for (var i=0; i<data.length; i++)
+        view.addOwner(data[i].id, data[i].username);
 }
 
 //-------------------------------------------------------------------------------------

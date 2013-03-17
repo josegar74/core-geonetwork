@@ -35,6 +35,23 @@ function Geonetwork20(xmlLoader)
 //===
 //=====================================================================================
 
+this.init = function()
+{
+	this.view.init();
+
+    model.retrieveUsers    (ker.wrap(this, init_users_OK));
+}
+
+//-------------------------------------------------------------------------------------
+
+function init_users_OK(data)
+{
+	view.clearOwners();
+
+	for (var i=0; i<data.length; i++)
+		view.addOwner(data[i].id, data[i].username);
+}
+
 this.getType      = function() { return "geonetwork20"; }
 this.getLabel     = function() { return loader.eval("info[@type='geonetwork20']/long"); }
 this.getEditPanel = function() { return "gn20.editPanel"; }

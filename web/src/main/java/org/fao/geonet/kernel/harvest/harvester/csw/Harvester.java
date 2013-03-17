@@ -490,6 +490,7 @@ class Harvester
             try {
                 XPath xpath = XPath.newInstance("gmd:fileIdentifier/gco:CharacterString");
                 xpath.addNamespace(Namespace.getNamespace("gco", "http://www.isotc211.org/2005/gco"));
+                xpath.addNamespace(Csw.NAMESPACE_GMD);
 
                 Element identif = (Element) xpath.selectSingleNode(record);
 
@@ -497,6 +498,7 @@ class Harvester
                 {
                     xpath = XPath.newInstance("gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gco:CharacterString");
                     xpath.addNamespace(Namespace.getNamespace("gco", "http://www.isotc211.org/2005/gco"));
+                    xpath.addNamespace(Csw.NAMESPACE_GMD);
 
                     identif = (Element) xpath.selectSingleNode(record);
 

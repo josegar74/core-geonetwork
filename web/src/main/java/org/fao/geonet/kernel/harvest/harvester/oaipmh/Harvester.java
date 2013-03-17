@@ -249,7 +249,8 @@ class Harvester
 		log.debug("  - Adding metadata with remote id : "+ ri.id);
 
 		String id = dataMan.insertMetadataExt(dbms, schema, md, context.getSerialFactory(), params.uuid,
-														  ri.changeDate.toString(), ri.changeDate.toString(), ri.id, 1, null);
+														  ri.changeDate.toString(), ri.changeDate.toString(), ri.id,
+                                                          new Integer(params.userOwner), params.groupOwner);
 
 		int iId = Integer.parseInt(id);
 
@@ -443,6 +444,7 @@ class Harvester
 				return;
 
 			dataMan.updateMetadataExt(dbms, id, md, ri.changeDate.toString());
+            dataMan.updateMetadataOwner(dbms, id, params.userOwner,  params.groupOwner);
 
 			//--- the administrator could change privileges and categories using the
 			//--- web interface so we have to re-set both

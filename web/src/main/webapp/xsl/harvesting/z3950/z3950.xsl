@@ -14,6 +14,8 @@
 			<div class="dots"/>
 			<xsl:call-template name="content-Z3950"/>
 			<div class="dots"/>
+            <xsl:call-template name="owner-Z3950"/>
+            <div class="dots"/>
 			<xsl:call-template name="privileges-Z3950"/>
 			<div class="dots"/>
 			<xsl:call-template name="categories-Z3950"/>
@@ -126,6 +128,28 @@
 			<tr>
 				<td class="padded"><xsl:value-of select="/root/gui/harvesting/validate"/></td>
 				<td class="padded"><input id="z3950.validate" type="checkbox" value=""/></td>
+			</tr>
+		</table>
+	</xsl:template>
+
+    <!-- ============================================================================================= -->
+
+	<xsl:template name="owner-Z3950">
+		<h1 align="left"><xsl:value-of select="/root/gui/harvesting/owner"/></h1>
+		<table>
+			<tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/owneruser"/></td>
+				<td class="padded"><select id="z3950.owner" class="content" onchange="harvesting.z3950.loadUserGroups()" /></td>
+			</tr>
+
+            <tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/ownergroup"/></td>
+
+				<td class="padded">
+                    <input type="hidden" id="z3950.ownergroup" value="" />
+                    <select id="z3950.ownergroup_sel" class="content" onchange="harvesting.z3950.updateUserGroupSelection()" />
+                    <img id="z3950.loading_groups" style="display: none" src="{/root/gui/url}/images/loading.gif" width="20" height="21"/>
+                </td>
 			</tr>
 		</table>
 	</xsl:template>

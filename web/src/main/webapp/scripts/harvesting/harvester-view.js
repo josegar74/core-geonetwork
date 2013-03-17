@@ -64,6 +64,7 @@ this.setEmptyCommon = function()
 	$(prefix+'.validate').checked = false;
 	this.unselectImportXslt();
 
+    this.clearOwnerGroups();
 	this.removeAllGroupRows();
 	this.unselectCategories();
 }
@@ -75,6 +76,7 @@ this.setDataCommon = function(node)
 	var site   = node.getElementsByTagName('site')   [0];
 	var options= node.getElementsByTagName('options')[0];
 	var content= node.getElementsByTagName('content')[0];
+    var owner  = node.getElementsByTagName('owner')[0];
 	hvutil.setOption(site, 'name',     prefix+'.name');
 	hvutil.setOptionIfExists(site, 'use',      prefix+'.useAccount');
 	hvutil.setOptionIfExists(site, 'username', prefix+'.username');
@@ -86,6 +88,8 @@ this.setDataCommon = function(node)
 	$(prefix+'.every.mins') .value = every.mins;
 	hvutil.setOption(content, 'validate', prefix+'.validate');
 	hvutil.setOption(content, 'importxslt', prefix+'.importxslt');
+    hvutil.setOption(owner, 'user', prefix+'.owner');
+    hvutil.setOption(owner, 'group', prefix+'.ownergroup');
 }
 
 //=====================================================================================
@@ -99,22 +103,26 @@ this.getDataCommon = function()
 	var data;
 	if($(prefix+'.useAccount')) {
 		data =
-	{
-		//--- site	
-		NAME     : $F(prefix+'.name'),
-		
-		USE_ACCOUNT: $(prefix+'.useAccount').checked,
-		USERNAME   : $F(prefix+'.username'),
-		PASSWORD   : $F(prefix+'.password'),
-	
-		//--- options		
-		EVERY        : Every.build(days, hours, mins),
-		ONE_RUN_ONLY : $(prefix+'.oneRunOnly').checked,
-	
-		//--- content		
-		IMPORTXSLT   : $F(prefix+'.importxslt'),
-		VALIDATE     : $(prefix+'.validate').checked
-	}
+        {
+            //--- site
+            NAME     : $F(prefix+'.name'),
+
+            USE_ACCOUNT: $(prefix+'.useAccount').checked,
+            USERNAME   : $F(prefix+'.username'),
+            PASSWORD   : $F(prefix+'.password'),
+
+            //--- options
+            EVERY        : Every.build(days, hours, mins),
+            ONE_RUN_ONLY : $(prefix+'.oneRunOnly').checked,
+
+            //--- content
+            IMPORTXSLT   : $F(prefix+'.importxslt'),
+            VALIDATE     : $(prefix+'.validate').checked,
+
+            // owner
+            OWNER_USER   : $F(prefix+'.owner'),
+            OWNER_GROUP  : $F(prefix+'.ownergroup')
+        }
 	}
 	else {
 		data =
@@ -128,7 +136,11 @@ this.getDataCommon = function()
 
 			//--- content		
 			IMPORTXSLT   : $F(prefix+'.importxslt'),
-			VALIDATE     : $(prefix+'.validate').checked
+			VALIDATE     : $(prefix+'.validate').checked,
+
+            // owner
+            OWNER_USER   : $F(prefix+'.owner'),
+            OWNER_GROUP  : $F(prefix+'.ownergroup')
 		}
 	}
 	
@@ -153,7 +165,31 @@ this.isDataValidCommon = function()
 }
 
 //=====================================================================================
-//=== Groups methods 
+//=== Owner methods
+//=====================================================================================
+
+this.clearOwners = function()
+{
+	$(prefix+ '.owner').options.length = 0;
+}
+
+//=====================================================================================
+
+this.addOwner = function(id, label)
+{
+	gui.addToSelect(prefix+'.owner', id, label);
+}
+
+//=====================================================================================
+
+this.clearOwnerGroups = function()
+{
+	$(prefix+ '.ownergroup').value = '';
+    $(prefix+ '.ownergroup_sel').options.length = 0;
+}
+
+//=====================================================================================
+//=== Groups methods
 //=====================================================================================
 
 this.clearGroups = function() 
@@ -383,6 +419,61 @@ this.selectCategories = function(node)
 	
 	for (var i=0; i<list.length; i++)
 		selectCategory(list[i]);
+}
+
+this.loadUserGroups = function() {
+    var ctrl = $(prefix+'.ownergroup_sel');
+
+    if ($(prefix+".owner").value == "") {
+        ctrl.options.length =0;
+
+        return;
+    }
+    var pars = "id=" + $(prefix+".owner").value;
+
+    $(prefix+'.loading_groups').show();
+    var ajaxRequest = new Ajax.Request(
+        getGNServiceURL('xml.usergroups.list'),
+        {
+            method: 'get',
+            parameters: pars,
+
+            onSuccess: function(req) {
+                ctrl.options.length =0;
+
+                //Response received
+                var groups = req.responseXML.documentElement;
+
+                for (i = 0; i < groups.getElementsByTagName('group').length; i++) {
+                    var group = groups.getElementsByTagName('group')[i];
+
+                    var id = group.getElementsByTagName('id')[0].firstChild.data;
+                    var name = group.getElementsByTagName('name')[0].firstChild.data;
+                    if (parseInt(id) > 1) {
+                        var selected =  (id ==  $(prefix+'.ownergroup').value);
+                        gui.addToSelect(prefix+'.ownergroup_sel', id, name, selected);
+                    }
+                }
+
+                $(prefix+'.ownergroup').value = $(prefix+'.ownergroup_sel').value;
+                $(prefix+'.loading_groups').hide();
+
+            },
+
+            onFailure: function(req) {
+                // Clear previous groups if any error
+                ctrl.options.length =0;
+                $("loading_groups").hide();
+
+            }
+        }
+    );
+}
+
+this.updateUserGroupSelection = function() {
+    var ctrl_sel = $(prefix+'.ownergroup_sel');
+    var ctrl = $(prefix+'.ownergroup');
+    ctrl.value = ctrl_sel.value;
 }
 
 //=====================================================================================

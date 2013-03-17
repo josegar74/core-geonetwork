@@ -16,6 +16,8 @@
 			<div class="dots"/>
 			<xsl:call-template name="content-GN"/>
 			<div class="dots"/>
+            <xsl:call-template name="owner-GN"/>
+			<div class="dots"/>
 			<xsl:call-template name="privileges-GN"/>
 			<div class="dots"/>
 			<xsl:call-template name="categories-GN"/>
@@ -135,6 +137,29 @@
 			</tr>
 		</table>
 	</div>
+	</xsl:template>
+
+    <!-- ============================================================================================= -->
+
+	<xsl:template name="owner-GN">
+		<h1 align="left"><xsl:value-of select="/root/gui/harvesting/owner"/></h1>
+
+		<table>
+			<tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/owneruser"/></td>
+				<td class="padded"><select id="gn.owner" class="content" onchange="harvesting.geonet.loadUserGroups()" /></td>
+			</tr>
+
+			<tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/ownergroup"/></td>
+
+				<td class="padded">
+                    <input type="hidden" id="gn.ownergroup" value="" />
+                    <select id="gn.ownergroup_sel" class="content" onchange="harvesting.geonet.updateUserGroupSelection()" />
+                    <img id="gn.loading_groups" style="display: none" src="{/root/gui/url}/images/loading.gif" width="20" height="21"/>
+                </td>
+			</tr>
+		</table>
 	</xsl:template>
 
 	<!-- ============================================================================================= -->

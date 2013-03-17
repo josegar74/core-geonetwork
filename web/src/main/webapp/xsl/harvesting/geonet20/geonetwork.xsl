@@ -12,6 +12,7 @@
 			<xsl:call-template name="search-GN20"/>
 			<xsl:call-template name="options-GN20"/>
 			<xsl:call-template name="content-GN20"/>
+            <xsl:call-template name="owner-GN20"/>
 			<p/>
 			<span style="color:red"><xsl:value-of select="/root/gui/harvesting/gn20Unsafe"/></span>
 		</div>
@@ -135,6 +136,29 @@
 		</table>
 	</div>
 	</xsl:template>
+
+    <!-- ============================================================================================= -->
+
+    <xsl:template name="owner-GN20">
+        <h1 align="left"><xsl:value-of select="/root/gui/harvesting/owner"/></h1>
+
+        <table>
+            <tr>
+                <td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/owneruser"/></td>
+                <td class="padded"><select id="gn20.owner" class="content" onchange="harvesting.geonet20.loadUserGroups()" /></td>
+            </tr>
+
+			<tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/ownergroup"/></td>
+
+				<td class="padded">
+                    <input type="hidden" id="gn20.ownergroup" value="" />
+                    <select id="gn20.ownergroup_sel" class="content" onchange="harvesting.geonet20.updateUserGroupSelection()" />
+                    <img id="gn20.loading_groups" style="display: none" src="{/root/gui/url}/images/loading.gif" width="20" height="21"/>
+                </td>
+			</tr>
+        </table>
+    </xsl:template>
 
 	<!-- ============================================================================================= -->
 

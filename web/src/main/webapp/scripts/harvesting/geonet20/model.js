@@ -9,7 +9,15 @@ gn20.Model = function(xmlLoader)
 	var loader = xmlLoader;
 
 	this.getUpdateRequest = getUpdateRequest;
-	
+    this.retrieveUsers    = retrieveUsers;
+
+//=====================================================================================
+
+    function retrieveUsers(callBack)
+    {
+        new InfoService(loader, 'users', callBack);
+    }
+
 //=====================================================================================
 
 function getUpdateRequest(data)
@@ -44,7 +52,12 @@ var updateTemp =
 '    <searches>'+
 '       {SEARCHES}'+
 '    </searches>'+
-    
+
+'    <owner>'+
+'       <user>{OWNER_USER}</user>'+
+'       <group>{OWNER_GROUP}</group>'+
+'    </owner>'+
+
 '    <options>'+
 '      <every>{EVERY}</every>'+
 '      <oneRunOnly>{ONE_RUN_ONLY}</oneRunOnly>'+

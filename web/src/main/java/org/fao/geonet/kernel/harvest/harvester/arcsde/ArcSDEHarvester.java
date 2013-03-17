@@ -233,6 +233,7 @@ public class ArcSDEHarvester extends AbstractHarvester {
 		System.out.println("  - Updating metadata with id: "+ id);
 
 		dataMan.updateMetadataExt(dbms, id, xml, new ISODate().toString());
+        dataMan.updateMetadataOwner(dbms, id, params.userOwner,  params.groupOwner);
 
 		dbms.execute("DELETE FROM OperationAllowed WHERE metadataId=?", Integer.parseInt(id));
 		addPrivileges(id, localGroups, dbms);
@@ -259,7 +260,7 @@ public class ArcSDEHarvester extends AbstractHarvester {
 		String source = params.uuid;
 		String createDate = new ISODate().toString();
 		String id = dataMan.insertMetadataExt(dbms, schema, xml, context.getSerialFactory(), source, createDate, 
-												createDate, uuid, 1, null);
+												createDate, uuid, new Integer(params.userOwner).intValue(), params.groupOwner);
 
 		int iId = Integer.parseInt(id);
 		dataMan.setTemplateExt(dbms, iId, "n", null);

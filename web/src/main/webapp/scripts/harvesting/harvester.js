@@ -33,7 +33,9 @@ this.init = function()
 this.setData = function(node) 
 { 
 	currId = node.getAttribute('id');
-	this.view.setData(node); 
+	this.view.setData(node);
+	
+    this.view.loadUserGroups();
 }
 
 //=====================================================================================
@@ -41,7 +43,9 @@ this.setData = function(node)
 this.setEmpty = function()
 { 
 	currId = "";
-	this.view.setEmpty();    
+	this.view.setEmpty();
+
+    this.view.loadUserGroups();
 }
 
 //=====================================================================================
@@ -57,6 +61,18 @@ this.getUpdateRequest = function()
 	data.TYPE = this.getType();
 	
 	return this.model.getUpdateRequest(data);
+}
+
+//=====================================================================================
+
+this.loadUserGroups = function() {
+    this.view.loadUserGroups();
+}
+
+//=====================================================================================
+
+this.updateUserGroupSelection = function() {
+    this.view.updateUserGroupSelection();
 }
 
 //=====================================================================================

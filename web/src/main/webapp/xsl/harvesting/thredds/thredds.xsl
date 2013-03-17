@@ -14,6 +14,8 @@
 			<div class="dots"/>
 			<xsl:call-template name="content-thredds"/>
 			<div class="dots"/>
+            <xsl:call-template name="owner-thredds"/>
+			<div class="dots"/>
 			<xsl:call-template name="privileges-thredds"/>
 			<div class="dots"/>
 			<xsl:call-template name="categories-thredds"/>
@@ -247,6 +249,29 @@
 		</table>
 	</div>
 	</xsl:template>
+
+    <!-- ============================================================================================= -->
+
+     <xsl:template name="owner-thredds">
+         <h1 align="left"><xsl:value-of select="/root/gui/harvesting/owner"/></h1>
+
+         <table>
+             <tr>
+                 <td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/owneruser"/></td>
+                 <td class="padded"><select id="thredds.owner" class="content" onchange="harvesting.thredds.loadUserGroups()" /></td>
+             </tr>
+
+             <tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/ownergroup"/></td>
+
+				<td class="padded">
+                    <input type="hidden" id="thredds.ownergroup" value="" />
+                    <select id="thredds.ownergroup_sel" class="content" onchange="harvesting.thredds.updateUserGroupSelection()" />
+                    <img id="thredds.loading_groups" style="display: none" src="{/root/gui/url}/images/loading.gif" width="20" height="21"/>
+                </td>
+			</tr>
+         </table>
+     </xsl:template>
 
 	<!-- ============================================================================================= -->
 

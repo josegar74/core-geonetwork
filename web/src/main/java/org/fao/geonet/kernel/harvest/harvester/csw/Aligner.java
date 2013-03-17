@@ -185,7 +185,9 @@ public class Aligner
 		log.debug("  - Adding metadata with remote uuid:"+ ri.uuid + " schema:" + schema);
 
 		String id = dataMan.insertMetadataExt(dbms, schema, md, context.getSerialFactory(),
-													 params.uuid, ri.changeDate, ri.changeDate, ri.uuid, 1, null);
+													 params.uuid, ri.changeDate, ri.changeDate, ri.uuid,
+                                                     new Integer(params.userOwner).intValue(), params.groupOwner );
+
 
 		int iId = Integer.parseInt(id);
 
@@ -282,6 +284,7 @@ public class Aligner
 					return;
 
 				dataMan.updateMetadataExt(dbms, id, md, ri.changeDate);
+                dataMan.updateMetadataOwner(dbms, id, params.userOwner,  params.groupOwner);
 
 				dbms.execute("DELETE FROM OperationAllowed WHERE metadataId=?", Integer.parseInt(id));
 				addPrivileges(id);

@@ -167,7 +167,7 @@ public class Aligner
 		}
 
 		String id = dataMan.insertMetadataExt(dbms, schema, md, context.getSerialFactory(),
-														  params.uuid, createDate, changeDate, remoteUuid, 1, null);
+											    params.uuid, createDate, changeDate, remoteUuid, new Integer(params.userOwner), params.groupOwner);
 
 		int iId = Integer.parseInt(id);
 
@@ -261,6 +261,7 @@ public class Aligner
 			else
 			{
 				dataMan.updateMetadataExt(dbms, id, md, changeDate);
+                dataMan.updateMetadataOwner(dbms, id, params.userOwner,  params.groupOwner);
 				result.updatedMetadata++;
 			}
 		}

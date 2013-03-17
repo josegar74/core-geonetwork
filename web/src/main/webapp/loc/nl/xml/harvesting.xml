@@ -9,6 +9,9 @@
 	<every>Elke</every>
 	<lastRun>Vorige actie</lastRun>
 	<operation>Operatie</operation>
+    <owner>Owner</owner>
+    <owneruser>User</owneruser>
+    <ownergroup>Group</ownergroup>
 
 	<!-- harvesting types - - - - - - - - - - - - - - - - - - - - -->
 	

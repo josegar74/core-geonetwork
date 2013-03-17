@@ -14,9 +14,17 @@ csw.Model = function(xmlLoader)
 
 	this.retrieveImportXslts = retrieveImportXslts;
 	this.retrieveGroups    = retrieveGroups;
+    this.retrieveUsers    = retrieveUsers;
 	this.retrieveCategories= retrieveCategories;
 	this.retrieveIcons     = retrieveIcons;
 	this.getUpdateRequest  = getUpdateRequest;
+
+//=====================================================================================
+
+function retrieveUsers(callBack)
+{
+    new InfoService(loader, 'users', callBack);
+}
 
 //=====================================================================================
 
@@ -134,6 +142,11 @@ var updateTemp =
 '    <searches>'+
 '       {SEARCH_LIST}'+
 '    </searches>'+
+
+'    <owner>'+
+'       <user>{OWNER_USER}</user>'+
+'       <group>{OWNER_GROUP}</group>'+
+'    </owner>'+
 
 '    <privileges>'+
 '       {PRIVIL_LIST}'+

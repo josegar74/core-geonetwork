@@ -14,6 +14,8 @@
 			<div class="dots"/>
 			<xsl:call-template name="content-metadatafragments"/>
 			<div class="dots"/>
+            <xsl:call-template name="owner-metadatafragments"/>
+			<div class="dots"/>
 			<xsl:call-template name="privileges-metadatafragments"/>
 			<div class="dots"/>
 			<xsl:call-template name="categories-metadatafragments"/>
@@ -160,6 +162,29 @@
 		</table>
 	</div>
 	</xsl:template>
+
+    <!-- ============================================================================================= -->
+
+     <xsl:template name="owner-metadatafragments">
+         <h1 align="left"><xsl:value-of select="/root/gui/harvesting/owner"/></h1>
+
+         <table>
+             <tr>
+                 <td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/owneruser"/></td>
+                 <td class="padded"><select id="metadatafragments.owner" class="content" onchange="harvesting.metadatafragments.loadUserGroups()" /></td>
+             </tr>
+
+              <tr>
+				<td class="padded" valign="top"><xsl:value-of select="/root/gui/harvesting/ownergroup"/></td>
+
+				<td class="padded">
+                    <input type="hidden" id="metadatafragments.ownergroup" value="" />
+                    <select id="metadatafragments.ownergroup_sel" class="content" onchange="harvesting.metadatafragments.updateUserGroupSelection()" />
+                    <img id="metadatafragments.loading_groups" style="display: none" src="{/root/gui/url}/images/loading.gif" width="20" height="21"/>
+                </td>
+			</tr>
+         </table>
+     </xsl:template>
 
 	<!-- ============================================================================================= -->
 
