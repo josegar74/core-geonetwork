@@ -175,6 +175,7 @@
 			<xsl:with-param name="title" select="/root/gui/strings/xmlInsert"/>
 			<xsl:with-param name="content">
 				<form name="xmlinsert" accept-charset="UTF-8" method="post" action="{/root/gui/locService}/metadata.insert" enctype="multipart/form-data">
+					<input type="hidden" name="_tk" value="{/root/gui/_tk}"/>
 					<input type="submit" style="display: none;" />
 					<table id="gn.insertTable" class="text-aligned-left">
 						<tr>
