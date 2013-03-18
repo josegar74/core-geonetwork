@@ -250,7 +250,7 @@ public class FragmentHarvester {
 
 		// find all elements that have an attribute id with the matchId
 		log.info("Attempting to search metadata for "+matchId);
-		List<Element> elems = Xml.selectNodes(templateCopy,"*//*[@id='"+matchId+"']", metadataTemplateNamespaces);
+		List<Element> elems = (List<Element>) Xml.selectNodes(templateCopy,"*//*[@id='"+matchId+"']", metadataTemplateNamespaces);
 
 		// for each of these elements...
 		for (Element elem : elems) {
@@ -281,7 +281,7 @@ public class FragmentHarvester {
 		// find all elements that have an attribute id with the matchId
 		
 		log.info("Attempting to search metadata for "+matchId);
-		List<Element> elems = Xml.selectNodes(metadata,"*//*[@id='"+matchId+"']", metadataTemplateNamespaces);
+		List<Element> elems = (List<Element>) Xml.selectNodes(metadata,"*//*[@id='"+matchId+"']", metadataTemplateNamespaces);
 
 		// for each of these elements...
 		
