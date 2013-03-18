@@ -71,7 +71,8 @@ ConfigModel.prototype.getConfig_OK = function(node)
             METADATA_XML_VIEW                : xml.evalXPath(node, 'metadata/enableXmlView'),
             METADATA_DEFAULT_VIEW            : xml.evalXPath(node, 'metadata/defaultView'),
 
-			LOCAL_RATING      : xml.evalXPath(node, 'localrating/enable'),
+            DTD               : xml.evalXPath(node, 'dtd/enable'),
+            LOCAL_RATING      : xml.evalXPath(node, 'localrating/enable'),
             AUTO_FIXING       : xml.evalXPath(node, 'autofixing/enable'),
 			PROXY_USE         : xml.evalXPath(node, 'proxy/use'),
 			PROXY_HOST        : xml.evalXPath(node, 'proxy/host'),
@@ -191,6 +192,9 @@ ConfigModel.updateTemp =
 '	<clickablehyperlinks>' +
 '		<enable>{CLICKABLE_HYPERLINKS}</enable>'+
 '	</clickablehyperlinks>' +
+'	<dtd>' +
+'		<enable>{DTD}</enable>'+
+'	</dtd>' +
 '	<localrating>' +
 '		<enable>{LOCAL_RATING}</enable>'+
 '	</localrating>' +

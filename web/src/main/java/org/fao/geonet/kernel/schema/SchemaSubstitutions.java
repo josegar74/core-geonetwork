@@ -44,7 +44,7 @@ public class SchemaSubstitutions
 
 	public SchemaSubstitutions(String xmlSubstitutionFile) throws Exception {
 		if (xmlSubstitutionFile != null) {
-			Element subs = Xml.loadFile(xmlSubstitutionFile);
+			Element subs = Xml.loadFile(xmlSubstitutionFile, false);
 
 			List list = subs.getChildren();
 

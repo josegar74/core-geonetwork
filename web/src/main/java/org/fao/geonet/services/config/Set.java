@@ -134,8 +134,9 @@ public class Set extends BaseSecureService
         new ConfigEntry(ConfigEntry.Type.STRING, false, "csw/metadataPublic",                          "system/csw/metadataPublic"),
 
 		new ConfigEntry(ConfigEntry.Type.BOOL,   true,  "clickablehyperlinks/enable", "system/clickablehyperlinks/enable"),
-		
-		new ConfigEntry(ConfigEntry.Type.BOOL,   true,  "localrating/enable", "system/localrating/enable"),
+
+        new ConfigEntry(ConfigEntry.Type.BOOL,   true,  "dtd/enable", "system/dtd/enable"),
+        new ConfigEntry(ConfigEntry.Type.BOOL,   true,  "localrating/enable", "system/localrating/enable"),
         new ConfigEntry(ConfigEntry.Type.BOOL,   true,  "autofixing/enable", "system/autofixing/enable"),
         new ConfigEntry(ConfigEntry.Type.BOOL,   true,  "inspire/enable", "system/inspire/enable"),
         new ConfigEntry(ConfigEntry.Type.BOOL,   true,  "inspire/enableSearchPanel", "system/inspire/enableSearchPanel"),

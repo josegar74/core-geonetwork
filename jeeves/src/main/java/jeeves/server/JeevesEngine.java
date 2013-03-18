@@ -233,7 +233,7 @@ public class JeevesEngine
 
 		info("Loading : " + file);
 
-		Element configRoot = Xml.loadFile(file);
+		Element configRoot = Xml.loadFile(file, false);
 
 		Element elGeneral = configRoot.getChild(ConfigFile.Child.GENERAL);
 		Element elDefault = configRoot.getChild(ConfigFile.Child.DEFAULT);

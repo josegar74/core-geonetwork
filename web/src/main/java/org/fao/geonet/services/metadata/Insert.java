@@ -38,6 +38,7 @@ import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.fao.geonet.kernel.DataManager;
 import org.fao.geonet.kernel.mef.Importer;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.fao.geonet.util.ISODate;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -92,7 +93,9 @@ public class Insert extends BaseSecureService
 		//-----------------------------------------------------------------------
 		//--- add the DTD to the input xml to perform validation
 
-		Element xml = Xml.loadString(data, false);
+        SettingManager sm = gc.getSettingManager();
+        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+        Element xml = Xml.loadString(data, false, allowDTD);
 
         // Apply a stylesheet transformation if requested
         if (!style.equals("_none_"))

@@ -74,7 +74,7 @@ public class Get implements Service
 		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 		InputStream input = conn.getInputStream();
 
-		return Xml.loadStream(input);
+		return Xml.loadStream(input, false);
 
 		/* FIXME: use this instead of previous line to dump HTTP response body
 		ByteArrayOutputStream output = new ByteArrayOutputStream();

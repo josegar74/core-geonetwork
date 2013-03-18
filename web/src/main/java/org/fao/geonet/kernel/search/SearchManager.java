@@ -238,9 +238,9 @@ public class SearchManager
         SettingInfo si = new SettingInfo(_settingMan);
 
 
-		_summaryConfig = Xml.loadStream(new FileInputStream(new File(appPath,summaryConfigXmlFile)));
+		_summaryConfig = Xml.loadStream(new FileInputStream(new File(appPath,summaryConfigXmlFile)), false);
 
-		Element luceneConfig = Xml.loadStream(new FileInputStream(new File(appPath,luceneConfigXmlFile)));
+		Element luceneConfig = Xml.loadStream(new FileInputStream(new File(appPath,luceneConfigXmlFile)), false);
 		_tokenizedFields = luceneConfig.getChild("tokenized");
         _numericFields = luceneConfig.getChild("numeric");
 

@@ -96,6 +96,7 @@
     
 	<clickablehyperlinks>Tıklanabilir üstbağ</clickablehyperlinks>
 
+    <dtd>DTD'ler izin ver</dtd>
 	<localrating>Yerel Değerlendirme</localrating>
     <autofixing>Otomatik Düzeltmeler</autofixing>
 	
@@ -279,6 +280,11 @@
 		<tip id="clickablehyperlinks.enable">
 			Eğer ayarlanmış ise, GeoNetwork tıklanabilir üstbağları üstveri içerisinde gösterecektir.
 		</tip>
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            Ayarlanırsa, GeoNetwork DTD içeren meta ekleme sağlar. Artırılmış güvenlik için false olarak ayarlayın.
+        </tip>
 
 		<!-- local rating -->
 		<tip id="localrating.enable">

@@ -36,6 +36,7 @@ import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.fao.geonet.kernel.Thesaurus;
 import org.fao.geonet.kernel.ThesaurusManager;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -134,9 +135,11 @@ public class Upload implements Service
 			String extension = fname.substring(fname.lastIndexOf('.')).toLowerCase();
 
 			if (extension.equals(".rdf")) {
-
-					Log.debug("Thesaurus","Uploading thesaurus: "+fname);
-					eTSResult = UploadThesaurus(oldFile, style, context, validate, fname, type, dir);
+			    Log.debug("Thesaurus","Uploading thesaurus: "+fname);
+                GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
+                SettingManager sm = gc.getSettingManager();
+                boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+                eTSResult = UploadThesaurus(oldFile, style, context, validate, fname, type, dir, allowDTD);
 				}
 				else {
 					Log.debug("Thesaurus","Incorrect extension for thesaurus file name : "+fname);
@@ -157,17 +160,17 @@ public class Upload implements Service
 	 * @param style
 	 * @param context
 	 * @param validate
-	 * @param siteId
 	 * @param fname
 	 * @param type
 	 * @param dir
+     * @param allowDTD
 	 * @return Element thesaurus uploaded
 	 * @throws Exception
 	 */
-	private Element UploadThesaurus(File oldFile, String style, ServiceContext context, boolean validate, String fname, String type, String dir) throws Exception {
+	private Element UploadThesaurus(File oldFile, String style, ServiceContext context, boolean validate, String fname, String type, String dir, boolean allowDTD) throws Exception {
 
 		Element TS_xml = null;
-		Element xml = Xml.loadFile(oldFile);
+		Element xml = Xml.loadFile(oldFile, allowDTD);
 		xml.detach();
 		
 		if (!style.equals("_none_")) {

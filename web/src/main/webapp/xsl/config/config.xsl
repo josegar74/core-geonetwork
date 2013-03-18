@@ -54,7 +54,8 @@
 		<xsl:call-template name="xlinkResolver"/>
 		<xsl:call-template name="downloadservice"/>
 		<xsl:call-template name="hyperlinks"/>
-		<xsl:call-template name="localrating"/>
+        <xsl:call-template name="dtd"/>
+        <xsl:call-template name="localrating"/>
         <xsl:call-template name="autofixing"/>
         <xsl:call-template name="inspire"/>
         <xsl:call-template name="metadataviews"/>
@@ -420,7 +421,21 @@
 		</div>
 	</xsl:template>
 
-	<!-- ============================================================================================= -->
+    <!-- ============================================================================================= -->
+    <xsl:template name="dtd">
+        <h1 align="left"><xsl:value-of select="/root/gui/config/dtd"/></h1>
+
+        <div align="left" style="{$style}">
+            <table>
+                <tr>
+                    <td class="padded" width="{$width}"><xsl:value-of select="/root/gui/config/enable"/></td>
+                    <td class="padded"><input id="dtd.enable" class="content" type="checkbox" value=""/></td>
+                </tr>
+            </table>
+        </div>
+    </xsl:template>
+
+    <!-- ============================================================================================= -->
 	<xsl:template name="localrating">
 		<h1 align="left"><xsl:value-of select="/root/gui/config/localrating"/></h1>
 

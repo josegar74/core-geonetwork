@@ -325,7 +325,7 @@ public abstract class AbstractOperation
 		
         Element xmlFilter;
 		try {
-			xmlFilter = Xml.loadString(xml, false);
+			xmlFilter = Xml.loadString(xml, false, false);
 		} catch (Exception e) {
 			Log.error(Geonet.CSW, "Error loading xml filter as jdom Element ");
 			throw new NoApplicableCodeEx("Error loading xml filter as jdom Element " + e);

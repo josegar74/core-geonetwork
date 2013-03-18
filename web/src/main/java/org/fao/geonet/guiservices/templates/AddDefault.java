@@ -35,6 +35,7 @@ import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.fao.geonet.kernel.DataManager;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.jdom.Element;
 
 import java.io.File;
@@ -119,7 +120,10 @@ public class AddDefault implements Service {
 									+ "): " + templateName);
 
 					try {
-						Element xml = Xml.loadFile(temp);
+                        SettingManager sm = gc.getSettingManager();
+                        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+
+                        Element xml = Xml.loadFile(temp, allowDTD);
 						String uuid = UUID.randomUUID().toString();
 						String isTemplate = "y";
 						String title = null;

@@ -94,7 +94,8 @@
     <cswMetadataPublic>Inserted metadata is public</cswMetadataPublic>
 	
 	<clickablehyperlinks>Работающую гиперссылку</clickablehyperlinks>
-	
+
+    <dtd>Разрешить DTDs</dtd>
 	<localrating>Местные Рейтинг</localrating>
     <autofixing>Автоматического исправления</autofixing>
 
@@ -274,6 +275,11 @@
 		<tip id="clickablehyperlinks.enable">
 			Если установлено, GeoNetwork покажет работающую гиперссылку в метаданных.
 		</tip>
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            Если установлено, GeoNetwork позволяет вставлять метаданных, который содержит DTD. Установите это к ложным для повышения безопасности.
+        </tip>
 
 		<!-- local rating -->
 		<tip id="localrating.enable">

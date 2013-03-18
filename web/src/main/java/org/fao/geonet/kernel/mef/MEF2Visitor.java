@@ -43,15 +43,15 @@ import static org.fao.geonet.kernel.mef.MEFConstants.FILE_INFO;
  */
 public class MEF2Visitor implements IVisitor {
 
-	public void visit(File mefFile, IMEFVisitor v) throws Exception {
-		handleXml(mefFile, v);
+	public void visit(File mefFile, IMEFVisitor v, boolean allowDTD) throws Exception {
+		handleXml(mefFile, v, allowDTD);
 	}
 
 	/**
 	 * Read the input MEF file and for each metadata found, check structure for
 	 * metadata.xml, info.xml and optional feature catalogue files.
 	 */
-	public Element handleXml(File mefFile, IMEFVisitor v) throws Exception {
+	public Element handleXml(File mefFile, IMEFVisitor v, boolean allowDTD) throws Exception {
 
 		Logger log = Log.createLogger(Geonet.MEF);
 
@@ -92,7 +92,7 @@ public class MEF2Visitor implements IVisitor {
                     // Handle feature catalog
                     File fcFile = getFeatureCalalogFile(file);
                     if (fcFile != null) {
-                        fc = Xml.loadFile(fcFile);
+                        fc = Xml.loadFile(fcFile, allowDTD);
                     }
                     else {
                         fc = null;
@@ -101,10 +101,10 @@ public class MEF2Visitor implements IVisitor {
                     // Handle info file
                     File fileInfo = new File(file, FILE_INFO);
                     if (fileInfo.exists()) {
-                        info = Xml.loadFile(fileInfo);
+                        info = Xml.loadFile(fileInfo, allowDTD);
                     }
 
-                    v.handleMetadataFiles(xmlFiles, nbMetadata);
+                    v.handleMetadataFiles(xmlFiles, nbMetadata, allowDTD);
                     v.handleFeatureCat(fc, nbMetadata);
                     v.handleInfo(info, nbMetadata);
 

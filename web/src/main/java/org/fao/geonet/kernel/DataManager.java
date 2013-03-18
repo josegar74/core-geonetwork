@@ -1099,7 +1099,7 @@ public class DataManager
 		//--- generate a new metadata id
 		int serial = sf.getSerial(dbms, "Metadata");
 
-		Element xml = updateFixedInfoNew(schema, Integer.toString(serial), Xml.loadString(data, false), uuid, parentUuid);
+		Element xml = updateFixedInfoNew(schema, Integer.toString(serial), Xml.loadString(data, false, false), uuid, parentUuid);
 
 		//--- store metadata
 
@@ -1583,7 +1583,7 @@ public class DataManager
 
 	public synchronized boolean updateMetadataEmbedded(UserSession session,
 			Dbms dbms, String id, String currVersion, Hashtable changes,
-			String lang) throws Exception {
+			String lang, boolean allowDTD) throws Exception {
 		String schema = getMetadataSchema(dbms, id);
 
 		// --- check if the metadata has been modified from last time
@@ -1685,7 +1685,7 @@ public class DataManager
                     for (String fragment : fragments) {
                         if (name != null) {
                             name = name.replace("COLON", ":");
-                            editLib.addFragment(schema, el, name, fragment);
+                            editLib.addFragment(schema, el, name, fragment, allowDTD);
                         }
                         else {
                             // clean before update
@@ -1694,7 +1694,7 @@ public class DataManager
                             fragment = addNamespaceToFragment(fragment);
 
                             // Add content
-                            el.addContent(Xml.loadString(fragment, false));
+                            el.addContent(Xml.loadString(fragment, false, allowDTD));
                         }
                     }
                     Log.debug(Geonet.DATA_MANAGER, "replacing XML content");
@@ -1706,7 +1706,7 @@ public class DataManager
 		editLib.removeEditingInfo(md);
 
 		md.detach();
-		return updateMetadata(session, dbms, id, md, false, currVersion, lang);
+		return updateMetadata(session, dbms, id, md, false, currVersion, lang, allowDTD);
 
 	}
 
@@ -1918,7 +1918,7 @@ public class DataManager
 	/** For Editing : updates all leaves with new values
 	  */
 
-	public synchronized boolean updateMetadata(UserSession session, Dbms dbms, String id, String currVersion, Hashtable changes, boolean validate, String lang) throws Exception
+	public synchronized boolean updateMetadata(UserSession session, Dbms dbms, String id, String currVersion, Hashtable changes, boolean validate, String lang, boolean allowDTD) throws Exception
 	{
 		Element md = XmlSerializer.select(dbms, "Metadata", id);
 
@@ -1989,7 +1989,7 @@ public class DataManager
 				
 				val = addNamespaceToFragment(val);
 
-				el.addContent(Xml.loadString(val, false));
+				el.addContent(Xml.loadString(val, false, allowDTD));
             }
 			else
 			{
@@ -2009,7 +2009,7 @@ public class DataManager
 		//--- remove editing info added by previous call
 		editLib.removeEditingInfo(md);
 
-		return updateMetadata(session, dbms, id, md, validate, currVersion, lang);
+		return updateMetadata(session, dbms, id, md, validate, currVersion, lang, allowDTD);
 	}
 
 	//--------------------------------------------------------------------------
@@ -2018,7 +2018,7 @@ public class DataManager
 	 * Clean current validation report in session. If user ask for validation
 	 * the validation report will be (re-)created then.
 	 */
-	public synchronized boolean updateMetadata(UserSession session, Dbms dbms, String id, Element md, boolean validate, String version, String lang) throws Exception
+	public synchronized boolean updateMetadata(UserSession session, Dbms dbms, String id, Element md, boolean validate, String version, String lang, boolean allowDTD) throws Exception
 	{
 		session.removeProperty(Geonet.Session.VALIDATION_REPORT);
 

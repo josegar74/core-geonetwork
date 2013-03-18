@@ -83,30 +83,40 @@ public class Xml
 	//---
 	//--------------------------------------------------------------------------
 
-    private static SAXBuilder getSAXBuilderWithoutXMLResolver(boolean validate) {
+    private static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
+    private static SAXBuilder getSAXBuilderWithoutXMLResolver(boolean validate, boolean allowDTD) {
+        System.out.println("\n\n\n******************** ALLOW DTD ? " + allowDTD + " ***************************\n\n\n");
         SAXBuilder builder = new SAXBuilder(validate);
+        builder.getDTDHandler();
         builder.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        if(allowDTD) {
+            builder.setFeature(DISALLOW_DOCTYPE_DECL, false);
+        }
+        else {
+            builder.setFeature(DISALLOW_DOCTYPE_DECL, true);
+        }
         return builder;
     }
 
     /**
      *
      * @param file
+     * @param allowDTD
      * @return
      * @throws IOException
      * @throws JDOMException
      */
-	public static Element loadFile(String file) throws IOException, JDOMException
+	public static Element loadFile(String file, boolean allowDTD) throws IOException, JDOMException
 	{
-		return loadFile(new File(file));
+		return loadFile(new File(file), allowDTD);
 	}
 
 	//--------------------------------------------------------------------------
 	/** Loads an xml file from a URL and returns its root node */
 	
-	public static Element loadFile(URL url) throws IOException, JDOMException
+	public static Element loadFile(URL url, boolean allowDTD) throws IOException, JDOMException
 	{
-		SAXBuilder builder = getSAXBuilderWithoutXMLResolver(false);//new SAXBuilder();
+		SAXBuilder builder = getSAXBuilderWithoutXMLResolver(false, allowDTD);//new SAXBuilder();
 		Document   jdoc    = builder.build(url);
 
 		return (Element) jdoc.getRootElement().detach();
@@ -115,7 +125,7 @@ public class Xml
 	//--------------------------------------------------------------------------
 	/** Loads an xml file from a URL after posting content to the URL */
 	
-	public static Element loadFile(URL url, Element xmlQuery) throws IOException, JDOMException
+	public static Element loadFile(URL url, Element xmlQuery, boolean allowDTD) throws IOException, JDOMException
 	{
 		Element result = null;
 		try {
@@ -129,7 +139,7 @@ public class Xml
 			out.print(getString(xmlQuery));
 			out.close();
 
-			SAXBuilder builder = getSAXBuilderWithoutXMLResolver(false);//new SAXBuilder();
+			SAXBuilder builder = getSAXBuilderWithoutXMLResolver(false, allowDTD);//new SAXBuilder();
 			Document   jdoc    = builder.build(connection.getInputStream());
 
 			result = (Element)jdoc.getRootElement().detach();
@@ -144,9 +154,9 @@ public class Xml
 
 	/** Loads an xml file and returns its root node */
 
-	public static Element loadFile(File file) throws IOException, JDOMException
+	public static Element loadFile(File file, boolean allowDTD) throws IOException, JDOMException
 	{
-		SAXBuilder builder = getSAXBuilderWithoutXMLResolver(false);//new SAXBuilder();
+		SAXBuilder builder = getSAXBuilderWithoutXMLResolver(false, allowDTD);//new SAXBuilder();
 		Document   jdoc    = builder.build(file);
 
 		return (Element) jdoc.getRootElement().detach();
@@ -155,10 +165,10 @@ public class Xml
 	//--------------------------------------------------------------------------
 	/** Loads an xml file and returns its root node (validates the xml with a dtd) */
 
-	public static Element loadString(String data, boolean validate)
+	public static Element loadString(String data, boolean validate, boolean allowDTD)
 												throws IOException, JDOMException
 	{
-		SAXBuilder builder = getSAXBuilderWithoutXMLResolver(validate);//new SAXBuilder(validate);
+		SAXBuilder builder = getSAXBuilderWithoutXMLResolver(validate, allowDTD);//new SAXBuilder(validate);
 		Document   jdoc    = builder.build(new StringReader(data));
 
 		return (Element) jdoc.getRootElement().detach();
@@ -167,9 +177,9 @@ public class Xml
 	//--------------------------------------------------------------------------
 	/** Loads an xml stream and returns its root node (validates the xml with a dtd) */
 
-	public static Element loadStream(InputStream input) throws IOException, JDOMException
+	public static Element loadStream(InputStream input, boolean allowDTD) throws IOException, JDOMException
 	{
-		SAXBuilder builder = getSAXBuilderWithoutXMLResolver(false);//new SAXBuilder();
+		SAXBuilder builder = getSAXBuilderWithoutXMLResolver(false, allowDTD);//new SAXBuilder();
 		builder.setFeature("http://apache.org/xml/features/validation/schema",false);
 		builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
 		Document   jdoc    = builder.build(input);

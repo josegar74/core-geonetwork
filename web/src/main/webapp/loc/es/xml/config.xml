@@ -94,6 +94,7 @@
     
 	<clickablehyperlinks>Se puede hacer clic en hipervínculos</clickablehyperlinks>
 
+    <dtd>Permitir DTDs</dtd>
 	<localrating>Clasificación Local</localrating>
     <autofixing>Automática corrige</autofixing>
 
@@ -309,7 +310,12 @@
 		<tip id="clickablehyperlinks.enable">
 			Si está establecido, GeoNetwork mostrará hacer clic en enlaces en los metadatos.
 		</tip>
-		
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            Si está establecido, GeoNetwork permite la inserción de metadatos que contiene una DTD. Ponga esto a false para mayor seguridad.
+        </tip>
+
 		<!-- local rating -->
 		<tip id="localrating.enable">
 			Si está establecido, GeoNetwork calculará puntuaciones de usuario para los metadatos de este nodo sólo (no distribuida entre los otros nodos de GeoNetwork).

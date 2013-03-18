@@ -33,6 +33,7 @@ import org.fao.geonet.kernel.harvest.harvester.CategoryMapper;
 import org.fao.geonet.kernel.harvest.harvester.GroupMapper;
 import org.fao.geonet.kernel.harvest.harvester.Privileges;
 import org.fao.geonet.kernel.harvest.harvester.UriMapper;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 
@@ -59,7 +60,10 @@ class Harvester {
 
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		dataMan = gc.getDataManager();
-	}
+        SettingManager sm = gc.getSettingManager();
+        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+        this.allowDTD = allowDTD;
+    }
 
 	//---------------------------------------------------------------------------
 	//---
@@ -73,7 +77,7 @@ class Harvester {
 		rr.init(log, context, params);
 		List<RemoteFile> files = rr.retrieve();
 		log.debug("Remote files found : "+ files.size());
-		align(files);
+		align(files, allowDTD);
 		rr.destroy();
 		return result;
 	}
@@ -84,7 +88,7 @@ class Harvester {
 	//---
 	//---------------------------------------------------------------------------
 
-	private void align(List<RemoteFile> files) throws Exception {
+	private void align(List<RemoteFile> files, boolean allowDTD) throws Exception {
 		log.info("Start of alignment for : "+ params.name);
 		//-----------------------------------------------------------------------
 		//--- retrieve all local categories and groups
@@ -112,10 +116,10 @@ class Harvester {
 			result.total++;
 			String id = localUris.getID(rf.getPath());
 			if (id == null)	{
-				addMetadata(rf);
+				addMetadata(rf, allowDTD);
 			}
 			else {
-				updateMetadata(rf, id);
+				updateMetadata(rf, id, allowDTD);
 			}
 		}
 		log.info("End of alignment for : "+ params.name);
@@ -137,8 +141,8 @@ class Harvester {
 	//--- Private methods : addMetadata
 	//---
 	//--------------------------------------------------------------------------
-	private void addMetadata(RemoteFile rf) throws Exception {
-		Element md = retrieveMetadata(rf);
+	private void addMetadata(RemoteFile rf, boolean allowDTD) throws Exception {
+		Element md = retrieveMetadata(rf, allowDTD);
 		if (md == null) {
 			return;
 		}
@@ -172,10 +176,10 @@ class Harvester {
 
 	//--------------------------------------------------------------------------
 
-	private Element retrieveMetadata(RemoteFile rf) {
+	private Element retrieveMetadata(RemoteFile rf, boolean allowDTD) {
 		try {
 			log.debug("Getting remote file : "+ rf.getPath());
-			Element md = rf.getMetadata();
+			Element md = rf.getMetadata(allowDTD);
 			log.debug("Record got:\n"+ Xml.getString(md));
 
 			String schema = dataMan.autodetectSchema(md);
@@ -266,7 +270,7 @@ class Harvester {
 	//---
 	//--------------------------------------------------------------------------
 
-	private void updateMetadata(RemoteFile rf, String id) throws Exception {
+	private void updateMetadata(RemoteFile rf, String id, boolean allowDTD) throws Exception {
 		String date = localUris.getChangeDate(rf.getPath());
 		if (!rf.isMoreRecentThan(date)) {
 			log.debug("  - Metadata XML not changed for path : "+ rf.getPath());
@@ -274,7 +278,7 @@ class Harvester {
 		}
 		else {
 			log.debug("  - Updating local metadata for path : "+ rf.getPath());
-			Element md = retrieveMetadata(rf);
+			Element md = retrieveMetadata(rf, allowDTD);
 			if (md == null) {
 				return;
 			}
@@ -302,6 +306,7 @@ class Harvester {
 	private Logger log;
 	private ServiceContext context;
 	private Dbms dbms;
+    private boolean allowDTD;
 	private WebDavParams params;
 	private DataManager dataMan;
 	private CategoryMapper localCateg;
@@ -323,7 +328,7 @@ interface RemoteRetriever {
 interface RemoteFile {
 	public String  getPath();
 	public String  getChangeDate();
-	public Element getMetadata() throws Exception;
+	public Element getMetadata(boolean allowDTD) throws Exception;
 	public boolean isMoreRecentThan(String localDate);
 }
 

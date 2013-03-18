@@ -96,7 +96,7 @@ public class ListMetadataFormats implements OaiPmhService
 
 		//--- extract namespace
 
-		Element elem   = Xml.loadFile(context.getAppPath() + schemaFile);
+		Element elem   = Xml.loadFile(context.getAppPath() + schemaFile, false);
 		String  nsPref = elem.getAttributeValue("targetNamespace");
 
 		//--- create object
@@ -115,7 +115,7 @@ public class ListMetadataFormats implements OaiPmhService
 	private List<MetadataFormat> getDefaultFormats(ServiceContext context) throws IOException, JDOMException
 	{
 	
-		Element elem = Xml.loadFile(context.getAppPath() + DEFAULT_SCHEMAS_FILE);
+		Element elem = Xml.loadFile(context.getAppPath() + DEFAULT_SCHEMAS_FILE, false);
 		List<Element> defaultSchemas = elem.getChildren();
 
 		List <MetadataFormat> defMdfs = new ArrayList<MetadataFormat>();

@@ -74,7 +74,7 @@ public class XmlSerializer
 //		if (!xmlData.startsWith("<?xml"))
 //			xmlData  = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + xmlData;
 
-		rec = Xml.loadString(xmlData, false);
+		rec = Xml.loadString(xmlData, false, true);
 
 		return (Element) rec.detach();
 	}

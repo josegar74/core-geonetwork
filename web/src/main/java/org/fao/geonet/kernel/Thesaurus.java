@@ -459,7 +459,7 @@ public class Thesaurus {
      */
     private void retrieveThesaurusInfo(File thesaurusFile, String defaultTitle) {
         try {
-            Element thesaurusEl = Xml.loadFile(thesaurusFile);
+            Element thesaurusEl = Xml.loadFile(thesaurusFile, false);
 
             List<Namespace> theNSs = new ArrayList<Namespace>();
             theNSs.add(Namespace.getNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"));

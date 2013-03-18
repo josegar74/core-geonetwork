@@ -34,6 +34,7 @@ import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.fao.geonet.exceptions.ConcurrentUpdateEx;
 import org.fao.geonet.kernel.DataManager;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.jdom.Element;
 
 //=============================================================================
@@ -73,7 +74,9 @@ public class DeleteAttribute implements Service
 		//-----------------------------------------------------------------------
 		//--- delete element and return status
 
-		EditUtils.updateContent(params, context);
+        SettingManager sm = gc.getSettingManager();
+        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+        EditUtils.updateContent(params, context, allowDTD);
 
 		// version already checked in updateContent
 		if (!dataMan.deleteAttribute(dbms, id, ref, name, null))

@@ -58,7 +58,7 @@ public class RegExpReplace implements Service
 	public void init(String appPath, ServiceConfig params) throws Exception
 	{
 		String  file   = params.getMandatoryValue(Jeeves.Config.FILE);
-		Element config = Xml.loadFile(appPath + file);
+		Element config = Xml.loadFile(appPath + file, false);
 
 		patterns     = new Vector();
 		replacements = new Vector();

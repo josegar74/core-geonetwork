@@ -93,13 +93,13 @@ class EditUtils
 	/** Update metadata content
 	  */
 
-	public static void updateContent(Element params, ServiceContext context, boolean validate) throws Exception
+	public static void updateContent(Element params, ServiceContext context, boolean validate, boolean allowDTD) throws Exception
 	{
-		 updateContent(params, context, validate, false);
+		 updateContent(params, context, validate, false, allowDTD);
 		
 	}
 
-	public static void updateContent(Element params, ServiceContext context, boolean validate, boolean embedded) throws Exception
+	public static void updateContent(Element params, ServiceContext context, boolean validate, boolean embedded, boolean allowDTD) throws Exception
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		DataManager   dataMan   = gc.getDataManager();
@@ -132,9 +132,9 @@ class EditUtils
 
 		boolean result;
 		if (embedded) {
-			result = dataMan.updateMetadataEmbedded(context.getUserSession(), dbms, id, version, htChanges, context.getLanguage());
+			result = dataMan.updateMetadataEmbedded(context.getUserSession(), dbms, id, version, htChanges, context.getLanguage(), allowDTD);
 		} else {
-			result = dataMan.updateMetadata(context.getUserSession(), dbms, id, version, htChanges, validate, context.getLanguage());
+			result = dataMan.updateMetadata(context.getUserSession(), dbms, id, version, htChanges, validate, context.getLanguage(), allowDTD);
 		}
 
 		if (!result)
@@ -144,9 +144,9 @@ class EditUtils
 
 	//--------------------------------------------------------------------------
 
-	public static void updateContent(Element params, ServiceContext context) throws Exception
+	public static void updateContent(Element params, ServiceContext context, boolean allowDTD) throws Exception
 	{
-		updateContent(params, context, false);
+		updateContent(params, context, false, allowDTD);
 	}
 }
 

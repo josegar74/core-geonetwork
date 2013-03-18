@@ -619,7 +619,7 @@ public class SchemaLoader
 
 		//--- load xml-schema
 
-        Element elRoot = Xml.loadFile(xmlSchemaFile);
+        Element elRoot = Xml.loadFile(xmlSchemaFile, false);
 		if (elFirst == null) elFirst = elRoot;
 
 		// change target namespace

@@ -96,6 +96,7 @@
 
 	<clickablehyperlinks>可点击链接</clickablehyperlinks>
 
+    <dtd>允许的DTD</dtd>
 	<localrating>本地的信贷评级</localrating>
     <autofixing>自动修复</autofixing>
 	
@@ -279,7 +280,12 @@
 		<tip id="clickablehyperlinks.enable">
 			如果设置，地理网将显示在数据可点击链接。
 		</tip>
-		
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            如果设置，GeoNetwork的允许插入元数据包含DTD。设置为false，以提高安全性。
+        </tip>
+
 		<!-- local rating -->
 		<tip id="localrating.enable">
 			如果设置，地理网将计算从这个节点的数据用户评级只（不分配等地理网节点）。

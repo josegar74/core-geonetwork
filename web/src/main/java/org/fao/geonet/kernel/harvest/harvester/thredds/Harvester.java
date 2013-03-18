@@ -43,6 +43,7 @@ import org.fao.geonet.kernel.harvest.harvester.fragment.FragmentHarvester;
 import org.fao.geonet.kernel.harvest.harvester.fragment.FragmentHarvester.FragmentParams;
 import org.fao.geonet.kernel.harvest.harvester.fragment.FragmentHarvester.HarvestSummary;
 import org.fao.geonet.kernel.setting.SettingInfo;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -170,7 +171,10 @@ class Harvester
 		
 		GeonetContext gc = (GeonetContext) context.getHandlerContext (Geonet.CONTEXT_NAME);
 		dataMan = gc.getDataManager ();
-		difToIsoStyleSheet = context.getAppPath() + Geonet.Path.IMPORT_STYLESHEETS + "/DIF-to-ISO19139.xsl"; 
+        SettingManager sm = gc.getSettingManager();
+        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+        this.allowDTD = allowDTD;
+        difToIsoStyleSheet = context.getAppPath() + Geonet.Path.IMPORT_STYLESHEETS + "/DIF-to-ISO19139.xsl";
 		difToIsoMcpStyleSheet = context.getAppPath() + Geonet.Path.IMPORT_STYLESHEETS + "/DIF-to-ISO19139-MCP.xsl"; 
 		cdmCoordsToIsoKeywordsStyleSheet = context.getAppPath() + Geonet.Path.IMPORT_STYLESHEETS + "/CDMCoords-to-ISO19139Keywords.xsl";
 		cdmCoordsToIsoMcpDataParametersStyleSheet = context.getAppPath() + Geonet.Path.IMPORT_STYLESHEETS + "/CDMCoords-to-ISO19139MCPDataParameters.xsl";
@@ -214,7 +218,7 @@ class Harvester
     //--- Try to load thredds catalog document
 		String url = params.url;
 		try {
-			xml = Xml.loadFile (new URL(url));
+			xml = Xml.loadFile (new URL(url), allowDTD);
 		} catch (SSLHandshakeException e) {
 			throw new BadServerCertificateEx(
 				"Most likely cause: The thredds catalog "+url+" does not have a "+
@@ -480,7 +484,7 @@ class Harvester
 			if (!ds.hasNestedDatasets()) {
 				NetcdfDataset ncD = NetcdfDataset.openDataset("thredds:"+ds.getCatalogUrl());
 				NcMLWriter ncmlWriter = new NcMLWriter();
-				Element ncml = Xml.loadString(ncmlWriter.writeXML(ncD),false);
+				Element ncml = Xml.loadString(ncmlWriter.writeXML(ncD),false, allowDTD);
 				dsMetadata.addContent(ncml);
 			}
 
@@ -539,7 +543,7 @@ class Harvester
 			datasetSubsetUrl = catalogUrl + "?dataset=" + ds.getID();
 		}
 		
-		return Xml.loadFile(new URL(datasetSubsetUrl));
+		return Xml.loadFile(new URL(datasetSubsetUrl), allowDTD);
 	}
 	
 	//---------------------------------------------------------------------------
@@ -1189,6 +1193,7 @@ class Harvester
 	private Logger         log;
 	private ServiceContext context;
 	private Dbms           dbms;
+    private boolean allowDTD;
 	private ThreddsParams  params;
 	private DataManager    dataMan;
 	private CategoryMapper localCateg;

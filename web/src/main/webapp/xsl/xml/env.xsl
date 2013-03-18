@@ -14,8 +14,9 @@
 		<xsl:variable name="oai"    	select="children/oai/children"/>
 		<xsl:variable name="xlinkResolver" select="children/xlinkResolver/children"/>
 		<xsl:variable name="userSelfRegistration" select="children/userSelfRegistration/children"/>
-		<xsl:variable name="clickablehyperlinks" select="children/clickablehyperlinks/children"/>		
-		<xsl:variable name="localrating" select="children/localrating/children"/>		
+		<xsl:variable name="clickablehyperlinks" select="children/clickablehyperlinks/children"/>
+        <xsl:variable name="dtd" select="children/dtd/children"/>
+        <xsl:variable name="localrating" select="children/localrating/children"/>
         <xsl:variable name="autofixing" select="children/autofixing/children"/>
 		<xsl:variable name="csw"        select="children/csw/children"/>
 		<xsl:variable name="proxy"    select="children/proxy/children"/>
@@ -75,6 +76,10 @@
 			<clickablehyperlinks>
 				<enable><xsl:value-of select="$clickablehyperlinks/enable/value"/></enable>
 			</clickablehyperlinks>
+
+            <dtd>
+                <enable><xsl:value-of select="dtd/enable/value"/></enable>
+            </dtd>
 
 			<localrating>
 				<enable><xsl:value-of select="$localrating/enable/value"/></enable>

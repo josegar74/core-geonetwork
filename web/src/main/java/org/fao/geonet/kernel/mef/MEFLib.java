@@ -177,9 +177,9 @@ public class MEFLib {
 
 	// --------------------------------------------------------------------------
 
-	public static void visit(File mefFile, IVisitor visitor, IMEFVisitor v)
+	public static void visit(File mefFile, IVisitor visitor, IMEFVisitor v, boolean allowDTD)
 			throws Exception {
-		visitor.visit(mefFile, v);
+		visitor.visit(mefFile, v, allowDTD);
 	}
 
 	/**

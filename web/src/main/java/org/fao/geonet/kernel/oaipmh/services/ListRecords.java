@@ -26,9 +26,11 @@ package org.fao.geonet.kernel.oaipmh.services;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.context.ServiceContext;
 import jeeves.utils.Xml;
+import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.kernel.oaipmh.Lib;
 import org.fao.geonet.kernel.oaipmh.ResumptionTokenCache;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.fao.oaipmh.OaiPmh;
 import org.fao.oaipmh.requests.ListRecordsRequest;
 import org.fao.oaipmh.requests.TokenListRequest;
@@ -114,7 +116,11 @@ public class ListRecords extends AbstractTokenLister
 		String changeDate = rec.getChildText("changedate");
 		String data       = rec.getChildText("data");
 
-		Element md = Xml.loadString(data, false);
+        GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
+        SettingManager sm = gc.getSettingManager();
+        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+
+        Element md = Xml.loadString(data, false, allowDTD);
 
 		//--- try to disseminate format
 

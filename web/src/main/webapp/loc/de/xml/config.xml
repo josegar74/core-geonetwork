@@ -96,6 +96,7 @@
 
 	<clickablehyperlinks>Anklickbare Hyperlinks</clickablehyperlinks>
 
+    <dtd>Lassen DTDs</dtd>
 	<localrating>Lokale Bewertung</localrating>
     <autofixing>Automatische Updates</autofixing>
 
@@ -264,7 +265,12 @@
 		<tip id="clickablehyperlinks.enable">
 			Falls gesetzt, werden GeoNetwork anklickbare Hyperlinks Anzeige in den Metadaten.
 		</tip>
-	
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            Wenn gesetzt, ermöglicht GeoNetwork Einfügen von Metadaten, die eine DTD enthält. Setzen Sie diese für die erhöhte Sicherheit false.
+        </tip>
+
 		<!-- local rating -->
 		<tip id="localrating.enable">
 			Falls gesetzt, werden GeoNetwork Ihre Bewertung für Metadaten aus diesen Knoten zu berechnen nur (nicht unter anderem GeoNetwork Knoten verteilt).

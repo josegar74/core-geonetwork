@@ -53,7 +53,7 @@ public class ProfileManager
 
 	public ProfileManager(String profilesFile) throws Exception
 	{
-		Element elProfiles = Xml.loadFile(profilesFile);
+		Element elProfiles = Xml.loadFile(profilesFile, false);
 
 		htProfiles  = new Hashtable(50);
 

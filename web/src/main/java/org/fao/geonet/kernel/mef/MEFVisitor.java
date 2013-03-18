@@ -44,8 +44,8 @@ import static org.fao.geonet.kernel.mef.MEFConstants.FILE_METADATA;
  * MEF version 1 visitor to process and load MEF files.
  */
 public class MEFVisitor implements IVisitor {
-	public void visit(File mefFile, IMEFVisitor v) throws Exception {
-		Element info = handleXml(mefFile, v);
+	public void visit(File mefFile, IMEFVisitor v, boolean allowDTD) throws Exception {
+		Element info = handleXml(mefFile, v, allowDTD);
 		handleBin(mefFile, v, info, 0);
 	}
 
@@ -54,7 +54,7 @@ public class MEFVisitor implements IVisitor {
 	 * Read the input MEF file and check structure for metadata.xml and info.xml
 	 * files.
 	 */
-	public Element handleXml(File mefFile, IMEFVisitor v) throws Exception {
+	public Element handleXml(File mefFile, IMEFVisitor v, boolean allowDTD) throws Exception {
 		ZipInputStream zis = new ZipInputStream(new FileInputStream(mefFile));
 		InputStreamBridge isb = new InputStreamBridge(zis);
 
@@ -68,9 +68,9 @@ public class MEFVisitor implements IVisitor {
 				String name = entry.getName();
 
 				if (name.equals(FILE_METADATA))
-					md = Xml.loadStream(isb);
+					md = Xml.loadStream(isb, allowDTD);
 				else if (name.equals(FILE_INFO))
-					info = Xml.loadStream(isb);
+					info = Xml.loadStream(isb, false);
 
 				zis.closeEntry();
 			}
@@ -84,7 +84,7 @@ public class MEFVisitor implements IVisitor {
 		if (info == null)
 			throw new BadFormatEx("Missing info file : " + FILE_INFO);
 
-		v.handleMetadata(md, 0);
+		v.handleMetadata(md, 0, allowDTD);
 		v.handleInfo(info, 0);
 
 		return info;

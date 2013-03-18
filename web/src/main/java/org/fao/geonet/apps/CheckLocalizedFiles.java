@@ -120,8 +120,8 @@ public class CheckLocalizedFiles
 	{
 		try
 		{
-			Element mlElem = Xml.loadFile(mlFile);
-			Element lElem  = Xml.loadFile(lFile);
+			Element mlElem = Xml.loadFile(mlFile, false);
+			Element lElem  = Xml.loadFile(lFile, false);
 			
 			// for each root child in mlElem
             for (Object o : mlElem.getChildren()) {

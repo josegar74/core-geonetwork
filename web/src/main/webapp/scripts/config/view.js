@@ -212,7 +212,8 @@ ConfigView.prototype.setData = function(data)
 	
 	$('clickablehyperlinks.enable').checked = data['CLICKABLE_HYPERLINKS'] == 'true';
 
-	$('localrating.enable').checked = data['LOCAL_RATING'] == 'true';
+    $('dtd.enable').checked = data['DTD'] == 'true';
+    $('localrating.enable').checked = data['LOCAL_RATING'] == 'true';
 	$('autofixing.enable').checked = data['AUTO_FIXING'] == 'true';
     $('inspire.enable').checked = data['INSPIRE'] == 'true';
     $('inspire.enableSearchPanel').checked = data['INSPIRE_SEARCH_PANEL'] == 'true';
@@ -325,8 +326,9 @@ ConfigView.prototype.getData = function()
 		INDEXOPTIMIZER_INTERVAL_MIN:  $('indexoptimizer.interval.min') .value,
 
 		CLICKABLE_HYPERLINKS : $('clickablehyperlinks.enable').checked,
-		
-		LOCAL_RATING : $('localrating.enable').checked,
+
+        DTD : $('dtd.enable').checked,
+        LOCAL_RATING : $('localrating.enable').checked,
 		AUTO_FIXING : $('autofixing.enable').checked,
 
         INSPIRE : $('inspire.enable').checked,

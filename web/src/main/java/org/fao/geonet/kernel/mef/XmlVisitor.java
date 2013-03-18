@@ -36,21 +36,21 @@ import java.io.File;
  */
 public class XmlVisitor implements IVisitor {
 
-	public void visit(File xmlFile, IMEFVisitor v) throws Exception {
-		handleXml(xmlFile, v);
+	public void visit(File xmlFile, IMEFVisitor v, boolean allowDTD) throws Exception {
+		handleXml(xmlFile, v, allowDTD);
 	}
 
 	/**
 	 * Load an XML file and pass it to a MEF visitor.
 	 */
-	public Element handleXml(File xmlFile, IMEFVisitor v) throws Exception {
+	public Element handleXml(File xmlFile, IMEFVisitor v, boolean allowDTD) throws Exception {
 
 		Element md;
-		md = Xml.loadFile(xmlFile);
+		md = Xml.loadFile(xmlFile, allowDTD);
 		if (md == null)
 			throw new BadFormatEx("Missing xml metadata file .");
 
-		v.handleMetadata(md, 0);
+		v.handleMetadata(md, 0, allowDTD);
 
 		// Generate dummy info file.
 		Element info;

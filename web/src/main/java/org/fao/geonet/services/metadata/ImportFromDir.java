@@ -37,6 +37,7 @@ import org.fao.geonet.exceptions.SchematronValidationErrorEx;
 import org.fao.geonet.kernel.DataManager;
 import org.fao.geonet.kernel.MetadataIndexerProcessor;
 import org.fao.geonet.kernel.mef.MEFLib;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.jdom.Element;
 
 import java.io.File;
@@ -206,8 +207,10 @@ public class ImportFromDir implements Service
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		DataManager   dm = gc.getDataManager();
+        SettingManager sm = gc.getSettingManager();
+        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
 
-		ImportConfig config = new ImportConfig(configFile, context);
+        ImportConfig config = new ImportConfig(configFile, context);
 
 		String dir   = Util.getParam(params, Params.DIR);
 		String group = Util.getParam(params, Params.GROUP);
@@ -245,7 +248,7 @@ public class ImportFromDir implements Service
 
 				for(int k=0; k<files.length; k++)
 				{
-					Element xml = Xml.loadFile(files[k]);
+					Element xml = Xml.loadFile(files[k], allowDTD);
 
 					if (!style.equals("_none_"))
 						xml = Xml.transform(xml, stylePath +"/"+ style);
@@ -354,8 +357,10 @@ class ImportConfig
 		DataManager   dm = gc.getDataManager();
 
 		Dbms dbms = (Dbms) context.getResourceManager().open(Geonet.Res.MAIN_DB);
+        SettingManager sm = gc.getSettingManager();
+        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
 
-		Element config = Xml.loadFile(configFile);
+        Element config = Xml.loadFile(configFile, allowDTD);
 
 		fillCategIds(dbms);
 

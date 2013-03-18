@@ -104,7 +104,7 @@ public class Export
 	private static String applyTemplate(String source, String templateFile)
 		throws Exception
 	{
-		Element xml = Xml.loadString(source, false);
+		Element xml = Xml.loadString(source, false, true);
 		Element result = Xml.transform(xml, templateFile);
 		return Xml.getString(result);
 	}

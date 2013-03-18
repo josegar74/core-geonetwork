@@ -95,6 +95,7 @@
     
 	<clickablehyperlinks>Linkkejä voi klikata</clickablehyperlinks>
 
+    <dtd>salli DTD</dtd>
 	<localrating>Arvostelu on mahdollista.</localrating>
 		
 	<proxy>Proxy</proxy>
@@ -254,6 +255,11 @@
 		<tip id="clickablehyperlinks.enable">
 			Jos otettu käyttöön, Paikkatietohakemiston metatietoihin tallennetut www-osoitteet näytetään linkkeinä.
 		</tip>
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            Jos asetettu, GeoNetwork avulla lisätään metatietoja, joka sisältää DTD. Aseta tämä epätosi lisää turvallisuutta.
+        </tip>
 
 		<!-- local rating -->
 		<tip id="localrating.enable">

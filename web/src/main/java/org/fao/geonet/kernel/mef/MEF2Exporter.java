@@ -202,7 +202,7 @@ class MEF2Exporter {
 			boolean transform, String stylePath) throws Exception {
 		String xmlData = elt.getChildText("data");
 
-		Element md = Xml.loadString(xmlData, false);
+		Element md = Xml.loadString(xmlData, false, true);
 
 		// Resolving Xlinks before export
 		// md = Processor.processXLink(md);

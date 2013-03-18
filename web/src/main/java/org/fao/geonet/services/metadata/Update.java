@@ -36,6 +36,7 @@ import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.fao.geonet.exceptions.ConcurrentUpdateEx;
 import org.fao.geonet.kernel.DataManager;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.jdom.Element;
 
 //=============================================================================
@@ -85,13 +86,16 @@ public class Update implements Service
 		boolean forget   = config.getValue(Params.FORGET, "no").equals("yes");
 
 		if (!forget) {
-			if (data != null) {
-				Element md = Xml.loadString(data, false);
+            SettingManager sm = gc.getSettingManager();
+            boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+            if (data != null) {
 
-				if (!dataMan.updateMetadata(context.getUserSession(), dbms, id, md, false, version, context.getLanguage()))
+                Element md = Xml.loadString(data, false, allowDTD);
+
+				if (!dataMan.updateMetadata(context.getUserSession(), dbms, id, md, false, version, context.getLanguage(), allowDTD))
 					throw new ConcurrentUpdateEx(id);
 			} else {
-				EditUtils.updateContent(params, context, false, true);
+				EditUtils.updateContent(params, context, false, true, allowDTD);
 			}
 
 			dataMan.setTemplate(dbms, Integer.parseInt(id), isTemplate, title);

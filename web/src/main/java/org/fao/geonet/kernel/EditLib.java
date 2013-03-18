@@ -338,9 +338,10 @@ public class EditLib
 	 * @param el
 	 * @param qname
 	 * @param fragment
+     * @param allowDTD
 	 * @throws Exception
 	 */
-	public void addFragment(String schema, Element el, String qname, String fragment) throws Exception {
+	public void addFragment(String schema, Element el, String qname, String fragment, boolean allowDTD) throws Exception {
 
 		String name = getUnqualifiedName(qname);
 		String ns = getNamespace(qname, el, getSchema(schema));
@@ -350,7 +351,7 @@ public class EditLib
 		Element root = new Element(name, prefix, ns);
 
 		try {
-			Element fragElt = Xml.loadString(fragment, false);
+			Element fragElt = Xml.loadString(fragment, false, allowDTD);
 			// Clean children if exist before loading new fragment.
 			root.removeContent();
 			// Add XML fragment collection

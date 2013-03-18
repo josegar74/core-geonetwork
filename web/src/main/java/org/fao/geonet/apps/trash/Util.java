@@ -34,7 +34,7 @@ public class Util
 	public static DbmsPool getDbmsPool(String configFile)
 		throws Exception
 	{
-		Element configRoot    = Xml.loadFile(configFile);
+		Element configRoot    = Xml.loadFile(configFile, false);
 		Element resourcesRoot = configRoot.getChild(ConfigFile.Child.RESOURCES);
 		List resList = resourcesRoot.getChildren(ConfigFile.Resources.Child.RESOURCE);
 
@@ -57,7 +57,7 @@ public class Util
 	public static Element getServices(String configFile, String pack)
 		throws Exception
 	{
-		Element configRoot    = Xml.loadFile(configFile);
+		Element configRoot    = Xml.loadFile(configFile, false);
 		List services = configRoot.getChildren(ConfigFile.Child.SERVICES);
 		for (int i = 0; i < services.size(); i++)
 		{

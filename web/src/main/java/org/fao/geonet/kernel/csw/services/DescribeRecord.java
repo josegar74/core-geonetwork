@@ -26,6 +26,7 @@ package org.fao.geonet.kernel.csw.services;
 import jeeves.server.context.ServiceContext;
 import jeeves.utils.Util;
 import jeeves.utils.Xml;
+import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.csw.common.Csw;
 import org.fao.geonet.csw.common.exceptions.CatalogException;
@@ -33,6 +34,7 @@ import org.fao.geonet.csw.common.exceptions.InvalidParameterValueEx;
 import org.fao.geonet.csw.common.exceptions.NoApplicableCodeEx;
 import org.fao.geonet.kernel.csw.CatalogConfiguration;
 import org.fao.geonet.kernel.csw.CatalogService;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -253,7 +255,10 @@ public class DescribeRecord extends AbstractOperation implements CatalogService
     	String dir = context.getAppPath() + Geonet.Path.VALIDATION + "csw202_apiso100/csw/2.0.2/";
     	
     	try {
-			Element schema = Xml.loadFile(dir+schemafile);
+            GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
+            SettingManager sm = gc.getSettingManager();
+            boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+            Element schema = Xml.loadFile(dir+schemafile, allowDTD);
 			Element sc = new Element("SchemaComponent", Csw.NAMESPACE_CSW);
 			
 			// Add required attributes to SchemaComponent

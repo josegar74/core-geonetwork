@@ -130,6 +130,7 @@
 
 	<clickablehyperlinks>Hyperliens cliquables</clickablehyperlinks>
 
+    <dtd>Permettre DTDs</dtd>
 	<localrating>Evaluation Local</localrating>
     <autofixing>Automatique fixe</autofixing>
 	
@@ -293,7 +294,12 @@
 		<tip id="clickablehyperlinks.enable">
 			Si défini, GeoNetwork permet de trouver des hyperliens cliquables dans les métadonnées.
 		</tip>
-		
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            S'il est défini, GeoNetwork permet l'insertion de métadonnées qui contient une DTD. Réglez ce paramètre sur false pour une sécurité accrue.
+        </tip>
+
 		<!-- local rating -->
 		<tip id="localrating.enable">
 			Si défini, GeoNetwork va calculer les cotes de l'utilisateur pour les métadonnées de ce nœud seulement (pas répartis entre les autres nœuds GeoNetwork).

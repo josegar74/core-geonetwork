@@ -95,8 +95,9 @@
     <cswMetadataPublic>Inserted metadata is public</cswMetadataPublic>
     
 	<clickablehyperlinks>التشعبية القابلة للنقر عليها</clickablehyperlinks>
-	
-	<localrating>تصنيف المحلية</localrating>
+
+    <dtd>DTD</dtd>
+    <localrating>تصنيف المحلية</localrating>
 
     <autofixing>التلقائي إصلاحات</autofixing>
 	
@@ -279,7 +280,12 @@
 		<tip id="clickablehyperlinks.enable">
 			إذا كان تعيين ، سوف يعرض وصلات الشبكة الأرضية للنقر في الفوقية.
 		</tip>
-		
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            إذا مجموعة، الشبكة الأرضية يسمح إدخال البيانات الوصفية التي تحتوي على DTD. تعيين هذا إلى false لدرجات الأمان العليا.
+        </tip>
+
 		<!-- local rating -->
 		<tip id="localrating.enable">
 			إذا كان تعيين وسوف الشبكة الأرضية للمستخدم حساب التصنيفات الفوقية من هذه العقدة فقط (وليس توزيعها بين العقدتين الشبكة الأرضية الأخرى).

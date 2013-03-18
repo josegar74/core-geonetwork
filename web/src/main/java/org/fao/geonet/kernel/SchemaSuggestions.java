@@ -45,7 +45,7 @@ public class SchemaSuggestions
 
 	public SchemaSuggestions(String xmlSuggestFile) throws Exception
 	{
-		Element sugg = Xml.loadFile(xmlSuggestFile);
+		Element sugg = Xml.loadFile(xmlSuggestFile, false);
 
 		List list = sugg.getChildren();
 

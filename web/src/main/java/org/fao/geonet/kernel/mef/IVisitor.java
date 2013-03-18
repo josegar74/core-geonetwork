@@ -37,12 +37,12 @@ public interface IVisitor
 	/**
 	 * Register XML or binary file to process.
 	 */
-	public void visit(File mefFile, IMEFVisitor v) throws Exception;
+	public void visit(File mefFile, IMEFVisitor v, boolean allowDTD) throws Exception;
 
 	/**
 	 * Register XML files.
 	 */
-	public Element handleXml(File mefFile, IMEFVisitor v) throws Exception ;
+	public Element handleXml(File mefFile, IMEFVisitor v, boolean allowDTD) throws Exception ;
 
 	/**
 	 * Register binary file.

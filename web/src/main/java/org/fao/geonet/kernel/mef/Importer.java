@@ -35,6 +35,7 @@ import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
 import org.fao.geonet.exceptions.UnAuthorizedException;
 import org.fao.geonet.kernel.DataManager;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.fao.geonet.lib.Lib;
 import org.fao.geonet.util.ISODate;
 import org.fao.oaipmh.exceptions.BadArgumentException;
@@ -113,6 +114,9 @@ public class Importer {
 			throw new BadArgumentException("Bad file type parameter.");
         }
 
+        SettingManager sm = gc.getSettingManager();
+        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+
 		// import metadata from MEF, Xml, ZIP files
 		MEFLib.visit(mefFile, visitor, new IMEFVisitor() {
             /**
@@ -121,7 +125,7 @@ public class Importer {
              * @param index
              * @throws Exception
              */
-			public void handleMetadata(Element metadata, int index) throws Exception {
+			public void handleMetadata(Element metadata, int index, boolean allowDTD) throws Exception {
 				Log.debug(Geonet.MEF, "Collecting metadata:\n" + Xml.getString(metadata));
 				md.add(index, metadata);
 			}
@@ -132,14 +136,14 @@ public class Importer {
              * @param index
              * @throws Exception
              */
-			public void handleMetadataFiles(File[] Files, int index) throws Exception {
+			public void handleMetadataFiles(File[] Files, int index, boolean allowDTD) throws Exception {
 				Log.debug(Geonet.MEF, "Multiple metadata files");
 
 				Element metadataValidForImport = null;
 
                 for (File file : Files) {
                     if (file != null && !file.isDirectory()) {
-                        Element metadata = Xml.loadFile(file);
+                        Element metadata = Xml.loadFile(file, allowDTD);
                         String metadataSchema = dm.autodetectSchema(metadata);
 
                         // If local node doesn't know metadata schema try to load next xml file.
@@ -150,7 +154,7 @@ public class Importer {
                         // If schema is preferred local node schema load that file.
                         if (metadataSchema.equals(preferredSchema)) {
                             Log.debug(Geonet.MEF, "Found metadata file " + file.getName() + " with preferred schema (" + preferredSchema + ").");
-                            handleMetadata(metadata, index);
+                            handleMetadata(metadata, index, allowDTD);
                             return;
                         }
                         else {
@@ -163,7 +167,7 @@ public class Importer {
 				// Import a valid metadata if not one found with preferred schema.
 				if (metadataValidForImport != null) {
 					Log.debug(Geonet.MEF, "Importing metadata with valid schema but not preferred one.");
-					handleMetadata(metadataValidForImport, index);
+					handleMetadata(metadataValidForImport, index, allowDTD);
                 }
                 else {
 					throw new BadFormatEx("No valid metadata file found.");
@@ -364,7 +368,7 @@ public class Importer {
 						is);
 			}
 
-		});
+		}, allowDTD);
 
 		return id;
 	}

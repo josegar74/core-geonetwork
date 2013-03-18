@@ -236,7 +236,7 @@ public class ServiceRequestFactory
 	private static Element extractXmlParameters(HttpServletRequest req)
 																throws IOException, JDOMException
 	{
-		return Xml.loadStream(req.getInputStream());
+		return Xml.loadStream(req.getInputStream(), false);
 	}
 
 	//---------------------------------------------------------------------------

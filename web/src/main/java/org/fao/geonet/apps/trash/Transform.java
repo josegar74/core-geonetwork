@@ -108,7 +108,7 @@ public class Transform
 	private static String applyTemplate(String source, String templateFile)
 		throws Exception
 	{
-		Element xml = Xml.loadString(source, false);
+		Element xml = Xml.loadString(source, false, false);
 		Element result = Xml.transform(xml, templateFile);
 		return Xml.getString(result);
 	}

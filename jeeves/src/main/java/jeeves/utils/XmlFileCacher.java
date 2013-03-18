@@ -100,7 +100,7 @@ public class XmlFileCacher
 
 	protected Element load() throws JDOMException, IOException
 	{
-		return Xml.loadFile(file);
+		return Xml.loadFile(file, false);
 	}
 
 	//--------------------------------------------------------------------------

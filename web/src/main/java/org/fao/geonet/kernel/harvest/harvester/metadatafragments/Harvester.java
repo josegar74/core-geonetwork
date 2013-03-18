@@ -38,6 +38,7 @@ import org.fao.geonet.kernel.harvest.harvester.GroupMapper;
 import org.fao.geonet.kernel.harvest.harvester.Privileges;
 import org.fao.geonet.kernel.harvest.harvester.UUIDMapper;
 import org.fao.geonet.kernel.setting.SettingInfo;
+import org.fao.geonet.kernel.setting.SettingManager;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -126,6 +127,9 @@ class Harvester
 		
 		GeonetContext gc = (GeonetContext) context.getHandlerContext (Geonet.CONTEXT_NAME);
 		dataMan = gc.getDataManager ();
+        SettingManager sm = gc.getSettingManager();
+        boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
+        this.allowDTD = allowDTD;
 		templateForLinks = null;
 		SettingInfo si = new SettingInfo(context);
 		String siteUrl = si.getSiteUrl() + context.getBaseUrl();
@@ -190,14 +194,14 @@ class Harvester
 		
 		log.info("Parsing query :\n" + params.query);
 		try {
-			xmlQuery = Xml.loadString(params.query, false); 
+			xmlQuery = Xml.loadString(params.query, false, allowDTD);
 		} catch (JDOMException e) {
 			e.printStackTrace();
 			throw new BadParameterEx("GetFeature Query failed to parse\n", params.query);
 		}
 
 		//--- post the query to the remote site
-		xml = Xml.loadFile(new URL(params.url), xmlQuery);
+		xml = Xml.loadFile(new URL(params.url), xmlQuery, allowDTD);
 		if (xml == null) {
 			throw new BadXmlResponseEx("No response or problem getting response from "+params.url+":\n"+Xml.getString(xmlQuery));
 		}
@@ -500,6 +504,7 @@ class Harvester
 	private Logger         log;
 	private ServiceContext context;
 	private Dbms           dbms;
+    private boolean allowDTD;
 	private MetadataFragmentsParams   params;
 	private DataManager    dataMan;
 	private CategoryMapper localCateg;

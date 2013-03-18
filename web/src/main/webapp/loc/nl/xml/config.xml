@@ -95,7 +95,8 @@
     <cswMetadataPublic>Toegevoegde metadata is publiek beschikbaar</cswMetadataPublic>
     
 	<clickablehyperlinks>Klikbare hyperlinks</clickablehyperlinks>
-	
+
+    <dtd>Sta DTDs toe</dtd>
 	<localrating>Locale Waardering</localrating>
     <autofixing>Automatische correcties</autofixing>
 	
@@ -277,6 +278,11 @@
 		<tip id="clickablehyperlinks.enable">
 			Als deze optie is ingeschakeld zal GeoNetwork klikbare hyperlinks tonen in de metadata.
 		</tip>
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            Als deze optie is ingeschakeld staat GeoNetwork toe dat metadata met een DTD kan worden ingevoerd. Zet dit uit voor verbeterde beveiliging.
+        </tip>
 
 		<!-- local rating -->
 		<tip id="localrating.enable">

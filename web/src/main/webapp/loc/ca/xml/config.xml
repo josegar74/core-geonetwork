@@ -94,6 +94,7 @@
     
 	<clickablehyperlinks>Es pot fer clic a hipervincles</clickablehyperlinks>
 
+    <dtd>permetre DTD</dtd>
 	<localrating>Classificació local</localrating>
     <autofixing>Correccions automàtiques</autofixing>
 
@@ -316,6 +317,11 @@
 		<tip id="localrating.enable">
 			Si activat, GeoNetwork calcularà puntuacions d'usuari només per les metadades d'aquest node (no distribuït entre els altres nodes de GeoNetwork).
 		</tip>
+
+        <!-- dtd -->
+        <tip id="dtd.enable">
+            Si està establert, GeoNetwork permet la inserció de metadades que conté una DTD. Posi això a false per a més seguretat.
+        </tip>
 
 		<!-- automatic fixes -->
 		<tip id="autofixing.enable">

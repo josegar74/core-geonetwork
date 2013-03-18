@@ -77,8 +77,7 @@ public class SearchController
 	public SearchController(File summaryConfig, File luceneConfig) {
 		try {
 			if (summaryConfig != null) {
-				_summaryConfig = Xml.loadStream(new FileInputStream(
-						summaryConfig));
+				_summaryConfig = Xml.loadStream(new FileInputStream(summaryConfig), false);
 			} else {
 				_summaryConfig = null;
 			}
@@ -90,7 +89,7 @@ public class SearchController
 		_tokenizedFieldSet = new HashSet<String>();
 		try {
 			if (luceneConfig != null) {
-				Element config = Xml.loadStream(new FileInputStream(luceneConfig));
+				Element config = Xml.loadStream(new FileInputStream(luceneConfig), false);
 				Element fields = config.getChild("tokenized");
 				for ( int i = 0; i < fields.getContentSize(); i++ ) {
 					Object o = fields.getContent(i);

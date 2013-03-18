@@ -533,7 +533,7 @@ class Harvester
 				if (href != null) {	// No metadataUrl attribute for that layer
 					mdXml = href.getValue ();
 					try {
-						xml = Xml.loadFile (new URL(mdXml));
+						xml = Xml.loadFile (new URL(mdXml), false);
 
                         // If url is CSW GetRecordById remove envelope
                         if (xml.getName().equals("GetRecordByIdResponse")) {

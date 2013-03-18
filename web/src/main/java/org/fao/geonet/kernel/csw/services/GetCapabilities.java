@@ -99,7 +99,7 @@ public class GetCapabilities extends AbstractOperation implements CatalogService
 
 		try
 		{
-			Element capabilities = Xml.loadFile(file);
+			Element capabilities = Xml.loadFile(file, false);
 			setKeywords(capabilities, context);
 			setOperationsParameters(capabilities);
 
