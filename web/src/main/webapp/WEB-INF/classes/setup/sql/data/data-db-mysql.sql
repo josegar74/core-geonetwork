@@ -10553,8 +10553,8 @@ INSERT INTO Settings VALUES (703,700,'cachesize','60');
 INSERT INTO Settings VALUES (720,1,'inspire',NULL);
 INSERT INTO Settings VALUES (721,720,'enable','false');
 INSERT INTO Settings VALUES (722,720,'enableSearchPanel','false');
-INSERT INTO Settings VALUES (730,1,'localrating',NULL);
-INSERT INTO Settings VALUES (731,730,'enable','false');
+INSERT INTO Settings VALUES (730,1,'dtd',NULL);
+INSERT INTO Settings VALUES (731,730,'enable','true');
 
 INSERT INTO Settings VALUES (910,1,'metadata',NULL);
 INSERT INTO Settings VALUES (911,910,'enableSimpleView','true');
