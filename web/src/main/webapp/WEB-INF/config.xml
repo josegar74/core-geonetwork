@@ -311,6 +311,8 @@
 				<call name="repositories" class=".services.main.Info">
 					<param name="type" value="z3950repositories" />
 				</call>
+				
+				<call name="_tk" class="jeeves.services.GetSecureToken" />
  			</output>
 
  		</service>

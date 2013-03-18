@@ -30,6 +30,7 @@ import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
 import jeeves.services.BaseSecureService;
+import jeeves.utils.CSRFUtil;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.kernel.AccessManager;
@@ -116,7 +117,7 @@ public class MassiveUpdatePrivileges extends BaseSecureService
 
 					String name  = el.getName();
 
-					if (name.startsWith("_")) {
+                    if (name.startsWith("_") && !name.equals(CSRFUtil.TOKEN_PARAMETER_NAME)) {
 						StringTokenizer st = new StringTokenizer(name, "_");
 
 						String groupId = st.nextToken();

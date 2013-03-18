@@ -29,6 +29,8 @@ import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
+import jeeves.services.BaseSecureService;
+import jeeves.utils.CSRFUtil;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.exceptions.MetadataNotFoundEx;
@@ -45,7 +47,7 @@ import java.util.StringTokenizer;
 /** Stores all operations allowed for a metadata. Called by the metadata.admin service
   */
 
-public class UpdateAdminOper implements Service
+public class UpdateAdminOper extends BaseSecureService
 {
 	//--------------------------------------------------------------------------
 	//---
@@ -61,7 +63,7 @@ public class UpdateAdminOper implements Service
 	//---
 	//--------------------------------------------------------------------------
 
-	public Element exec(Element params, ServiceContext context) throws Exception
+	public Element doExec(Element params, ServiceContext context) throws Exception
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		DataManager   dm = gc.getDataManager();
@@ -107,7 +109,7 @@ public class UpdateAdminOper implements Service
 
 			String name  = el.getName();
 
-			if (name.startsWith("_"))
+            if (name.startsWith("_") && !name.equals(CSRFUtil.TOKEN_PARAMETER_NAME))
 			{
 				StringTokenizer st = new StringTokenizer(name, "_");
 

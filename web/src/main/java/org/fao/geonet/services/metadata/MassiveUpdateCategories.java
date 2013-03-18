@@ -30,6 +30,7 @@ import jeeves.server.ServiceConfig;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
 import jeeves.services.BaseSecureService;
+import jeeves.utils.CSRFUtil;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.kernel.AccessManager;
@@ -104,7 +105,7 @@ public class MassiveUpdateCategories extends BaseSecureService
 					Element el = (Element) list.get(i);
 					String name = el.getName();
 
-					if (name.startsWith("_"))
+                    if (name.startsWith("_") && !name.equals(CSRFUtil.TOKEN_PARAMETER_NAME))
 						dm.setCategory(dbms, id, name.substring(1));
 				}
 				metadata.add(new Integer(id));
