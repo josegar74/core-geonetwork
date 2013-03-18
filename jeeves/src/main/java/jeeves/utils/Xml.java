@@ -85,7 +85,8 @@ public class Xml
 
     private static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
     private static SAXBuilder getSAXBuilderWithoutXMLResolver(boolean validate, boolean allowDTD) {
-        System.out.println("\n\n\n******************** ALLOW DTD ? " + allowDTD + " ***************************\n\n\n");
+        // TODO log4j
+        System.out.println("Allow DTD ? " + allowDTD);
         SAXBuilder builder = new SAXBuilder(validate);
         builder.getDTDHandler();
         builder.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
