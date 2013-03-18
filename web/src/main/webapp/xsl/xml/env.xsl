@@ -78,7 +78,7 @@
 			</clickablehyperlinks>
 
             <dtd>
-                <enable><xsl:value-of select="dtd/enable/value"/></enable>
+                <enable><xsl:value-of select="$dtd/enable/value"/></enable>
             </dtd>
 
 			<localrating>
