@@ -47,7 +47,7 @@ public class Repositories
 
 	/** builds the repositories
 	  */
-	public static boolean build(String appPath, ServiceContext context) 
+	public static boolean build(String appPath, ServiceContext context, SettingManager sm)
 	{
 		try
 		{
@@ -57,7 +57,6 @@ public class Repositories
 			String realRepo = appPath + Jeeves.Path.WEBINF + "classes/JZKitConfig.xml";
 
             GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
-            SettingManager sm = gc.getSettingManager();
             boolean allowDTD = sm.getValueAsBool("/system/dtd/enable");
 			buildRepositoriesFile(tempRepo, realRepo, allowDTD);
 

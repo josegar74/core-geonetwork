@@ -164,7 +164,7 @@ public class Geonetwork implements ApplicationHandler
 		ApplicationContext app_context = null;
 
 		// build Z3950 repositories file first from template
-		if (Repositories.build(path, context)) {
+		if (Repositories.build(path, context, settingMan)) {
 			logger.info("     Repositories file built from template.");
 
 			app_context = new  ClassPathXmlApplicationContext( handlerConfig.getMandatoryValue( Geonet.Config.JZKITCONFIG )   );
