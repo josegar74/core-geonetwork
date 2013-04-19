@@ -677,7 +677,7 @@ function gn_search_complete(req) {
 ********************************************************************/
 function gn_showSingleMetadataUUID(uuid)
 {
-   var pars = 'uuid=' + uuid + '&control&currTab=simple';
+   var pars = 'uuid=' + escape(uuid) + '&control&currTab=simple';
    gn_showSingleMet(pars);
 }
 
