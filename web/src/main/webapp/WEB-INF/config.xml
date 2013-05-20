@@ -1295,6 +1295,14 @@
 			<class name=".services.crs.GetCRS" />
 			<output sheet="crs.xsl" contentType="text/xml; charset=UTF-8" />
 		</service>
+
+        <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+        <!-- CSRF token services                                              -->
+        <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+        <service name="secure.token">
+            <class name="jeeves.services.GetSecureToken" />
+        </service>
 	</services>
 
 	<!-- ====================================================================== -->

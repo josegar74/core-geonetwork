@@ -232,6 +232,7 @@
 		<allow service="user.infoedit"/>
 		<allow service="user.infoupdate"/>
 
+        <allow service="secure.token"/>
 	</profile>
 
 	<!-- ====================================================================== -->
