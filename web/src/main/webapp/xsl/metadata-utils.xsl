@@ -182,7 +182,10 @@
 		</xsl:if>
 		
 		<!-- delete button -->
-		<xsl:if test="geonet:info/owner='true'">
+		<!--<xsl:if test="geonet:info/owner='true'">-->
+        <xsl:if test="
+		(/root/gui/config/allow-editing-for-harvested-record = 1 and geonet:info/isHarvested = 'y' and geonet:info/edit='true')
+		or (geonet:info/isHarvested = 'n' and geonet:info/edit='true')">
 			&#160;
 			<button class="content" onclick="return doConfirmDelete('{/root/gui/locService}/metadata.delete?id={$metadata/geonet:info/id}&amp;_tk={/root/gui/_tk}', '{/root/gui/strings/confirmDelete}','{$ltitle}','{$metadata/geonet:info/id}', '{/root/gui/strings/deleteConfirmationTitle}')"><xsl:value-of select="/root/gui/strings/delete"/></button>
 		</xsl:if>
