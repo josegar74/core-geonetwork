@@ -32,6 +32,7 @@
 			<class name=".services.metadata.Show"/>
 
 			<output sheet="metadata-show.xsl">
+                <call name="_tk" class="jeeves.services.GetSecureToken" />
 				<call name="services" class="jeeves.guiservices.services.Get"/>
 				<call name="currTab"  class=".guiservices.util.GetCurrentMDTab"/>
 				<call name="position" class=".guiservices.util.GetPositionMD"/>
