@@ -92,7 +92,7 @@ Modalbox.Methods = {
 		this.setOptions(options);
 		
 		if(this.options.title) // Updating title of the MB
-			$(this.MBcaption).update(this.options.title);
+			$(this.MBcaption).update(encodeURIComponent(this.options.title));
 		else { // If title isn't given, the header will not displayed
 			$(this.MBheader).hide();
 			$(this.MBcaption).hide();
