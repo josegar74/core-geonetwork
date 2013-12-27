@@ -193,6 +193,7 @@ GeoNetwork.editor.ConceptSelectionPanel = Ext.extend(Ext.Panel, {
         var combo = new Ext.form.ComboBox({
             store: this.keywordStore,
             triggerAction: 'all',
+            editable: false,
             mode: 'remote',
             displayField: 'value',
             valueField: 'uri',
@@ -321,6 +322,123 @@ GeoNetwork.editor.ConceptSelectionPanel = Ext.extend(Ext.Panel, {
         } else {
             return [dv];
         }
+    },
+    /** private: method[generateSelectionCheckList]
+     *
+     *  Create a multiple selection list using checkboxes for selecting keywords.
+     *  If the mode is multiplelist, the multiple selection is allowed.
+     *
+     *
+     */
+    generateSelectionCheckList: function () {
+        var self = this;
+
+        // Custom number of max items
+        var dv = new Ext.DataView({
+            id: self.renderTo.replace("_panel", "_dv"),
+            store: this.keywordStore,
+            tpl: GeoNetwork.Templates.KEYWORD_ITEM_CHECKBOX,
+            autoHeight: true,
+            simpleSelect: true,
+            multiSelect: true,
+            singleSelect: true,
+            width: this.itemSelectorWidth,
+            height: this.itemSelectorHeight,
+            // Dummy value, important to use a no existing value, to avoid using selection model of DataView as
+            // has issues with checkboxes. If used, the checkboxes doesn't work due to multiSelect = true,
+            // caused by e.preventDefault() in:
+            //
+            //  onItemClick : function(item, index, e){
+            //    ...
+            //    if(this.multiSelect){
+            //      this.doMultiSelection(item, index, e);
+            //      e.preventDefault();
+            itemSelector: 'div.thumb-wrap',
+            listeners: {
+                // On selection, remove all current selection
+                // and add the selected one
+                // to the selected keyword store selection.
+                //selectionchange: selectionChangeCb,
+                afterrender: function () {
+                    // Load all keyword for the current thesaurus
+                    this.keywordStore.on('load', function () {
+
+                        // Custom callback which load response to the loading area
+                        // When the initial keyword set will be loaded in the loading area
+                        // the list of keywords will be added to the selected store.
+                        var cb = function (response) {
+                            self.loadingKeywordStore.loadData(response.responseXML, true);
+                        };
+
+                        var cmp = Ext.get(self.id);
+                        // Uncheck all the checkboxes
+                        var chk = cmp.query('input[type=checkbox]')
+                        Ext.each(chk, function(c) {
+                            c.checked = false;
+                        });
+
+                        // Get initial keyword in the data view and select them
+                        Ext.each(self.initialKeyword, function (initKeyword) {
+                            var filter = self.identificationMode || 'value';
+                            var p = self.keywordStore.find(filter, initKeyword);
+                            dv.select(p, true);
+
+                            // Add the element to the selectedKeywordStore
+                            var r = self.keywordStore.getAt( p );
+                            self.selectedKeywordStore.add(r)
+
+                            // Check the checkbox
+                            var chk = cmp.query('input[type=checkbox][value='+r.data.value+']')
+                            Ext.each(chk, function(c) {
+                                c.checked = true;
+                            });
+
+                            self.keywordSearch(self.thesaurusIdentifier, initKeyword, cb);
+                        });
+
+
+                        self.generateXML();
+                    });
+
+                    // Load thesaurus keyword to populate the data view
+                    this.keywordStore.baseParams.pThesauri = this.thesaurusIdentifier;
+                    this.keywordStore.baseParams.maxResults = this.maxKeywords;
+                    this.keywordStore.reload();
+
+
+                },
+                scope: this
+            },
+            selectByRecordId: function( id ) {
+                var filter = self.identificationMode || 'value';
+                var p = self.keywordStore.find(filter, id);
+                dv.select(p, true);
+
+                // Add the element to the selectedKeywordStore
+                var r = self.keywordStore.getAt( p );
+                self.selectedKeywordStore.add([r])
+
+                self.generateXML();
+            },
+            deselectByRecordId: function( id ) {
+                var filter = self.identificationMode || 'value';
+                var p = self.keywordStore.find(filter, id);
+                dv.deselect(p);
+
+                // Remove the element from the selectedKeywordStore
+                var pos = self.selectedKeywordStore.find(filter, id);
+                self.selectedKeywordStore.removeAt(pos);
+
+                self.generateXML();
+            }
+        });
+
+        // If no keywords in the initial set, flag the component as initialized
+        if (this.initialKeyword.length === 0 || this.initialKeyword[0] === '') {
+            this.initialKeywordLoaded = true;
+        }
+
+        return [dv];
     },
     /** private: method[getKeywordsItemSelector]
      * 
@@ -713,6 +831,8 @@ GeoNetwork.editor.ConceptSelectionPanel = Ext.extend(Ext.Panel, {
         // * in combobox mode
         if (this.mode === 'combo') {
             fields.push(this.generateSimpleCombo());
+        } else if (this.mode === 'multiplelistchecks') {
+            fields.push(this.generateSelectionCheckList());
         } else if (this.mode === 'list' || this.mode === 'multiplelist' || this.mode === 'multiplelist_with_filter') {
             fields.push(this.generateSelectionList(this.mode.indexOf('with_filter') !== -1));
         } else {

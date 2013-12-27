@@ -287,6 +287,12 @@ GeoNetwork.Templates.KEYWORD_ITEM = new Ext.XTemplate(
     '</tpl>'
 );
 
+GeoNetwork.Templates.KEYWORD_ITEM_CHECKBOX = new Ext.XTemplate(
+    '<tpl for=".">',
+    '<div><input type="checkbox" value="{value}" title="{definition}" onclick="var cmpId = Ext.get(this).dom.parentNode.parentNode.id; if (this.checked) Ext.getCmp(cmpId).selectByRecordId(\'{value}\'); else Ext.getCmp(cmpId).deselectByRecordId(\'{value}\');"/>{value}</div>',
+    '</tpl>'
+);
+
 GeoNetwork.Templates.THESAURUS_HEADER = new Ext.XTemplate(
     '<tpl for=".">',
         '<div class="thesaurusInfo"><span class="title">{title}</span><span class="theme">{theme}</span><span class="filename">({filename})</span></div>',

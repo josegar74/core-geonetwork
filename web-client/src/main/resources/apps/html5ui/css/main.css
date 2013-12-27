@@ -1684,3 +1684,9 @@ dl.xml * dd {
 		margin-left: 0%;
 	}
 }
+
+
+/* Fix for Chrome combo arrow, not displayed in the right */
+.x-form-field-wrap .x-form-trigger {
+    right: 0;
+}
