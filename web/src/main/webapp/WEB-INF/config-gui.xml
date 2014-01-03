@@ -216,9 +216,9 @@
 -->
 <editor-thesaurus>
   <schema id="iso19139">
-    <thesaurus id="geonetwork.thesaurus.local.theme.initiative" type="multiplelistchecks" listOfTransformations="'to-iso19139-keyword'" />
-    <thesaurus id="geonetwork.thesaurus.local.theme.serviceclasiffication" type="combo" listOfTransformations="'to-iso19139-keyword'"/>
-    <thesaurus id="geonetwork.thesaurus.external.theme.gemet-theme" type="multiplelist" listOfTransformations="'to-iso19139-keyword'" />
+    <thesaurus id="geonetwork.thesaurus.local.theme.initiative" type="multiplelistchecks" listOfTransformations="'to-iso19139-keyword'" hideIcons="true" />
+    <thesaurus id="geonetwork.thesaurus.local.theme.serviceclasiffication" type="combo" listOfTransformations="'to-iso19139-keyword'" hideIcons="true" />
+    <thesaurus id="geonetwork.thesaurus.external.theme.gemet-theme" type="multiplelist" listOfTransformations="'to-iso19139-keyword'" hideIcons="true" />
   </schema>
 </editor-thesaurus>
 

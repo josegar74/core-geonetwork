@@ -436,6 +436,8 @@
   <xsl:template mode="complexElement" match="*">
     <xsl:param name="schema"/>
     <xsl:param name="edit" select="false()"/>
+    <xsl:param name="hideIcons" select="'false'"/>
+
     <xsl:param name="title">
       <xsl:call-template name="getTitle">
         <xsl:with-param name="name" select="name(.)"/>
@@ -462,6 +464,7 @@
           <xsl:with-param name="title" select="$title"/>
           <xsl:with-param name="content" select="$content"/>
           <xsl:with-param name="helpLink" select="$helpLink"/>
+          <xsl:with-param name="hideIcons" select="$hideIcons"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
@@ -867,6 +870,7 @@
     <xsl:param name="title"/>
     <xsl:param name="content"/>
     <xsl:param name="helpLink"/>
+    <xsl:param name="hideIcons" select="'false'"/>
 
     <xsl:variable name="id" select="geonet:element/@uuid"/>
     <xsl:variable name="addLink">
@@ -932,6 +936,7 @@
       <xsl:with-param name="schema" select="$schema"/>
       <xsl:with-param name="edit" select="true()"/>
       <xsl:with-param name="id" select="$id"/>
+      <xsl:with-param name="hideIcons" select="$hideIcons"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -1805,6 +1810,7 @@
     <xsl:param name="schema"/>
     <xsl:param name="edit" select="false()"/>
     <xsl:param name="id" select="generate-id(.)"/>
+    <xsl:param name="hideIcons" select="'false'"/>
 
     <xsl:variable name="isXLinked" select="count(ancestor::node()[@xlink:href]) > 0"/>
     <tr id="{$id}">
@@ -1812,7 +1818,13 @@
         <fieldset>
           <legend id="stip.{$helpLink}|{$id}">
             
-            <span class="toggle">
+            <span>
+              <xsl:attribute name="class">
+                <xsl:choose>
+                  <xsl:when test="$hideIcons = 'true'">toggle hidden</xsl:when>
+                  <xsl:otherwise>toggle</xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
               <xsl:if test="/root/gui/config/metadata-view-toggleTab">
                 <xsl:attribute name="onclick">toggleFieldset(Ext.getDom('toggled-bt-<xsl:value-of select="$id"/>'), Ext.getDom('toggled<xsl:value-of select="$id"/>'));</xsl:attribute>
                 <div class="button tgDown" id="toggled-bt-{$id}">&#160;</div>
@@ -1841,6 +1853,8 @@
                 <xsl:with-param name="downLink" select="$downLink"/>
                 <xsl:with-param name="validationLink" select="$validationLink"/>
                 <xsl:with-param name="id" select="$id"/>
+                <xsl:with-param name="hideIcons" select="$hideIcons"/>
+
               </xsl:call-template>
             </xsl:if>
           </legend>

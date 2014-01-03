@@ -1404,43 +1404,49 @@
     
     <xsl:choose>
       <xsl:when test="$edit=true()">
-    
-        <xsl:apply-templates mode="complexElement" select=".">
-          <xsl:with-param name="schema"  select="$schema"/>
-          <xsl:with-param name="edit"    select="$edit"/>
-          <xsl:with-param name="content">
-            
-            <xsl:variable name="thesaurusName" select="gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString"></xsl:variable>
-            <xsl:variable name="thesaurusCode" select="if (gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/
+
+        <xsl:variable name="thesaurusName" select="gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString"></xsl:variable>
+        <xsl:variable name="thesaurusCode" select="if (gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/
               gmd:identifier/gmd:MD_Identifier/gmd:code) then gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/
               gmd:identifier/gmd:MD_Identifier/gmd:code else /root/gui/thesaurus/thesauri/thesaurus[title=$thesaurusName]/key"/>
-            
-            <xsl:choose>
-              <!-- If a thesaurus is attached to that keyword group 
-              use a snippet editor. 
-              TODO : check that the thesaurus is available in the catalogue to not 
-              to try to initialize a widget with a non existing thesaurus. -->
-              <xsl:when test="$thesaurusCode != ''">
-                <xsl:apply-templates select="gmd:MD_Keywords" mode="snippet-editor">
-                  <xsl:with-param name="edit" select="$edit"/>
-                  <xsl:with-param name="schema" select="$schema"/>
-                </xsl:apply-templates>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:variable name="content">
-                  <xsl:apply-templates select="gmd:MD_Keywords" mode="classic-editor">
-                    <xsl:with-param name="edit" select="$edit"/>
-                    <xsl:with-param name="schema" select="$schema"/>
-                  </xsl:apply-templates>
-                </xsl:variable>
-                
-                <xsl:call-template name="columnElementGui">
-                  <xsl:with-param name="cols" select="$content"/>
-                </xsl:call-template>
-              </xsl:otherwise>
-            </xsl:choose>
-            
-            
+
+
+            <xsl:apply-templates mode="complexElement" select=".">
+              <xsl:with-param name="schema"  select="$schema"/>
+              <xsl:with-param name="edit"    select="$edit"/>
+              <xsl:with-param name="hideIcons">
+                <xsl:choose>
+                  <!-- only hide icons toolbar in simple view -->
+                  <xsl:when test="$currTab != 'simple'">false</xsl:when>
+                  <xsl:when test="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus/@id = $thesaurusCode"><xsl:value-of select="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus[@id = $thesaurusCode]/@hideIcons" /></xsl:when>
+                  <xsl:otherwise>false</xsl:otherwise>
+                </xsl:choose>
+              </xsl:with-param>
+              <xsl:with-param name="content">
+                <xsl:choose>
+                  <!-- If a thesaurus is attached to that keyword group
+                  use a snippet editor.
+                  TODO : check that the thesaurus is available in the catalogue to not
+                  to try to initialize a widget with a non existing thesaurus. -->
+                  <xsl:when test="$thesaurusCode != ''">
+                    <xsl:apply-templates select="gmd:MD_Keywords" mode="snippet-editor">
+                      <xsl:with-param name="edit" select="$edit"/>
+                      <xsl:with-param name="schema" select="$schema"/>
+                    </xsl:apply-templates>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:variable name="content">
+                      <xsl:apply-templates select="gmd:MD_Keywords" mode="classic-editor">
+                        <xsl:with-param name="edit" select="$edit"/>
+                        <xsl:with-param name="schema" select="$schema"/>
+                      </xsl:apply-templates>
+                    </xsl:variable>
+
+                    <xsl:call-template name="columnElementGui">
+                      <xsl:with-param name="cols" select="$content"/>
+                    </xsl:call-template>
+                  </xsl:otherwise>
+                </xsl:choose>
           </xsl:with-param>
         </xsl:apply-templates>
       </xsl:when>

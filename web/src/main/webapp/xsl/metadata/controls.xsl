@@ -50,9 +50,16 @@
     <xsl:param name="downLink"/>
     <xsl:param name="validationLink"/>
     <xsl:param name="id"/>
+    <xsl:param name="hideIcons" select="'false'"/>
 
 
-    <span class="buttons" id="buttons_{$id}">
+    <span id="buttons_{$id}">
+      <xsl:attribute name="class">
+        <xsl:choose>
+          <xsl:when test="$hideIcons = 'true'">buttons hidden</xsl:when>
+          <xsl:otherwise>buttons</xsl:otherwise>
+        </xsl:choose>
+      </xsl:attribute>
       <!-- 
 				add as remote XML fragment button when relevant -->
       <xsl:if test="normalize-space($addXMLFragment)">
