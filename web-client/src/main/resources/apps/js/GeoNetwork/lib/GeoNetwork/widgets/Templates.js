@@ -295,6 +295,6 @@ GeoNetwork.Templates.KEYWORD_ITEM_CHECKBOX = new Ext.XTemplate(
 
 GeoNetwork.Templates.THESAURUS_HEADER = new Ext.XTemplate(
     '<tpl for=".">',
-        '<div class="thesaurusInfo"><span class="title">{title}</span><span class="theme">{theme}</span><span class="filename">({filename})</span></div>',
+        '<div class="thesaurusInfo"><span class="title">{title}</span><span class="theme hidden">{theme}</span><span class="filename hidden">({filename})</span></div>',
     '</tpl>'
 );
