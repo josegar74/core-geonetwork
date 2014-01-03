@@ -351,7 +351,7 @@
           <gmd:onLine>
             <gmd:CI_OnlineResource>
               <gmd:linkage>
-                <gmd:URL>http://localhost:8080/geonetwork/srv/en/resources.get?uuid=655b556a-b122-40a5-b233-cf1be3c84301&fname=&access=private</gmd:URL>
+                <gmd:URL/>
               </gmd:linkage>
               <gmd:protocol>
                 <gco:CharacterString>WWW:DOWNLOAD-1.0-http--download</gco:CharacterString>
