@@ -1690,3 +1690,8 @@ dl.xml * dd {
 .x-form-field-wrap .x-form-trigger {
     right: 0;
 }
+
+
+.dataViewMultiselect {
+    border: 1px solid #7EADD9;
+}

@@ -276,8 +276,10 @@ GeoNetwork.editor.ConceptSelectionPanel = Ext.extend(Ext.Panel, {
             singleSelect: true,
             width: this.itemSelectorWidth,
             height: this.itemSelectorHeight,
+            autoScroll: this.mode === 'multiplelist' ? true : false,
             selectedClass: 'ux-mselect-selected',
             itemSelector: 'div.ux-mselect-item',
+            cls: this.mode === 'multiplelist' ? 'dataViewMultiselect' : '',
             listeners: {
                 // On selection, remove all current selection 
                 // and add the selected one
