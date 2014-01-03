@@ -534,7 +534,17 @@ function handleCheckboxAsBoolean (input, ref) {
 function swapControls(el1, el2){
     var el1Descs = getControlsFromElement(el1);
     var el2Descs = getControlsFromElement(el2);
-    
+
+    var idEl1 = el1.getAttribute('id');
+    var visibleEl1 = !Ext.get('buttons_' + idEl1).hasClass('hidden');
+
+    var idEl2 = el2.getAttribute('id');
+    var visibleEl2 = !Ext.get('buttons_' + idEl2).hasClass('hidden');
+
+    // Put all visible to swap controls (hidden class is used in keywords to hide the buttons for specific thesaurus)
+    Ext.get('buttons_' + idEl2).removeClass('hidden');
+    Ext.get('buttons_' + idEl1).removeClass('hidden');
+
     for (var index = 0; index < el1Descs.length; ++index) {
         var visible1 = el1Descs[index].isVisible();
         var visible2 = el2Descs[index] ? el2Descs[index].isVisible() : false;
@@ -550,6 +560,19 @@ function swapControls(el1, el2){
         } else {
             el1Descs[index].hide();
        }
+    }
+
+    // Restore controls visibility (hidden class is used in keywords to hide the buttons for specific thesaurus)
+    if (visibleEl1) {
+        Ext.get('buttons_' + idEl1).removeClass('hidden');
+    } else {
+        Ext.get('buttons_' + idEl1).addClass('hidden');
+    }
+
+    if (visibleEl2) {
+        Ext.get('buttons_' + idEl2).removeClass('hidden');
+    } else {
+        Ext.get('buttons_' + idEl2).addClass('hidden');
     }
 }
 
