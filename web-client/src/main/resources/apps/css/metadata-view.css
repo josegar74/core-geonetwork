@@ -413,3 +413,18 @@ div.help ul li {
   list-style-type : circle !important;
   margin-left : 10px !important;
 }
+
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+/* Fix for Chrome combo arrow, not displayed in the right */
+.x-form-field-wrap .x-form-trigger {
+    right: 0;
+}
+
+
+.dataViewMultiselect {
+    border: 1px solid #7EADD9;
+}
