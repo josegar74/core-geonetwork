@@ -1332,6 +1332,7 @@
     <xsl:variable name="widgetMode">
       <xsl:choose>
         <xsl:when test="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus/@id = $thesaurusId"><xsl:value-of select="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus[@id = $thesaurusId]/@type" /></xsl:when>
+        <xsl:when test="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus/@id = $thesaurusName"><xsl:value-of select="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus[@id = $thesaurusName]/@type" /></xsl:when>
         <xsl:otherwise></xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -1342,6 +1343,7 @@
     <xsl:variable name="listOfTransformations">
       <xsl:choose>
         <xsl:when test="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus/@id = $thesaurusId"><xsl:value-of select="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus[@id = $thesaurusId]/@listOfTransformations" /></xsl:when>
+        <xsl:when test="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus/@id = $thesaurusName"><xsl:value-of select="/root/gui/config/editor-thesaurus/schema[@id='iso19139']/thesaurus[@id = $thesaurusName]/@listOfTransformations" /></xsl:when>
         <xsl:otherwise>'to-iso19139-keyword', 'to-iso19139-keyword-with-anchor', 'to-iso19139-keyword-as-xlink'</xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
