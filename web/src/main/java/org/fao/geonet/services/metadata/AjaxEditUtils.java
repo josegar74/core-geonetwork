@@ -649,7 +649,8 @@ public class AjaxEditUtils extends EditUtils {
         dataManager.notifyMetadataChange(dbms, md, id);
 
 		//--- update search criteria
-        dataManager.indexInThreadPoolIfPossible(dbms,id);
+        boolean workspace = false; // TODO: Jose review
+        dataManager.indexInThreadPoolIfPossible(dbms,id, workspace);
 
 		return true;
 	}
@@ -706,8 +707,27 @@ public class AjaxEditUtils extends EditUtils {
         dataManager.notifyMetadataChange(dbms, md, id);
 
 		//--- update search criteria
-        dataManager.indexInThreadPoolIfPossible(dbms, id);
+        boolean workspace = false; // TODO: Jose review
+        dataManager.indexInThreadPoolIfPossible(dbms, id, workspace);
 
 		return true;
 	}
+
+    /***************************************/
+    /* Workspace API                       */
+    /***************************************/
+
+    public Element getMetadataEmbeddedFromWorkspace(ServiceContext srvContext, String id,
+                                                    boolean forEditing, boolean withValidationErrors) throws Exception {
+        boolean keepXlinkAttributes = false;
+        Element md = dataManager.getMetadataFromWorkspace(srvContext, id, forEditing,
+                withValidationErrors, keepXlinkAttributes, true, true);
+
+        if(md != null) {
+            UserSession session = srvContext.getUserSession();
+            setMetadataIntoSession(session, md, id);
+        }
+
+        return md;
+    }
 }

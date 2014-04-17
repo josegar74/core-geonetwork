@@ -819,7 +819,44 @@
            <output file="true"/>
            <error id="illegal-params" sheet="metadata-error.xsl"/>
        </service>
-        
-    </services>
+
+      <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+      <!-- unlock locked metadata -->
+      <service name="metadata.unlock">
+        <class name=".services.metadata.Unlock"/>
+        <output sheet="infomodal.xsl">
+          <xml name="info" file="xml/metadata-unlock.xml" />
+        </output>
+      </service>
+
+
+      <service name="metadata.grab.lock.form">
+        <class name=".services.user.List" />
+        <output sheet="metadata-grab-lock.xsl"/>
+      </service>
+
+
+      <service name="metadata.grab.lock">
+        <class name=".services.metadata.GrabLock" />
+        <!--<output sheet="metadata-grab-lock-results.xsl">
+            <xml name="info" file="xml/metadata-grabLock.xml" />
+        </output>-->
+      </service>
+
+      <service name="metadata.list.locked">
+        <class name=".services.metadata.GetLocked" />
+        <output sheet="search-results.xsl">
+          <call name="searchDefaults" class=".guiservices.search.GetDefaults" />
+          <call name="groups" class=".guiservices.groups.GetMine" />
+          <call name="sources" class=".guiservices.util.Sources" />
+          <call name="services" class="jeeves.guiservices.services.Get" />
+          <call name="repositories" class=".services.main.Info">
+            <param name="type" value="z3950repositories" />
+          </call>
+        </output>
+      </service>
+
+  </services>
 </geonet>
 

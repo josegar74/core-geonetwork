@@ -94,6 +94,7 @@ import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Edit;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.exceptions.UnAuthorizedException;
+import org.fao.geonet.kernel.AccessManager;
 import org.fao.geonet.kernel.MdInfo;
 import org.fao.geonet.kernel.search.LuceneConfig.Facet;
 import org.fao.geonet.kernel.search.LuceneConfig.FacetConfig;
@@ -290,8 +291,12 @@ public class LuceneSearcher extends MetaSearcher {
                     }
 					String id = doc.get("_id");
 					Element md = null;
-	
-					if (fast) {
+
+                    AccessManager accessMan = gc.getAccessManager();
+                    Dbms dbms = (Dbms) srvContext.getResourceManager().open(Geonet.Res.MAIN_DB);
+                    boolean getWorkspaceCopy = accessMan.canEdit(srvContext, id) && gc.getDataManager().isLocked(dbms, id);
+
+                    if (fast) {
 						md = LuceneSearcher.getMetadataFromIndex(doc, id, false, null, null, null);
 					}
                     else if ("index".equals(sFast)) {
@@ -303,7 +308,11 @@ public class LuceneSearcher extends MetaSearcher {
                     }
                     else if (srvContext != null) {
                         boolean forEditing = false, withValidationErrors = false, keepXlinkAttributes = false;
-                        md = gc.getDataManager().getMetadata(srvContext, id, forEditing, withValidationErrors, keepXlinkAttributes);
+                        if(getWorkspaceCopy) {
+                            md = gc.getDataManager().getMetadataFromWorkspace(srvContext, id, forEditing, withValidationErrors, keepXlinkAttributes, true);
+                        } else {
+                            md = gc.getDataManager().getMetadata(srvContext, id, forEditing, withValidationErrors, keepXlinkAttributes);
+                        }
 					}
 	
 					//--- a metadata could have been deleted just before showing 
@@ -1493,7 +1502,9 @@ public class LuceneSearcher extends MetaSearcher {
       try {
           for ( ScoreDoc sdoc : tdocs.scoreDocs ) {
               DocumentStoredFieldVisitor docVisitor = new DocumentStoredFieldVisitor("_id", "_root", "_schema", "_createDate", "_changeDate",
-                      "_source", "_isTemplate", "_title", "_uuid", "_isHarvested", "_owner", "_groupOwner");
+                      "_source", "_isTemplate", "_title", "_uuid", "_isHarvested", "_owner", "_groupOwner",
+                      LuceneIndexField._IS_LOCKED, LuceneIndexField._LOCKEDBY, LuceneIndexField._STATUS);
+
               indexAndTaxonomy.indexReader.document(sdoc.doc, docVisitor);
               Document doc = docVisitor.getDocument();
     
@@ -1525,7 +1536,19 @@ public class LuceneSearcher extends MetaSearcher {
               mdInfo.root         = doc.get("_root");
               mdInfo.owner        = doc.get("_owner");
               mdInfo.groupOwner   = doc.get("_groupOwner");
-    
+
+              String isLocked  = doc.get(LuceneIndexField._IS_LOCKED);
+              if (isLocked != null) {
+                  mdInfo.isLocked  = doc.get(LuceneIndexField._IS_LOCKED).equals("y");
+              }
+              else {
+                  mdInfo.isLocked  = false;
+              }
+
+              mdInfo.lockedBy = doc.get(LuceneIndexField._LOCKEDBY);
+              mdInfo.status = doc.get(LuceneIndexField._STATUS);
+
+
               response.put(Integer.parseInt(mdInfo.id), mdInfo);
           }
       } finally {
@@ -1545,6 +1568,10 @@ public class LuceneSearcher extends MetaSearcher {
      */
     public static String getMetadataFromIndex(String priorityLang, String id, String fieldname) throws Exception {
             return LuceneSearcher.getMetadataFromIndex(priorityLang, id, Collections.singleton(fieldname)).get(fieldname);
+    }
+
+    public static String getMetadataFromIndexWorkspace(String priorityLang, String id, String fieldname) throws Exception {
+        return LuceneSearcher.getMetadataFromIndexWorkspace(priorityLang, id, Collections.singleton(fieldname)).get(fieldname);
     }
 
     /**
@@ -1572,7 +1599,11 @@ public class LuceneSearcher extends MetaSearcher {
     private static Map<String,String> getMetadataFromIndex(String priorityLang, String uuid, Set<String> fieldnames) throws Exception {
         return LuceneSearcher.getMetadataFromIndex(priorityLang, "_uuid", uuid, fieldnames);
     }
-    
+
+    private static Map<String,String> getMetadataFromIndexWorkspace(String priorityLang, String uuid, Set<String> fieldnames) throws Exception {
+        return LuceneSearcher.getMetadataFromIndexWorkspace(priorityLang, "_uuid", uuid, fieldnames);
+    }
+
     public static Map<String,String> getMetadataFromIndex(String priorityLang, String idField, String id, Set<String> fieldnames) throws Exception {
         Map<String,Map<String,String>> results = LuceneSearcher.getAllMetadataFromIndexFor(priorityLang, idField, id, fieldnames, false);
         if (results.size() == 1) {
@@ -1581,6 +1612,16 @@ public class LuceneSearcher extends MetaSearcher {
             return new HashMap<String, String>();
         }
     }
+
+    public static Map<String,String> getMetadataFromIndexWorkspace(String priorityLang, String idField, String id, Set<String> fieldnames) throws Exception {
+        Map<String,Map<String,String>> results = LuceneSearcher.getAllMetadataFromIndexWorkspaceFor(priorityLang, idField, id, fieldnames, false);
+        if (results.size() == 1) {
+            return (Map<String, String>) results.values().toArray()[0];
+        } else {
+            return new HashMap<String, String>();
+        }
+    }
+
     /**
      * Get Lucene index fields for matching records
      * 
@@ -1638,6 +1679,87 @@ public class LuceneSearcher extends MetaSearcher {
                     values.put(fieldname, doc.get(fieldname));
                 }
                 
+                records.put(String.valueOf(counter), values);
+                counter ++;
+            }
+
+        } catch (CorruptIndexException e) {
+            // TODO: handle exception
+            Log.error(Geonet.LUCENE, e.getMessage());
+        }
+        catch (IOException e) {
+            // TODO: handle exception
+            Log.error(Geonet.LUCENE, e.getMessage());
+        } finally {
+            searchmanager.releaseIndexReader(indexAndTaxonomy);
+        }
+        return records;
+    }
+
+    /**
+     * Get Lucene index fields for matching records
+     *
+     * @param priorityLang  Preferred index language to use.
+     * @param field   Field to search for (eg. _uuid)
+     * @param value    Value to search for
+     * @param returnFields    Fields to return
+     * @param checkAllHits If false, only the first match is analyzed for returned field.
+     * Set to true when searching on uuid field and only one record is expected.
+     *
+     * @return
+     * @throws Exception
+     */
+    public static Map<String,Map<String,String>> getAllMetadataFromIndexWorkspaceFor(String priorityLang, String field, String value, Set<String> returnFields, boolean checkAllHits) throws Exception {
+        final IndexAndTaxonomy indexAndTaxonomy;
+        final SearchManager searchmanager;
+        ServiceContext context = ServiceContext.get();
+        GeonetworkMultiReader reader;
+        if (context != null) {
+            GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
+            searchmanager = gc.getSearchmanager();
+            indexAndTaxonomy = searchmanager.getNewIndexReader(priorityLang);
+            reader = indexAndTaxonomy.indexReader;
+        } else {
+            throw new IllegalStateException("There needs to be a ServiceContext in the thread local for this thread");
+        }
+
+        Map<String, Map<String, String>> records = new HashMap<String, Map<String, String>>();
+
+        try {
+            IndexSearcher searcher = new IndexSearcher(reader);
+
+            TermQuery queryId =new TermQuery(new Term(field, value));
+            TermQuery queryWorkspace = new TermQuery(new Term(LuceneIndexField._IS_WORKSPACE, "true"));
+
+            BooleanQuery query = new BooleanQuery();
+            query.add(queryId, BooleanClause.Occur.MUST);
+            query.add(queryWorkspace, BooleanClause.Occur.MUST);
+
+            SettingInfo settingInfo = _sm.get_settingInfo();
+            boolean sortRequestedLanguageOnTop = settingInfo.getRequestedLanguageOnTop();
+            if(Log.isDebugEnabled(Geonet.LUCENE))
+                Log.debug(Geonet.LUCENE, "sortRequestedLanguageOnTop: " + sortRequestedLanguageOnTop);
+
+            int numberOfHits = 1;
+            int counter = 0;
+            if (checkAllHits) {
+                numberOfHits = Integer.MAX_VALUE;
+            }
+            Sort sort = LuceneSearcher.makeSort(Collections.<Pair<String, Boolean>>emptyList(), priorityLang, sortRequestedLanguageOnTop);
+            Filter filter = NoFilterFilter.instance();
+            TopDocs tdocs = searcher.search(query, filter, numberOfHits, sort);
+
+            for( ScoreDoc sdoc : tdocs.scoreDocs ) {
+                Map<String, String> values = new HashMap<String, String>();
+
+                DocumentStoredFieldVisitor docVisitor = new DocumentStoredFieldVisitor(returnFields);
+                reader.document(sdoc.doc, docVisitor);
+                Document doc = docVisitor.getDocument();
+
+                for( String fieldname : returnFields ) {
+                    values.put(fieldname, doc.get(fieldname));
+                }
+
                 records.put(String.valueOf(counter), values);
                 counter ++;
             }

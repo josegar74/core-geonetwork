@@ -40,6 +40,7 @@ import jeeves.utils.Util;
 import jeeves.utils.Xml;
 import jeeves.xlink.Processor;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Priority;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
@@ -407,14 +408,147 @@ public abstract class XmlSerializer {
         }
 	}
 
+    /***************************************/
+    /* Workspace API                       */
+    /***************************************/
+
+    protected void updateDbWorkspace(Dbms dbms, String id, Element xml, String changeDate, String root, boolean updateDateStamp) throws SQLException {
+        if (resolveXLinks()) Processor.removeXLink(xml);
+
+        String query = "UPDATE Workspace SET data=?, changeDate=?, root=? WHERE id=?";
+        String queryMinor = "UPDATE Workspace SET data=?, root=? WHERE id=?";
+        Vector<Serializable> args = new Vector<Serializable>();
+        fixCR(xml);
+        args.add(Xml.getString(xml));
+        if (updateDateStamp) {
+            if (changeDate == null)	{
+                args.add(new ISODate().toString());
+            } else {
+                args.add(changeDate);
+            }
+        }
+        args.add(root);
+        args.add(new Integer(id));
+        if (updateDateStamp)  {
+            dbms.execute(query, args.toArray());
+        } else {
+            dbms.execute(queryMinor, args.toArray());
+        }
+    }
+
+    /**
+     * Deletes a record from workspace.
+     *
+     * @param dbms
+     * @param id
+     * @throws SQLException
+     */
+    protected void deleteFromWorkspaceDB(Dbms dbms, String id) throws SQLException {
+        String  query = "DELETE FROM MetadataInfocategoryWorkspace WHERE metadataId=?";
+        Vector<Serializable> args = new Vector<Serializable>();
+        args.add(new Integer(id));
+        dbms.execute(query, args.toArray());
+
+        query = "DELETE FROM Workspace WHERE id=?";
+        dbms.execute(query, args.toArray());
+    }
+
+    public void copyToWorkspace(Dbms dbms, String id) throws SQLException {
+        Element result = dbms.select("SELECT * FROM Metadata WHERE id=?", new Integer(id));
+
+        if(result == null) {
+            throw new IllegalArgumentException("Could not find metadata with id " + id);
+        }
+        else {
+
+            List results = result.getChildren();
+
+            if(CollectionUtils.isEmpty(results)) {
+                throw new IllegalArgumentException("Could not find metadata with id " + id);
+            }
+            else if(results.size() > 1) {
+                throw new IllegalArgumentException("Found more than 1 metadata with id " + id);
+            }
+            else {
+                Element record = (Element)results.get(0);
+
+                String uuid = record.getChildText("uuid");
+                String schemaId = record.getChildText("schemaid");
+                String isTemplate = record.getChildText("istemplate");
+                String isHarvested = record.getChildText("isharvested");
+                String isLocked = record.getChildText("islocked");
+                String lockedBy = record.getChildText("lockedby");
+                String createDate = record.getChildText("createdate");
+                String changeDate = record.getChildText("changedate");
+                String data = record.getChildText("data");
+                String source = record.getChildText("source");
+                String title = record.getChildText("title");
+                String root = record.getChildText("root");
+                String harvestUuid = record.getChildText("harvestuuid");
+                String owner = record.getChildText("owner");
+                String docType = record.getChildText("doctype");
+                String groupOwner = record.getChildText("groupowner");
+                String harvestUri = record.getChildText("harvesturi");
+                String rating = record.getChildText("rating");
+                String popularity = record.getChildText("popularity");
+                String displayorder = record.getChildText("displayorder");
+
+
+                StringBuffer fields = new StringBuffer("id, schemaId, data, createDate, changeDate, source, uuid, " +
+                        "isTemplate, isHarvested, isLocked, lockedBy, root, owner, doctype");
+
+                StringBuffer values = new StringBuffer("?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
+
+                Vector<Serializable> args = new Vector<Serializable>();
+
+                args.add(new Integer(id));
+                args.add(schemaId);
+                args.add(data);
+                args.add(createDate);
+                args.add(changeDate);
+                args.add(source);
+                args.add(uuid);
+                args.add(isTemplate);
+                args.add(isHarvested);
+                args.add(isLocked);
+                args.add(new Integer(lockedBy));
+                args.add(root);
+                args.add(new Integer(owner));
+                args.add(docType);
+
+                if (groupOwner != null) {
+                    fields.append(", groupOwner");
+                    values.append(", ?");
+                    args.add(groupOwner);
+                }
+
+                if (title != null) {
+                    fields.append(", title");
+                    values.append(", ?");
+                    args.add(title);
+                }
+
+                String query = "INSERT INTO Workspace (" + fields + ") VALUES(" + values + ")";
+                dbms.execute(query, args.toArray());
+            }
+        }
+    }
+
 	/* API to be overridden by extensions */
 
 	public abstract void delete(Dbms dbms, String table, String id, ServiceContext context) 
 	   throws Exception;
 
+    public abstract void deleteFromWorkspace(Dbms dbms, String id)
+            throws Exception;
+
 	public abstract void update(Dbms dbms, String id, Element xml, 
 		 String changeDate, boolean updateDateStamp, String uuid, ServiceContext context) 
 		 throws Exception;
+
+    public abstract void updateWorkspace(Dbms dbms, String id, Element xml,
+                                         String changeDate, boolean updateDateStamp, ServiceContext context)
+            throws Exception;
 
 	public abstract String insert(Dbms dbms, String schema, Element xml, 
 					 int serial, String source, String uuid, String createDate,

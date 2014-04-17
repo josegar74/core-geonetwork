@@ -109,4 +109,26 @@ public class StatusActionsFactory {
       });
 	}
 
+    /**
+     * When edit sessino is canceled, set current status to the last status before the current DRAFT status.
+     *
+     * @param sa StatusActions class to call statusChange method from
+     * @param id The metadata records to set status on
+     * @throws Exception hmm
+     */
+    public void onCancelEdit(StatusActions sa, String id) throws Exception {
+        Method onCancelEdit = statusRules.getMethod("onCancelEdit", new Class[] {
+                String.class    /* metadata id */
+        });
+
+        try {
+            onCancelEdit.invoke(sa, id);
+
+        }
+        catch(InvocationTargetException x) {
+            x.getCause().printStackTrace();
+            throw x;
+        }
+    }
+
 }

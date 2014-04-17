@@ -67,6 +67,8 @@ ConfigModel.prototype.getConfig_OK = function(node)
       REQUESTED_LANGUAGE_ONLY : xml.evalXPath(node, 'requestedLanguage/only'),
       REQUESTED_LANGUAGE_SORTED : xml.evalXPath(node, 'requestedLanguage/sorted'),
 
+      SYMBOLIC_LOCKING_ENABLE: xml.evalXPath(node, 'symbolicLocking/enable'),
+
 			DOWNLOADSERVICE_LEAVE         : xml.evalXPath(node, 'downloadservice/leave'),
 			DOWNLOADSERVICE_SIMPLE         : xml.evalXPath(node, 'downloadservice/simple'),
 			DOWNLOADSERVICE_WITHDISCLAIMER : xml.evalXPath(node, 'downloadservice/withdisclaimer'),
@@ -204,6 +206,9 @@ ConfigModel.updateTemp =
 '        <only>{REQUESTED_LANGUAGE_ONLY}</only>' +
 '        <sorted>{REQUESTED_LANGUAGE_SORTED}</sorted>' +
 '	</requestedLanguage>'+
+' <symbolicLocking>'+
+'		<enable>{SYMBOLIC_LOCKING_ENABLE}</enable>'+
+' </symbolicLocking>'+
 '	<downloadservice>'+
 '		<leave>{DOWNLOADSERVICE_LEAVE}</leave>'+
 '		<simple>{DOWNLOADSERVICE_SIMPLE}</simple>'+

@@ -151,7 +151,8 @@ public class Insert extends NotInReadOnlyModeService {
 		} 
 
 		// Index
-        dm.indexInThreadPool(context, id.get(0), dbms);
+        boolean workspace = false;
+        dm.indexInThreadPool(context, id.get(0), dbms, workspace);
         
 		// Return response
 		Element response = new Element(Jeeves.Elem.RESPONSE);

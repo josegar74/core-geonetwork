@@ -95,7 +95,9 @@ public class Import extends NotInReadOnlyModeService {
         while (iter.hasNext()) {
             String item = (String) iter.next();
             ids += item + ";";
-						dm.indexInThreadPool(context, item, dbms);	
+
+            boolean workspace = false;
+            dm.indexInThreadPool(context, id, dbms, workspace);
         }
 
         file.delete();

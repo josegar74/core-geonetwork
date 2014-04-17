@@ -183,6 +183,7 @@ public final class Params {
         public static final String RETIRED   = "3";
         public static final String SUBMITTED = "4";
         public static final String REJECTED  = "5";
+        public static final String APPROVED_DRAFT  = "6";
 	}
 
     /**

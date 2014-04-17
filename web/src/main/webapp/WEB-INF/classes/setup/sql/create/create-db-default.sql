@@ -306,6 +306,8 @@ CREATE TABLE Metadata
     schemaId     varchar(32)    not null,
     isTemplate   char(1)        default 'n' not null,
     isHarvested  char(1)        default 'n' not null,
+    isLocked     char(1)        default 'n' not null,
+    lockedBy     varchar(36),
     createDate   varchar(30)    not null,
     changeDate   varchar(30)    not null,
     data         longvarchar    not null,
@@ -478,7 +480,8 @@ CREATE TABLE Thesaurus
     primary key(id)
   );
 
-  
+-- ======================================================================
+
 CREATE TABLE Services
   (
   
@@ -489,7 +492,8 @@ CREATE TABLE Services
         
     primary key(id)
   );
-  
+
+-- ======================================================================
 
 CREATE TABLE ServiceParameters
   (
@@ -501,4 +505,49 @@ CREATE TABLE ServiceParameters
     primary key(id),
         
     foreign key(service) references Services(id)
+  );
+
+-- ======================================================================
+
+CREATE TABLE Workspace
+  (
+    id           int,
+    uuid         varchar(250)   not null,
+    schemaId     varchar(32)    not null,
+    isTemplate   char(1)        default 'n' not null,
+    isHarvested  char(1)        default 'n' not null,
+    isLocked     char(1)        default 'n' not null,
+    lockedBy     int,
+    createDate   varchar(30)    not null,
+    changeDate   varchar(30)    not null,
+    data         longvarchar    not null,
+    source       varchar(250)   not null,
+    title        varchar(255),
+    root         varchar(255),
+    harvestUuid  varchar(250)   default null,
+    owner        int    not null,
+    doctype      varchar(255),
+    groupOwner   int            default null,
+    harvestUri   varchar(255)   default null,
+    rating       int            default 0 not null,
+    popularity   int            default 0 not null,
+    displayorder int,
+
+    primary key(id),
+
+    unique(uuid)
+  );
+
+-- ======================================================================
+
+  CREATE TABLE ValidationWorkspace
+  (
+    metadataId   int,
+    valType      varchar(40),
+    status       int,
+    tested       int,
+    failed       int,
+    valDate      varchar(30),
+
+    primary key(metadataId, valType)
   );

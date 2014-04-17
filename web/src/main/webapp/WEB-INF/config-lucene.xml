@@ -84,6 +84,7 @@
     <dumpFields>
       <field name="_isTemplate" tagName="isTemplate"/>
       <field name="_isHarvested" tagName="isHarvested"/>
+      <field name="_isWorkspace" tagName="isWorkspace"/>
       <field name="_popularity" tagName="popularity"/>
       <field name="_rating" tagName="rating"/>
       <field name="_displayOrder" tagName="displayOrder"/>

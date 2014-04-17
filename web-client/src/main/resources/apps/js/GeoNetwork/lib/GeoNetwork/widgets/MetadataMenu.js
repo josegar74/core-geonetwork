@@ -65,6 +65,8 @@ GeoNetwork.MetadataMenu = Ext.extend(Ext.menu.Menu, {
     statusAction: undefined,
     versioningAction: undefined,
     adminAction: undefined,
+    cancelEditSessionAction: undefined,
+    changeEditSessionOwnerAction: undefined,
     categoryAction: undefined,
     viewAction: undefined,
     printAction: undefined,
@@ -135,7 +137,29 @@ GeoNetwork.MetadataMenu = Ext.extend(Ext.menu.Menu, {
             scope: this
         });
 
-        this.statusAction = new Ext.Action({
+       this.cancelEditSessionAction = new Ext.Action({
+         text: OpenLayers.i18n('cancelEditSession'),
+         iconCls : 'unlockIcon',
+         handler: function(){
+           var id = this.record.get('id');
+           this.catalogue.metadataCancelEditSession(id);
+         },
+         scope: this
+       });
+
+       this.changeEditSessionOwnerAction = new Ext.Action({
+         text: OpenLayers.i18n('changeEditSessionOwner'),
+         iconCls : '',
+         handler: function(){
+           var id = this.record.get('id');
+           var lockedBy = this.record.get('lockedBy');
+           this.catalogue.metadataChangeEditSessionOwner(id, lockedBy);
+         },
+         scope: this
+       });
+
+
+       this.statusAction = new Ext.Action({
             text: OpenLayers.i18n('status'),
             tooltip: OpenLayers.i18n('statusTT'),
             iconCls : 'statusIcon',

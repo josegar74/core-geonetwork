@@ -95,6 +95,8 @@ public class Transfer extends NotInReadOnlyModeService {
 
 			dbms.execute("UPDATE Metadata SET owner=?, groupOwner=? WHERE id=?", targetUsr, targetGrp, mdId);
 
+            dbms.execute("UPDATE Workspace SET owner=?, groupOwner=? WHERE id=?", targetUsr, targetGrp, mdId);
+
 			metadata.add(mdId);
 			privCount++;
 		}
@@ -106,8 +108,12 @@ public class Transfer extends NotInReadOnlyModeService {
 		for (int mdId : metadata) {
             list.add(Integer.toString(mdId));
         }
-        
-        dm.indexInThreadPool(context,list, dbms);
+
+        boolean workspace = false;
+        dm.indexInThreadPool(context,list, dbms, workspace);
+
+        workspace = true;
+        dm.indexInThreadPool(context,list, dbms, workspace);
 
 		//--- return summary
 		return new Element("response")

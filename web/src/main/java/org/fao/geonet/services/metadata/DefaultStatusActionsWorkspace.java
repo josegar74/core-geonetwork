@@ -26,26 +26,22 @@ package org.fao.geonet.services.metadata;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
-import jeeves.utils.Xml;
-
 import org.apache.commons.lang.StringUtils;
+import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
 import org.fao.geonet.constants.Params;
-import org.fao.geonet.GeonetContext;
 import org.fao.geonet.kernel.AccessManager;
 import org.fao.geonet.kernel.DataManager;
 import org.fao.geonet.kernel.setting.SettingManager;
-import org.fao.geonet.util.MailSender;
 import org.fao.geonet.util.ISODate;
-
+import org.fao.geonet.util.MailSender;
 import org.jdom.Element;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
-public class DefaultStatusActions implements StatusActions {
+public class DefaultStatusActionsWorkspace implements StatusActions {
 
 	private String host, port, from, fromDescr, replyTo, replyToDescr;
 	private ServiceContext context;
@@ -61,7 +57,7 @@ public class DefaultStatusActions implements StatusActions {
 	/**
 		* Constructor.
 		*/
-	public DefaultStatusActions() {}
+	public DefaultStatusActionsWorkspace() {}
 
 	/** 
 	  * Initializes the StatusActions class with external info from GeoNetwork.
@@ -119,19 +115,26 @@ public class DefaultStatusActions implements StatusActions {
 		* @param minorEdit If true then the edit was a minor edit.
 		*/
 	public void onEdit(int id, boolean minorEdit) throws Exception {
+        if (minorEdit) return;
 
-		if (!minorEdit && dm.getCurrentStatus(dbms, id).equals(Params.Status.APPROVED)) {
-			String changeMessage = "GeoNetwork user "+session.getUserId()+" ("+session.getUsername()+") edited metadata record "+id;
-			unsetAllOperations(id);
-			dm.setStatus(context, dbms, id, Integer.valueOf(Params.Status.DRAFT), new ISODate().toString(), changeMessage);
-		}
-		
-	}
+        boolean hasStatus = dm.hasStatus(dbms, id);
+        String currentStatus = dm.getCurrentStatus(dbms, id);
+
+        if (!hasStatus || (!(currentStatus.equals(Params.Status.DRAFT) || currentStatus.equals(Params.Status.APPROVED_DRAFT)))) {
+            String changeMessage = "GeoNetwork user "+session.getUserId()+" ("+session.getUsername()+") edited metadata record "+id;
+            unsetAllOperations(id);
+
+            String newStatus = Params.Status.DRAFT;
+            if (currentStatus.equals(Params.Status.APPROVED)) newStatus = Params.Status.APPROVED_DRAFT;
+
+            dm.setStatus(context, dbms, id, new Integer(newStatus), new ISODate().toString(), changeMessage);
+        }
+    }
 
     public void onCancelEdit(int id) throws Exception {
         String currentStatus = dm.getCurrentStatus(dbms, id);
 
-        if (currentStatus.equals(Params.Status.DRAFT)) {
+        if (currentStatus.equals(Params.Status.DRAFT) || currentStatus.equals(Params.Status.APPROVED_DRAFT)) {
             String changeMessage = "GeoNetwork user "+session.getUserId()+" ("+session.getUsername()+") canceled edit session for metadata record "+id;
             unsetAllOperations(id);
             String revertToThisStatus = dm.getLastBeforeCurrentStatus(dbms, new Integer(id).intValue());
@@ -214,12 +217,12 @@ public class DefaultStatusActions implements StatusActions {
     * @param mdId The metadata id to unset privileges on
     */
   private void unsetAllOperations(int mdId) throws Exception {
-    String allGroup = "1";
+    /*String allGroup = "1";
     dm.unsetOperation(context, dbms, mdId+"", allGroup, AccessManager.OPER_VIEW);
     dm.unsetOperation(context, dbms, mdId+"", allGroup, AccessManager.OPER_DOWNLOAD);
     dm.unsetOperation(context, dbms, mdId+"", allGroup, AccessManager.OPER_NOTIFY);
     dm.unsetOperation(context, dbms, mdId+"", allGroup, AccessManager.OPER_DYNAMIC);
-    dm.unsetOperation(context, dbms, mdId+"", allGroup, AccessManager.OPER_FEATURED);
+    dm.unsetOperation(context, dbms, mdId+"", allGroup, AccessManager.OPER_FEATURED);*/
   }
 		
 	/**

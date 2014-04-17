@@ -23,6 +23,7 @@
 
 package org.fao.geonet.services.metadata;
 
+import jeeves.exceptions.OperationNotAllowedEx;
 import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
@@ -44,6 +45,8 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 
 import jeeves.utils.Xml;
+
+import java.util.List;
 
 //=============================================================================
 
@@ -99,6 +102,7 @@ public class Show implements Service
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		DataManager   dm = gc.getDataManager();
 		SchemaManager sm = gc.getSchemamanager();
+        AccessManager am = gc.getAccessManager();
 
 		String id = Utils.getIdentifierFromParameters(params, context);
 		boolean skipPopularity = this.skipPopularity;
@@ -118,15 +122,77 @@ public class Show implements Service
 
 		//-----------------------------------------------------------------------
 		//--- get metadata
-		
-		Element elMd;
+
+        String fromWorkspaceParam = Util.getParam(params, "fromWorkspace", "false");
+        boolean fromWorkspace = Boolean.parseBoolean(fromWorkspaceParam);
+
+        Element elMd = null;
 		boolean addEditing = false;
 		if (!skipInfo) {
-            boolean withValidationErrors = false, keepXlinkAttributes = false;
-            elMd = gc.getDataManager().getMetadata(context, id, addEditing, withValidationErrors, keepXlinkAttributes);
+            //boolean withValidationErrors = false, keepXlinkAttributes = false;
+            //elMd = gc.getDataManager().getMetadata(context, id, addEditing, withValidationErrors, keepXlinkAttributes);
+            boolean withValidationErrors = false, keepXlinkAttributes = false, withInfo = true;
+            if(fromWorkspace) {
+                // only allow in same conditions as when View Workspace is displayed in Other Actions (i.e., when
+                // geonet:info/edit is true:
+                if (am.canEdit(context, id) || am.isOwner(context, id)) {
+                    elMd = gc.getDataManager().getMetadataFromWorkspace(context, id, addEditing, withValidationErrors, keepXlinkAttributes, withInfo);
+                } else {
+                    throw new OperationNotAllowedEx("You are not authorized to view this workspace copy");
+                }
+            }
+
+            if(fromWorkspace) {
+                // only allow in same conditions as when View Workspace is displayed in Other Actions (i.e., when
+                // geonet:info/edit is true:
+                if (am.canEdit(context, id) || am.isOwner(context, id)) {
+                    elMd = gc.getDataManager().getMetadataFromWorkspace(context, id, addEditing, withValidationErrors, keepXlinkAttributes, withInfo);
+                } else {
+                    throw new OperationNotAllowedEx("You are not authorized to view this workspace copy");
+                }
+            } else {
+                Dbms dbms = (Dbms) context.getResourceManager().open(Geonet.Res.MAIN_DB);
+
+                List<Element> previousStatuses = dbms.select("SELECT statusId, userId, changeDate FROM MetadataStatus " +
+                        "WHERE metadataId = ? AND (statusId = 2 OR statusId = 3) ORDER BY changeDate DESC", new Integer(id))
+                        .getChildren();
+
+                if (previousStatuses.size() > 0) {
+                    fromWorkspace = false;
+                } else {
+                    fromWorkspace = true;
+                }
+
+                if (fromWorkspace) {
+                    // only allow in same conditions as when View Workspace is displayed in Other Actions (i.e., when
+                    // geonet:info/edit is true:
+                    if (am.canEdit(context, id) || am.isOwner(context, id)) {
+                        elMd = gc.getDataManager().getMetadataFromWorkspace(context, id, addEditing, withValidationErrors, keepXlinkAttributes, withInfo);
+                    }
+                }
+            }
+
+
+            // if not found in workspace, or if not requested from workspace, retrieve from metadata
+            if(elMd == null) {
+                elMd = gc.getDataManager().getMetadata(context, id, addEditing, withValidationErrors, keepXlinkAttributes);
+            }
+
 		}
         else {
-			elMd = dm.getMetadataNoInfo(context, id);
+            if(fromWorkspace) {
+                if (am.canEdit(context, id) || am.isOwner(context, id)) {
+                    boolean withValidationErrors = false, keepXlinkAttributes = false, withInfo = false;
+                    elMd = gc.getDataManager().getMetadataFromWorkspace(context, id, addEditing, withValidationErrors, keepXlinkAttributes, withInfo);
+                } else {
+                    throw new OperationNotAllowedEx("You are not authorized to view this workspace copy");
+                }
+            }
+
+            // if not found in workspace, or if not requested from workspace, retrieve from metadata
+            if(elMd == null) {
+                elMd = dm.getMetadataNoInfo(context, id);
+            }
 		}
 
 		if (elMd == null) throw new MetadataNotFoundEx(id);

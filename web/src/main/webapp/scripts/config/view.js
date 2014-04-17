@@ -203,6 +203,8 @@ ConfigView.prototype.setData = function(data)
   $('requestedLanguage.only').value = data['REQUESTED_LANGUAGE_ONLY'];
   $('requestedLanguage.sorted').checked = data['REQUESTED_LANGUAGE_SORTED'] == 'true';
 
+  $('symbolicLocking.enable').checked = data['SYMBOLIC_LOCKING_ENABLE'] == 'true';
+
 	$('searchStats.enable').checked = data['SEARCHSTATS_ENABLE'] == 'true';
 
 	$('downloadservice.simple')        .checked = data['DOWNLOADSERVICE_SIMPLE'] == 'true';
@@ -319,7 +321,9 @@ ConfigView.prototype.getData = function()
     REQUESTED_LANGUAGE_SORTED : $('requestedLanguage.sorted').checked,
 
 		SEARCHSTATS_ENABLE : $('searchStats.enable').checked,
-	
+
+    SYMBOLIC_LOCKING_ENABLE : $('symbolicLocking.enable').checked,
+
 		DOWNLOADSERVICE_SIMPLE : $('downloadservice.simple').checked,
 		DOWNLOADSERVICE_WITHDISCLAIMER : $('downloadservice.withdisclaimer').checked,
 		DOWNLOADSERVICE_LEAVE : $('downloadservice.leave').checked,

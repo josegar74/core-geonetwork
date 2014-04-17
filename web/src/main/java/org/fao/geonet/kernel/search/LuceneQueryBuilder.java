@@ -923,22 +923,23 @@ public class LuceneQueryBuilder {
 
     /**
      * Add search privilege criteria to a query.
-     * 
+     *
+     * @param groupsQuery
      * @param luceneQueryInput user and system input
-     * @param query query being built
+     * @param selectWorkspaceDocs
      */
-    private void addPrivilegeQuery(LuceneQueryInput luceneQueryInput, BooleanQuery query) {
+    private boolean createGroupsQuery(BooleanQuery groupsQuery, LuceneQueryInput luceneQueryInput, boolean selectWorkspaceDocs) {
         // Set user groups privileges
         Set<String> groups = luceneQueryInput.getGroups();
         String editable$ = luceneQueryInput.getEditable();
         boolean editable = BooleanUtils.toBoolean(editable$);
-        BooleanQuery groupsQuery = new BooleanQuery();
+
         boolean groupsQueryEmpty = true;
         BooleanClause.Occur groupOccur = LuceneUtils.convertRequiredAndProhibitedToOccur(false, false);
         if (!CollectionUtils.isEmpty(groups)) {
             for (String group : groups) {
                 if (StringUtils.isNotBlank(group)) {
-                    if (!editable) {
+                    if (!editable) {    //  && !selectWorkspaceDocs) {
                         // add to view
                         TermQuery viewQuery = new TermQuery(new Term(LuceneIndexField._OP0, group.trim()));
                         BooleanClause viewClause = new BooleanClause(viewQuery, groupOccur);
@@ -962,7 +963,7 @@ public class LuceneQueryBuilder {
         //
         String owner = luceneQueryInput.getOwner();
         if (owner != null) {
-            TermQuery ownerQuery = new TermQuery(new Term(LuceneIndexField.OWNER, owner));
+            TermQuery ownerQuery = new TermQuery(new Term(LuceneIndexField._OWNER, owner));
             BooleanClause.Occur ownerOccur = LuceneUtils.convertRequiredAndProhibitedToOccur(false, false);
             BooleanClause ownerClause = new BooleanClause(ownerQuery, ownerOccur);
             groupsQueryEmpty = false;
@@ -975,16 +976,111 @@ public class LuceneQueryBuilder {
         //
         boolean admin = luceneQueryInput.getAdmin();
         if (admin) {
-            TermQuery adminQuery = new TermQuery(new Term(LuceneIndexField.DUMMY, "0"));
+            TermQuery adminQuery = new TermQuery(new Term(LuceneIndexField._DUMMY, "0"));
             BooleanClause adminClause = new BooleanClause(adminQuery, groupOccur);
             groupsQueryEmpty = false;
             groupsQuery.add(adminClause);
         }
 
-        // Add the privilege part of the query
-        if (!groupsQueryEmpty) {
-            BooleanClause.Occur groupsOccur = LuceneUtils.convertRequiredAndProhibitedToOccur(true, false);
-            BooleanClause groupsClause = new BooleanClause(groupsQuery, groupsOccur);
+        return groupsQueryEmpty;
+    }
+
+    /**
+     *
+     * @param workspaceOrNotQuery
+     * @param luceneQueryInput
+     * @param selectWorkspaceDocs
+     * @return
+     */
+    private boolean createWorkspaceQuery(BooleanQuery workspaceOrNotQuery, LuceneQueryInput luceneQueryInput, boolean selectWorkspaceDocs) {
+
+        BooleanQuery groupsQuery = new BooleanQuery();
+        boolean groupsQueryEmpty = createGroupsQuery(groupsQuery, luceneQueryInput, selectWorkspaceDocs) ;
+
+        if(!groupsQueryEmpty) {
+            BooleanClause groupsClause = new BooleanClause(groupsQuery, BooleanClause.Occur.MUST);
+            workspaceOrNotQuery.add(groupsClause);
+
+            if(!selectWorkspaceDocs) {
+                TermQuery workspaceQuery = new TermQuery(new Term(LuceneIndexField._IS_WORKSPACE, "false"));
+                BooleanClause workspaceClause = new BooleanClause(workspaceQuery, BooleanClause.Occur.MUST);
+                workspaceOrNotQuery.add(workspaceClause);
+
+                //if(StringUtils.isNotEmpty(luceneQueryInput.getOwner())) {
+                //
+                // this ensures that non-workspace docs are shown if workspace docs exist but you have no edit rights to them
+                //
+                BooleanQuery pfff = new BooleanQuery();
+
+                BooleanQuery editGroupsQuery = new BooleanQuery();
+                createGroupsQuery(editGroupsQuery, luceneQueryInput, selectWorkspaceDocs) ;
+                BooleanClause editGroupsClause = new BooleanClause(editGroupsQuery, BooleanClause.Occur.MUST);
+
+                TermQuery isLockedQuery = new TermQuery(new Term(LuceneIndexField._IS_LOCKED, "y"));
+                BooleanClause isLockedClause = new BooleanClause(isLockedQuery, BooleanClause.Occur.MUST);
+
+                //pfff.add(editGroupsClause);
+                pfff.add(isLockedClause);
+
+                BooleanClause pfffClause = new BooleanClause(pfff, BooleanClause.Occur.MUST_NOT);
+                workspaceOrNotQuery.add(pfffClause);
+                //}
+
+            }
+
+            else {
+                TermQuery workspaceQuery = new TermQuery(new Term(LuceneIndexField._IS_WORKSPACE, "true"));
+                BooleanClause workspaceClause = new BooleanClause(workspaceQuery, BooleanClause.Occur.MUST);
+                workspaceOrNotQuery.add(workspaceClause);
+
+                TermQuery isLockedQuery = new TermQuery(new Term(LuceneIndexField._IS_LOCKED, "y"));
+                BooleanClause isLockedClause = new BooleanClause(isLockedQuery, BooleanClause.Occur.MUST);
+                workspaceOrNotQuery.add(isLockedClause);
+            }
+        }
+        return groupsQueryEmpty;
+    }
+
+    /**
+     * Add search privilege criteria to a query.
+     * 
+     * @param luceneQueryInput user and system input
+     * @param query query being built
+     */
+    private void addPrivilegeQuery(LuceneQueryInput luceneQueryInput, BooleanQuery query) {
+        BooleanQuery privilegeQuery = new BooleanQuery();
+        boolean privilegeQueryEmpty;
+
+        //
+        // create query for non-workspace documents
+        //
+        BooleanQuery nonWorkspaceQuery = new BooleanQuery();
+        boolean selectWorkspaceDocs = false;
+        boolean nonWorkspaceQueryEmpty = createWorkspaceQuery(nonWorkspaceQuery, luceneQueryInput, selectWorkspaceDocs);
+
+        if (!nonWorkspaceQueryEmpty) {
+            BooleanClause nonWorkspaceClause = new BooleanClause(nonWorkspaceQuery, BooleanClause.Occur.SHOULD);
+            privilegeQuery.add(nonWorkspaceClause);
+        }
+
+        //
+        // create query for workspace documents
+        //
+        BooleanQuery workspaceQuery = new BooleanQuery();
+        selectWorkspaceDocs = true;
+        boolean workspaceQueryEmpty = createWorkspaceQuery(workspaceQuery, luceneQueryInput, selectWorkspaceDocs);
+
+        if (!workspaceQueryEmpty) {
+            BooleanClause workspaceClause = new BooleanClause(workspaceQuery, BooleanClause.Occur.SHOULD);
+            privilegeQuery.add(workspaceClause);
+        }
+
+        privilegeQueryEmpty = nonWorkspaceQueryEmpty && workspaceQueryEmpty;
+
+        // Add the resulting privilege part to the query
+        if(!privilegeQueryEmpty) {
+            BooleanClause.Occur privilegeOccur = LuceneUtils.convertRequiredAndProhibitedToOccur(true, false);
+            BooleanClause groupsClause = new BooleanClause(privilegeQuery, privilegeOccur);
             query.add(groupsClause);
         }
     }

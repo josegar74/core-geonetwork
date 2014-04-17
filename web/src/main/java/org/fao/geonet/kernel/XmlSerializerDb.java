@@ -119,6 +119,13 @@ public class XmlSerializerDb extends XmlSerializer {
 		updateDb(dbms, id, xml, changeDate, xml.getQualifiedName(), updateDateStamp, uuid);
 	}
 
+
+    @Override
+    public void updateWorkspace(Dbms dbms, String id, Element xml, String changeDate, boolean updateDateStamp, ServiceContext context) throws SQLException {
+        updateDbWorkspace(dbms, id, xml, changeDate, xml.getQualifiedName(), updateDateStamp);
+    }
+
+
     /**
      * Deletes an xml element given its id.
      *
@@ -131,5 +138,10 @@ public class XmlSerializerDb extends XmlSerializer {
 	public void delete(Dbms dbms, String table, String id, ServiceContext context) throws Exception {
 		deleteDb(dbms, table, id);
 	}
+
+    @Override
+    public void deleteFromWorkspace(Dbms dbms, String id) throws Exception {
+        deleteFromWorkspaceDB(dbms, id);
+    }
 
 }

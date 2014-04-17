@@ -79,5 +79,12 @@ public class LuceneIndexField {
 	public static final String UUID = "_uuid";
 	public static final String VALID = "_valid";
 	public static final String WEST = "westBL";
-
+    public static final String _IS_WORKSPACE = "_isWorkspace";
+    public static final String _CHANGE_DATE  = "_changeDate";
+    public static final String _ID = "_id";
+    public static final String _IS_LOCKED = "_isLocked";
+    public static final String _LOCKEDBY = "_lockedBy";
+    public static final String _STATUS = "_status";
+    public static final String _OWNER = "_owner";
+    public static final String _DUMMY = "_dummy";
 }

@@ -300,6 +300,8 @@ GeoNetwork.Catalogue = Ext.extend(Ext.util.Observable, {
             mdUnsetThumbnail: serviceUrl + 'metadata.thumbnail.unset.new',
             mdImport: serviceUrl + 'metadata.xmlinsert.form',
             mdStatus: serviceUrl + 'metadata.status.form',
+            mdCancelEditSession: serviceUrl + 'metadata.unlock',
+            mdChangeEditSessionOwner: serviceUrl + 'metadata.grab.lock.form',
             mdVersioning: serviceUrl + 'metadata.version',
             subTemplateType: serviceUrl + 'subtemplate.types',
             subTemplate: serviceUrl + 'subtemplate',
@@ -891,7 +893,8 @@ GeoNetwork.Catalogue = Ext.extend(Ext.util.Observable, {
                         maximized: maximized || false,
                         metadataUuid: uuid,
                         record: record,
-                        resultsView: this.resultsView
+                        resultsView: this.resultsView,
+                        workspaceCopy: record.get('workspace') == "true" ? true : false
                         });
                     win.show(this.resultsView);
                     win.alignTo(bd, 'tr-tr');
@@ -909,6 +912,151 @@ GeoNetwork.Catalogue = Ext.extend(Ext.util.Observable, {
             }
         }
     },
+      metadataOriginalCopyShow: function(uuid, maximized, width, height){
+      // UUID may contains special character like #
+      var url = this.services.mdView + '?uuid=' + escape(uuid) + '&fromWorkspace=false';
+      var bd = Ext.getBody();
+
+      if (this.resultsView) {
+        var record = this.metadataStore.getAt(this.metadataStore.find('uuid', uuid));
+
+        // No current search available with this record information
+        if (!record) {
+          // Retrieve information in synchrone mode
+          var store = GeoNetwork.data.MetadataResultsFastStore();
+          this.kvpSearch("fast=index&_uuid=" + escape(uuid), null, null, null, true, store, null, false);
+          record = store.getAt(store.find('uuid', uuid));
+        }
+
+        var win = new GeoNetwork.view.ViewWindow({
+          serviceUrl: url,
+          lang: this.lang,
+          currTab: GeoNetwork.defaultViewMode || 'simple',
+          printDefaultForTabs: GeoNetwork.printDefaultForTabs || false,
+          catalogue: this,
+          maximized: maximized || false,
+          metadataUuid: uuid,
+          record: record,
+          resultsView: this.resultsView,
+          workspaceCopy: false
+        });
+        win.show(this.resultsView);
+        win.alignTo(bd, 'tr-tr');
+      } else {
+        // Not really used - use old service
+        window.open( this.services.mdView + '?uuid=' + escape(uuid) + '&fromWorkspace=false',
+          this.windowName, this.windowOption);
+      }
+    },
+    metadataWorkspaceCopyShow: function(uuid, maximized, width, height){
+      // UUID may contains special character like #
+      var url = this.services.mdView + '?uuid=' + escape(uuid) + '&fromWorkspace=true';
+      var bd = Ext.getBody();
+
+      if (this.resultsView) {
+        var record = this.metadataStore.getAt(this.metadataStore.find('uuid', uuid));
+
+        // No current search available with this record information
+        if (!record) {
+          // Retrieve information in synchrone mode
+          var store = GeoNetwork.data.MetadataResultsFastStore();
+          this.kvpSearch("fast=index&_uuid=" + escape(uuid), null, null, null, true, store, null, false);
+          record = store.getAt(store.find('uuid', uuid));
+        }
+
+        var win = new GeoNetwork.view.ViewWindow({
+          serviceUrl: url,
+          lang: this.lang,
+          currTab: GeoNetwork.defaultViewMode || 'simple',
+          printDefaultForTabs: GeoNetwork.printDefaultForTabs || false,
+          catalogue: this,
+          maximized: maximized || false,
+          metadataUuid: uuid,
+          record: record,
+          resultsView: this.resultsView,
+          workspaceCopy: true
+        });
+        win.show(this.resultsView);
+        win.alignTo(bd, 'tr-tr');
+      } else {
+        // Not really used - use old service
+        window.open( this.services.mdView + '?uuid=' + escape(uuid) + '&fromWorkspace=true',
+          this.windowName, this.windowOption);
+      }
+    },
+
+  metadataOriginalCopyShow: function(uuid, maximized, width, height){
+  // UUID may contains special character like #
+  var url = this.services.mdView + '?uuid=' + escape(uuid) + '&fromWorkspace=false';
+  var bd = Ext.getBody();
+
+  if (this.resultsView) {
+    var record = this.metadataStore.getAt(this.metadataStore.find('uuid', uuid));
+
+    // No current search available with this record information
+    if (!record) {
+      // Retrieve information in synchrone mode
+      var store = GeoNetwork.data.MetadataResultsFastStore();
+      this.kvpSearch("fast=index&_uuid=" + escape(uuid), null, null, null, true, store, null, false);
+      record = store.getAt(store.find('uuid', uuid));
+    }
+
+    var win = new GeoNetwork.view.ViewWindow({
+      serviceUrl: url,
+      lang: this.lang,
+      currTab: GeoNetwork.defaultViewMode || 'simple',
+      printDefaultForTabs: GeoNetwork.printDefaultForTabs || false,
+      catalogue: this,
+      maximized: maximized || false,
+      metadataUuid: uuid,
+      record: record,
+      resultsView: this.resultsView,
+      workspaceCopy: false
+    });
+    win.show(this.resultsView);
+    win.alignTo(bd, 'tr-tr');
+  } else {
+    // Not really used - use old service
+    window.open( this.services.mdView + '?uuid=' + escape(uuid) + '&fromWorkspace=false',
+      this.windowName, this.windowOption);
+  }
+},
+metadataWorkspaceCopyShow: function(uuid, maximized, width, height){
+  // UUID may contains special character like #
+  var url = this.services.mdView + '?uuid=' + escape(uuid) + '&fromWorkspace=true';
+  var bd = Ext.getBody();
+
+  if (this.resultsView) {
+    var record = this.metadataStore.getAt(this.metadataStore.find('uuid', uuid));
+
+    // No current search available with this record information
+    if (!record) {
+      // Retrieve information in synchrone mode
+      var store = GeoNetwork.data.MetadataResultsFastStore();
+      this.kvpSearch("fast=index&_uuid=" + escape(uuid), null, null, null, true, store, null, false);
+      record = store.getAt(store.find('uuid', uuid));
+    }
+
+    var win = new GeoNetwork.view.ViewWindow({
+      serviceUrl: url,
+      lang: this.lang,
+      currTab: GeoNetwork.defaultViewMode || 'simple',
+      printDefaultForTabs: GeoNetwork.printDefaultForTabs || false,
+      catalogue: this,
+      maximized: maximized || false,
+      metadataUuid: uuid,
+      record: record,
+      resultsView: this.resultsView,
+      workspaceCopy: true
+    });
+    win.show(this.resultsView);
+    win.alignTo(bd, 'tr-tr');
+  } else {
+    // Not really used - use old service
+    window.open( this.services.mdView + '?uuid=' + escape(uuid) + '&fromWorkspace=true',
+      this.windowName, this.windowOption);
+  }
+},
      metadataShowById: function(id, maximized, width, height){
         var url = this.services.mdView + '?id=' + id, record;
         
@@ -1354,6 +1502,27 @@ GeoNetwork.Catalogue = Ext.extend(Ext.util.Observable, {
     metadataStatus: function(id){
         var url = this.services.mdStatus + "?id=" + id;
         this.modalAction(OpenLayers.i18n('setStatus'), url);
+    },
+    /** api: method[cancelEditSession]
+     *  Cancels an edit session for a metadata record, unlocking it
+     */
+    metadataCancelEditSession: function(id){
+      var params = {
+        id: id
+      };
+
+      catalogue.doAction(catalogue.services.mdCancelEditSession, params,
+        OpenLayers.i18n('unlockRecordSuccess'),
+        OpenLayers.i18n('unlockRecordFailure'),
+        catalogue.onAfterUnlock.bind(catalogue));
+    },
+    /** api: method[cancelEditSession]
+     *  Cancels an edit session for a metadata record, unlocking it
+     */
+    metadataChangeEditSessionOwner: function(id, lockOwner){
+      var url = this.services.mdChangeEditSessionOwner + '?id=' + id + '&currentLockOwner=' + lockOwner;
+      this.modalAction(OpenLayers.i18n('changeEditSessionOwner'), url, undefined, catalogue.onAfterGrabEditSession.bind(catalogue));
+
     },
     /** api: method[metadataVersioning]
      *  Active versioning for this metadata

@@ -20,51 +20,59 @@
 //===	Contact: Jeroen Ticheler - FAO - Viale delle Terme di Caracalla 2,
 //===	Rome - Italy. email: geonetwork@osgeo.org
 //==============================================================================
-package org.fao.geonet.guiservices.templates;
 
-import java.util.ArrayList;
-import java.util.List;
+package org.fao.geonet.services.metadata;
 
+import jeeves.constants.Jeeves;
 import jeeves.interfaces.Service;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
 import jeeves.server.context.ServiceContext;
-
-import org.apache.commons.lang.StringUtils;
+import jeeves.utils.Util;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.constants.Geonet;
+import org.fao.geonet.constants.Params;
+import org.fao.geonet.kernel.AccessManager;
 import org.fao.geonet.kernel.DataManager;
 import org.jdom.Element;
 
 /**
- * Saves display order of a list of templates.
+ *  Unlock locked metadata.
  *
- * @author heikki doeleman
- * 
+ *  @author heikki doeleman
  */
-public class SaveDisplayOrder implements Service {
-	public void init(String appPath, ServiceConfig params) throws Exception {}
+public class Unlock implements Service {
+    private ServiceConfig config;
 
-	public Element exec(Element params, ServiceContext context) throws Exception {
-        GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
-        Dbms dbms = (Dbms) context.getResourceManager().open(Geonet.Res.MAIN_DB);
-        DataManager dm = gc.getDataManager() ;
-        List<Element> requestParameters = params.getChildren();
-        List<String> ids = new ArrayList<String>();
-        for (Element param : requestParameters) {
-            // the request params come in as e.g. <displayorder-30749>5</displayorder-30749> where
-            // the part after the dash is the metadata id.
-            String id = param.getName().substring(param.getName().indexOf('-') + 1);
-            if (StringUtils.isNotEmpty(id) && !"_".equals(id)) {    // In Chrome with POST method, Ajax.Request sends <_/> parameters,
-                // If id is not an integer, exception will occur later.
-                String displayPosition = param.getText();
-                dm.updateDisplayOrder(dbms, id, displayPosition);
-                dbms.commit();
-                ids.add(id);
-            }
-        }
-        boolean workspace  = false;
-        dm.indexInThreadPool(context, ids, dbms, workspace);
-        return null;
+    public void init(String appPath, ServiceConfig params) throws Exception {
+        config = params;
     }
+
+    public Element exec(Element params, ServiceContext context) throws Exception {
+        String id = Util.getParam(params, Params.ID);
+
+        GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
+        DataManager dataMan = gc.getDataManager();
+        AccessManager accessManager = gc.getAccessManager();
+
+        Dbms dbms = (Dbms) context.getResourceManager().open(Geonet.Res.MAIN_DB);
+        String userId = context.getUserSession().getUserId();
+
+        if(context.getUserSession().getProfile().equals(Geonet.Profile.ADMINISTRATOR) || accessManager.unlockAllowed(userId, id, dbms)) {
+            dataMan.unLockMetadata(dbms, id);
+            dataMan.deleteFromWorkspace(dbms, id);
+            boolean workspace = false;
+            dataMan.indexMetadata(dbms, id, workspace);
+
+            StatusActionsFactory saf = new StatusActionsFactory(gc.getStatusActionsClass());
+            StatusActions sa = saf.createStatusActions(context, dbms);
+            saf.onCancelEdit(sa, id);
+        }
+
+        Element elResp = new Element(Jeeves.Elem.RESPONSE);
+        elResp.addContent(new Element(Geonet.Elem.ID).setText(id));
+
+        return elResp;
+    }
+
 }

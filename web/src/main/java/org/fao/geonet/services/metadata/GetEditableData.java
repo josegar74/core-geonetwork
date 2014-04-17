@@ -24,7 +24,9 @@
 package org.fao.geonet.services.metadata;
 
 import jeeves.interfaces.Service;
+import jeeves.resources.dbms.Dbms;
 import jeeves.server.ServiceConfig;
+import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
 import jeeves.utils.Util;
 
@@ -60,10 +62,14 @@ public class GetEditableData implements Service
 	{
 		GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
 		DataManager   dataMan   = gc.getDataManager();
+        Dbms dbms = (Dbms) context.getResourceManager().open(Geonet.Res.MAIN_DB);
 
 		String id = Utils.getIdentifierFromParameters(params, context);
 		boolean showValidationErrors = Util.getParam(params, Params.SHOWVALIDATIONERRORS, false);
         String justCreated = Util.getParam(params, Geonet.Elem.JUSTCREATED, null);
+
+        UserSession session = context.getUserSession();
+        String userId = session.getUserId();
 
         // Set current tab for new editing session if defined.
         Element elCurrTab = params.getChild(Params.CURRTAB);
@@ -73,7 +79,25 @@ public class GetEditableData implements Service
 		
         //-----------------------------------------------------------------------
 		//--- get metadata
-		Element elMd = new AjaxEditUtils(context).getMetadataEmbedded(context, id, true, showValidationErrors);
+        Element elMd = new AjaxEditUtils(context).getMetadataEmbeddedFromWorkspace(context, id, true, showValidationErrors);
+        // not in workspace; try to get from metadata
+        if (elMd == null) {
+            // lock metadata
+            dataMan.lockMetadata(dbms, userId, id);
+
+            // copy to workspace
+            dataMan.saveWorkspace(dbms, id);
+
+            // re-index md to index lock
+            boolean workspace = false;
+            dataMan.indexMetadata(dbms, id, workspace);
+            workspace = true;
+            dataMan.indexMetadata(dbms, id, workspace);
+
+            elMd = new AjaxEditUtils(context).getMetadataEmbeddedFromWorkspace(context, id, true, showValidationErrors);
+        }
+
+
 		if (elMd == null)
 			throw new IllegalArgumentException("Metadata not found --> " + id);
 

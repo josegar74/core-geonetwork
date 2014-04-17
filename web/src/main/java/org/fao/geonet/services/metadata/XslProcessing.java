@@ -192,7 +192,22 @@ public class XslProcessing extends NotInReadOnlyModeService {
             }
             // --- Process metadata
             boolean forEditing = false, withValidationErrors = false, keepXlinkAttributes = true;
-            Element md = dataMan.getMetadata(context, id, forEditing, withValidationErrors, keepXlinkAttributes);
+            String metadataStatus = dataMan.getCurrentStatus(dbms, Integer.parseInt(id));
+
+            Element md;
+
+            boolean workspace = false;
+            if (metadataStatus.equals(Params.Status.APPROVED)) {
+                md = dataMan.getMetadata(context, id, forEditing, withValidationErrors, keepXlinkAttributes);
+            } else {
+                md = dataMan.getMetadataFromWorkspace(context, id, forEditing, withValidationErrors, keepXlinkAttributes, false);
+
+                if (md == null) {
+                    md = dataMan.getMetadata(context, id, forEditing, withValidationErrors, keepXlinkAttributes);
+                } else {
+                    workspace = true;
+                }
+            }
 
             // -- here we send parameters set by user from URL if needed.
             List<Element> children = params.getChildren();
@@ -217,12 +232,18 @@ public class XslProcessing extends NotInReadOnlyModeService {
                 String language = context.getLanguage();
                 // Always udpate metadata date stamp on metadata processing (minor edit has no effect).
                 boolean updateDateStamp = true;
-                dataMan.updateMetadata(context, dbms, id, processedMetadata, validate, ufo, index, language, new ISODate().toString(), updateDateStamp);
+
+                if (!workspace) {
+                    dataMan.updateMetadata(context, dbms, id, processedMetadata, validate, ufo, index, language, new ISODate().toString(), updateDateStamp);
+                } else {
+                    dataMan.updateMetadataWorkspace(context, dbms, id, processedMetadata, validate, ufo, index, language, new ISODate().toString(), updateDateStamp);
+                }
+
                 if (useIndexGroup) {
-                    dataMan.indexMetadata(dbms, id);
+                    dataMan.indexMetadata(dbms, id, workspace);
                 }
                 else {
-                    dataMan.indexInThreadPool(context, id, dbms);
+                    dataMan.indexInThreadPool(context, id, dbms, workspace);
                 }
             }
 

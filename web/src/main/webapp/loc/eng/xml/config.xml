@@ -15,6 +15,9 @@
 	<network>Network</network>
 	<netmask>Netmask</netmask>
 
+  <symbolicLocking>Symbolic locking</symbolicLocking>
+  <enableSymbolicLocking>Symbolic locking</enableSymbolicLocking>
+
 	<searchStats>Search Statistics</searchStats>
 
 	<z3950>Z39.50 Server</z3950>
@@ -372,6 +375,10 @@
 		<tip id="requestedlanguage.ignored">
 			Ignore requested language for search results.
 		</tip>
+
+    <tip id="symbolicLocking.enable">
+      When this is enabled, any editor may unlock metadata in his groups (not only Reviewers).
+    </tip>
 
 	</tips>
 

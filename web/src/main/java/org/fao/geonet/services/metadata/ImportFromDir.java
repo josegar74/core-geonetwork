@@ -345,7 +345,8 @@ public class ImportFromDir extends NotInReadOnlyModeService{
 	
 		context.info("Now reindexing "+ids.size());
 
-		dm.batchRebuild(context, ids);
+        boolean workspace = false;
+		dm.batchRebuild(context, ids, workspace);
 		return files.length;
 	}
 
@@ -426,8 +427,8 @@ public class ImportFromDir extends NotInReadOnlyModeService{
 		}
 
 		//--- step 3 : index inserted metadata
-
-		dm.batchRebuild(context, ids);
+        boolean workspace = false;
+		dm.batchRebuild(context, ids, workspace);
 
 		return counter;
 	}

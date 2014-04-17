@@ -85,9 +85,14 @@ public class UpdateCategories extends NotInReadOnlyModeService {
 		}
 
 		//--- index metadata
-        dataMan.indexInThreadPool(context, id, dbms);
+        boolean workspace = false;
+        dataMan.indexInThreadPool(context, id, dbms, workspace);
 
-		//--- return id for showing
+        workspace = true;
+        dataMan.indexInThreadPool(context, id, dbms, workspace);
+
+
+        //--- return id for showing
 		return new Element(Jeeves.Elem.RESPONSE).addContent(new Element(Geonet.Elem.ID).setText(id));
 	}
 }

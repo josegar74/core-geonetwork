@@ -159,6 +159,20 @@ public class XmlSerializerSvn extends XmlSerializer {
 
 	}
 
+    @Override
+    public void updateWorkspace(Dbms dbms, String id, Element xml, String changeDate, boolean updateDateStamp, ServiceContext context) throws Exception {
+        // old XML comes from the database
+        updateDbWorkspace(dbms, id, xml, changeDate, xml.getQualifiedName(), updateDateStamp);
+
+        if (svnMan == null) { // do nothing
+            Log.error(Geonet.DATA_MANAGER, "SVN repository for metadata enabled but no repository available");
+        } else {
+            // set subversion manager to record history on this metadata when commit
+            // takes place
+            svnMan.setHistory(dbms, id, context);
+        }
+    }
+
     /**
      * Deletes a metadata record given its id. The metadata record is deleted
 		 * from 'table' and from the subversion repo (if present).
@@ -179,5 +193,11 @@ public class XmlSerializerSvn extends XmlSerializer {
 		}
 
 	}
+
+    @Override
+    public void deleteFromWorkspace(Dbms dbms, String id) throws Exception {
+        deleteFromWorkspaceDB(dbms, id);
+    }
+
 
 }

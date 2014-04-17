@@ -6,6 +6,7 @@ DELETE FROM MetadataCateg;
 DELETE FROM MetadataRating;
 DELETE FROM MetadataStatus;
 DELETE FROM OperationAllowed;
+DELETE FROM Workspace;
 DELETE FROM Metadata;
 DELETE FROM CategoriesDes;
 DELETE FROM Categories;
@@ -992,6 +993,9 @@ INSERT INTO Settings VALUES (954,952,'sorted','false');
 INSERT INTO Settings VALUES (956,1,'hidewithheldelements',NULL);
 INSERT INTO Settings VALUES (957,956,'enable','false');
 INSERT INTO Settings VALUES (958,956,'keepMarkedElement','true');
+
+INSERT INTO Settings VALUES (959,1,'symbolicLocking',NULL);
+INSERT INTO Settings VALUES (960,959,'enable','false');
 
 -- ======================================================================
 -- === Table: Users

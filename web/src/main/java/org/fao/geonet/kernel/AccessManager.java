@@ -23,6 +23,7 @@
 
 package org.fao.geonet.kernel;
 
+import jeeves.exceptions.OperationNotAllowedEx;
 import jeeves.resources.dbms.Dbms;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
@@ -522,6 +523,99 @@ public class AccessManager {
 	public String getPrivilegeName(int id) {
 		return hmIdToName.get(id);
 	}
+
+
+    /**************************************************/
+    /* Workspace API: access for lock operations      */
+    /**************************************************/
+
+    /**
+     * Whether the current user is allowed to reassign a metadata's lock to a particular other user.
+     *
+     * @param userProfile profile of current user
+     * @param userId id of current user
+     * @param targetUserId id of user to assign lock to
+     * @param metadataId id of metadata
+     * @param dbms dbms
+     * @param symbolicLocking whether symbolic locking is enabled
+     * @return true or false
+     * @throws Exception hmm
+     */
+    public boolean grabLockAllowed(String userProfile, String userId, String targetUserId, String metadataId, Dbms dbms, boolean symbolicLocking) throws Exception {
+        // if the user is an admin, just allow
+        if(userProfile.equals(Geonet.Profile.ADMINISTRATOR)) {
+            return true;
+        }
+        // if the user is a reviewer or useradmin, allow grabbing lock from metadata that has edit permission for the user's groups, and
+        // reassign it to another user in the user's groups
+        else if(userProfile.equals(Geonet.Profile.REVIEWER) || userProfile.equals(Geonet.Profile.USER_ADMIN)) {
+            return grabLockAllowed(userId, targetUserId, metadataId, dbms);
+        }
+        // if the user is an editor
+        else if(userProfile.equals(Geonet.Profile.EDITOR) && symbolicLocking) {
+            return grabLockAllowed(userId, targetUserId, metadataId, dbms);
+        }
+        return false;
+    }
+
+    /**
+     * Whether the current user is allow to grab a metadata's lock and assign it to another user. Returns true if the
+     * metadata has Edit privilege in at least one of the current user's groups, and the targeted user is member of at
+     * least one of the current user's groups.
+     *
+     * @param userId
+     * @param targetUserId
+     * @param metadataId
+     * @param dbms
+     * @return
+     * @throws Exception
+     */
+    private boolean grabLockAllowed(String userId, String targetUserId, String metadataId, Dbms dbms) throws Exception {
+        // check md has edit permission for at least one of the user's groups
+        String query = "SELECT count(*) as numr FROM OperationAllowed " +
+                "WHERE operationid = 2 AND groupid IN (SELECT groupid FROM UserGroups WHERE userid=?) " +
+                "AND metadataid=?";
+        List result = dbms.select(query, new Integer(userId), new Integer(metadataId)).getChildren();
+        int count = Integer.parseInt(((Element) result.get(0)).getChildText("numr"));
+        if (count == 0) {
+            throw new OperationNotAllowedEx("User " + userId + " attempted to grab lock of metadata " + metadataId + " that has no edit privilege for any of his groups");
+        }
+        // check targeted user is in at least one of this user's groups
+        query = "SELECT count(*) as numr FROM UserGroups " +
+                "WHERE userid=? AND groupid IN (SELECT groupid FROM UserGroups WHERE userid=?)";
+        result = dbms.select(query, new Integer(targetUserId), new Integer(userId)).getChildren();
+        count = Integer.parseInt(((Element) result.get(0)).getChildText("numr"));
+        if (count == 0) {
+            throw new OperationNotAllowedEx("User " + userId + " attempted to grab lock of metadata and assign it to user " + targetUserId + "  that is not in any of his groups");
+        }
+        // if you got here it's OK
+        return true;
+    }
+
+    /**
+     * Whether the current user is allowed to unlock this metadata. It's only allowed if this user owns the lock.
+     *
+     * @param userId
+     * @param metadataId
+     * @param dbms
+     * @return
+     * @throws Exception
+     */
+    public boolean unlockAllowed(String userId, String metadataId, Dbms dbms) throws Exception {
+        String query = "SELECT lockedBy from Metadata WHERE id=?";
+        Element resultList = dbms.select(query, new Integer(metadataId));
+        if(resultList.getChildren().size() == 0) {
+            throw new OperationNotAllowedEx("User " + userId + " attempted to unlock metadata " + metadataId + " which can't be found");
+        }
+        Element result = (Element)resultList.getChildren().get(0);
+        String lockedBy = result.getChildText("lockedBy");
+        if(lockedBy.equals(userId)) {
+            return true;
+        }
+        else {
+            throw new OperationNotAllowedEx("User " + userId + " attempted to unlock metadata " + metadataId + " but doesn't own the lock");
+        }
+    }
 
 	//--------------------------------------------------------------------------
 	//---

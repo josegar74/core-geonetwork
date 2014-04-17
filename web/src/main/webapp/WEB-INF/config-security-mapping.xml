@@ -379,6 +379,15 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans
                 <sec:intercept-url pattern="/srv/[a-z]{2,3}/region\.geom\.\w\w\w!?.*" access="permitAll"></sec:intercept-url>
 
 
+                <!-- Workspace -->
+                <sec:intercept-url pattern="/srv/.*/metadata.unlock!?.*" access="hasRole('Editor')"></sec:intercept-url>
+                <!-- lists locked metadata this user may unlock -->
+                <sec:intercept-url pattern="/srv/.*/metadata.list.locked!?.*" access="hasRole('Editor')"></sec:intercept-url>
+                <!-- transfers metadata lock to selected user -->
+                <sec:intercept-url pattern="/srv/.*/metadata.grab.lock!?.*" access="hasRole('Editor')"></sec:intercept-url>
+                <!-- lists users that this user may transfer metadata lock to -->
+                <sec:intercept-url pattern="/srv/.*/metadata.grab.lock.form!?.*" access="hasRole('Editor')"></sec:intercept-url>
+
                 <sec:intercept-url pattern="/.*" access="denyAll"></sec:intercept-url>
             </sec:filter-security-metadata-source>
         </property>

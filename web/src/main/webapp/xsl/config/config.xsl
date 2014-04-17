@@ -55,6 +55,7 @@
 		<xsl:call-template name="hideWithheld"/>
 		<xsl:call-template name="searchStats"/>
         <xsl:call-template name="multilingual"/>
+    <xsl:call-template name="locking"/>
 		<xsl:call-template name="downloadservice"/>
 		<xsl:call-template name="hyperlinks"/>
 		<xsl:call-template name="localrating"/>
@@ -365,7 +366,27 @@
 		</div>
 	</xsl:template>
 
-	<!-- ============================================================================================= -->
+  <!-- ============================================================================================= -->
+
+  <xsl:template name="locking">
+    <h1 align="left"><xsl:value-of select="/root/gui/config/symbolicLocking"/></h1>
+    <div align="left" style="{$style}">
+      <table>
+        <tr>
+          <td class="padded">
+            <input id="symbolicLocking.enable" class="content" type="checkbox"/>
+          </td>
+          <td class="padded">
+            <label for="symbolicLocking.enable">
+              <xsl:value-of select="/root/gui/config/enableSymbolicLocking"/>
+            </label>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </xsl:template>
+
+  <!-- ============================================================================================= -->
 
 	<xsl:template name="downloadservice">
 		<h1 align="left"><xsl:value-of select="/root/gui/config/downloadservice"/></h1>

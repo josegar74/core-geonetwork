@@ -120,6 +120,9 @@ public class BatchNewOwner extends NotInReadOnlyModeService {
 				// -- set the new owner into the metadata record
 				dm.updateMetadataOwner(dbms, Integer.parseInt(id), targetUsr, targetGrp);
 
+                // -- set the locker to new owner user (if the metadata is locked)
+                dm.updateMetadataLocker(dbms, Integer.parseInt(id), targetUsr);
+
 				metadata.add(Integer.valueOf(id));
 			}
 		}

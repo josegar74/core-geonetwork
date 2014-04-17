@@ -43,6 +43,13 @@
 													</xsl:if>
 												</xsl:if>
 
+                        <!-- status value unknown is reserved for administrators  -->
+                        <xsl:if test="not(contains($profile,'Admin'))">
+                          <xsl:if test="name='unknown'">
+                            <xsl:attribute name="disabled"/>
+                          </xsl:if>
+                        </xsl:if>
+
 												<!-- some status values are not available to Editors -->
 												<xsl:if test="/root/response/hasEditPermission = 'true' and not($isReviewer)">
 													<xsl:if test="name='approved' or name='retired' or name='rejected'">

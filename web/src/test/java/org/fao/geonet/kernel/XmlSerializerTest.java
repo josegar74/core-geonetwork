@@ -57,6 +57,18 @@ public class XmlSerializerTest {
 			throw new UnsupportedOperationException();
 		}
 
+        @Override
+        public void updateWorkspace(Dbms dbms, String id, Element xml,
+                                    String changeDate, boolean updateDateStamp,
+                                    ServiceContext context) throws Exception {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void deleteFromWorkspace(Dbms dbms, String id) throws Exception {
+            throw new UnsupportedOperationException();
+        }
+
 		@Override
 		public String insert(Dbms dbms, String schema, Element xml, int serial,
 				String source, String uuid, String createDate,
