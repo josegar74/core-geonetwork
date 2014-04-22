@@ -120,12 +120,11 @@ public class DefaultStatusActionsWorkspace implements StatusActions {
         boolean hasStatus = dm.hasStatus(dbms, id);
         String currentStatus = dm.getCurrentStatus(dbms, id);
 
-        if (!hasStatus || (!(currentStatus.equals(Params.Status.DRAFT) || currentStatus.equals(Params.Status.APPROVED_DRAFT)))) {
+        if (!hasStatus || (!(currentStatus.equals(Params.Status.DRAFT)))) {
             String changeMessage = "GeoNetwork user "+session.getUserId()+" ("+session.getUsername()+") edited metadata record "+id;
             unsetAllOperations(id);
 
             String newStatus = Params.Status.DRAFT;
-            if (currentStatus.equals(Params.Status.APPROVED)) newStatus = Params.Status.APPROVED_DRAFT;
 
             dm.setStatus(context, dbms, id, new Integer(newStatus), new ISODate().toString(), changeMessage);
         }
@@ -134,7 +133,7 @@ public class DefaultStatusActionsWorkspace implements StatusActions {
     public void onCancelEdit(int id) throws Exception {
         String currentStatus = dm.getCurrentStatus(dbms, id);
 
-        if (currentStatus.equals(Params.Status.DRAFT) || currentStatus.equals(Params.Status.APPROVED_DRAFT)) {
+        if (currentStatus.equals(Params.Status.DRAFT)) {
             String changeMessage = "GeoNetwork user "+session.getUserId()+" ("+session.getUsername()+") canceled edit session for metadata record "+id;
             unsetAllOperations(id);
             String revertToThisStatus = dm.getLastBeforeCurrentStatus(dbms, new Integer(id).intValue());
