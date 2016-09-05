@@ -41,6 +41,8 @@ import org.fao.geonet.domain.MetadataType;
 import org.fao.geonet.kernel.*;
 import org.fao.geonet.kernel.metadata.StatusActions;
 import org.fao.geonet.kernel.metadata.StatusActionsFactory;
+import org.fao.geonet.kernel.schema.ISOPlugin;
+import org.fao.geonet.kernel.schema.SchemaPlugin;
 import org.fao.geonet.kernel.setting.SettingManager;
 import org.fao.geonet.utils.Xml;
 import org.jdom.Element;
@@ -57,7 +59,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -689,30 +693,60 @@ public class MetadataEditingApi {
     public Element getSchemaStrings(String schemaToLoad, ServiceContext context) throws Exception {
         Element schemas = new Element("schemas");
 
-        for (String schema : schemaManager.getSchemas()) {
-            // Load schema and schema dependency localization files
-            if (schema.equals(schemaToLoad) ||
-                schemaToLoad.startsWith(schema)
-                ) {
-                try {
-                    Map<String, XmlFile> schemaInfo = schemaManager.getSchemaInfo(schema);
+        Set<String> schemaStringsLoaded = new HashSet<String>();
 
-                    for (Map.Entry<String, XmlFile> entry : schemaInfo.entrySet()) {
-                        XmlFile xf = entry.getValue();
-                        String fname = entry.getKey();
-                        Element response = xf.exec(new Element("junk"), context);
-                        response.setName(FilenameUtils.removeExtension(fname));
-                        response.removeAttribute("noNamespaceSchemaLocation", Geonet.Namespaces.XSI);
-                        Element schemaElem = new Element(schema);
-                        schemaElem.addContent(response);
-                        schemas.addContent(schemaElem);
-                    }
-                } catch (Exception e) {
-                    context.error("Failed to load localization file for schema " + schema + ": " + e.getMessage());
-                    e.printStackTrace();
-                }
+        loadStringsForSchema(schemaToLoad, schemas, context);
+        schemaStringsLoaded.add(schemaToLoad.toLowerCase());
+
+        // Load strings for dependency schemas
+        Set<String> dependencies = schemaManager.getDependencies(schemaToLoad);
+        for (String dependency : dependencies) {
+            // if not loaded already
+            if (!schemaStringsLoaded.contains(dependency.toLowerCase())) {
+                loadStringsForSchema(dependency, schemas, context);
+                schemaStringsLoaded.add(dependency.toLowerCase());
+            }
+        }
+
+        // For iso based schemas load the strings from iso19139 schema if not loaded as a dependency.
+        // For example iso19110 requires iso19139 strings, but it's not set as dependency
+        SchemaPlugin plugin =  schemaManager.getSchema(schemaToLoad).getSchemaPlugin();
+        if (!plugin.getIdentifier().equalsIgnoreCase("iso19139") &&
+            (!schemaStringsLoaded.contains("iso19139"))) {
+            boolean isISOPlugin = plugin instanceof ISOPlugin;
+            ISOPlugin isoPlugin = isISOPlugin ? (ISOPlugin) plugin : null;
+            if (isoPlugin != null) {
+                loadStringsForSchema("iso19139", schemas, context);
             }
         }
         return schemas;
+    }
+
+
+    /**
+     * Load strings for specified schema.
+     *
+     * @param schema
+     * @param schemas
+     * @param context
+     */
+    private void loadStringsForSchema(String schema, Element schemas, ServiceContext context) {
+        try {
+            Map<String, XmlFile> schemaInfo = schemaManager.getSchemaInfo(schema);
+
+            for (Map.Entry<String, XmlFile> entry : schemaInfo.entrySet()) {
+                XmlFile xf = entry.getValue();
+                String fname = entry.getKey();
+                Element response = xf.exec(new Element("junk"), context);
+                response.setName(FilenameUtils.removeExtension(fname));
+                response.removeAttribute("noNamespaceSchemaLocation", Geonet.Namespaces.XSI);
+                Element schemaElem = new Element(schema);
+                schemaElem.addContent(response);
+                schemas.addContent(schemaElem);
+            }
+        } catch (Exception e) {
+            context.error("Failed to load localization file for schema " + schema + ": " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
