@@ -41,8 +41,6 @@ import org.fao.geonet.domain.MetadataType;
 import org.fao.geonet.kernel.*;
 import org.fao.geonet.kernel.metadata.StatusActions;
 import org.fao.geonet.kernel.metadata.StatusActionsFactory;
-import org.fao.geonet.kernel.schema.ISOPlugin;
-import org.fao.geonet.kernel.schema.SchemaPlugin;
 import org.fao.geonet.kernel.setting.SettingManager;
 import org.fao.geonet.utils.Xml;
 import org.jdom.Element;
@@ -59,7 +57,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -693,32 +690,14 @@ public class MetadataEditingApi {
     public Element getSchemaStrings(String schemaToLoad, ServiceContext context) throws Exception {
         Element schemas = new Element("schemas");
 
-        Set<String> schemaStringsLoaded = new HashSet<String>();
-
         loadStringsForSchema(schemaToLoad, schemas, context);
-        schemaStringsLoaded.add(schemaToLoad.toLowerCase());
 
         // Load strings for dependency schemas
         Set<String> dependencies = schemaManager.getDependencies(schemaToLoad);
         for (String dependency : dependencies) {
-            // if not loaded already
-            if (!schemaStringsLoaded.contains(dependency.toLowerCase())) {
-                loadStringsForSchema(dependency, schemas, context);
-                schemaStringsLoaded.add(dependency.toLowerCase());
-            }
+            loadStringsForSchema(dependency, schemas, context);
         }
 
-        // For iso based schemas load the strings from iso19139 schema if not loaded as a dependency.
-        // For example iso19110 requires iso19139 strings, but it's not set as dependency
-        SchemaPlugin plugin =  schemaManager.getSchema(schemaToLoad).getSchemaPlugin();
-        if (!plugin.getIdentifier().equalsIgnoreCase("iso19139") &&
-            (!schemaStringsLoaded.contains("iso19139"))) {
-            boolean isISOPlugin = plugin instanceof ISOPlugin;
-            ISOPlugin isoPlugin = isISOPlugin ? (ISOPlugin) plugin : null;
-            if (isoPlugin != null) {
-                loadStringsForSchema("iso19139", schemas, context);
-            }
-        }
         return schemas;
     }
 
