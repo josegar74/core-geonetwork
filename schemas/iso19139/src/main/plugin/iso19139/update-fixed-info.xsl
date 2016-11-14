@@ -323,7 +323,7 @@
 	-->
 	<xsl:template match="gmd:PT_Locale">
 		<xsl:element name="gmd:{local-name()}">
-			<xsl:variable name="id" select="upper-case(java:twoCharLangCode(gmd:languageCode/gmd:LanguageCode/@codeListValue))"/>
+			<xsl:variable name="id" select="upper-case(gmd:languageCode/gmd:LanguageCode/@codeListValue)"/>
 
 			<xsl:apply-templates select="@*"/>
 			<xsl:if test="normalize-space(@id)='' or normalize-space(@id)!=$id">
@@ -341,7 +341,7 @@
 		<xsl:element name="gmd:{local-name()}">
 			<xsl:variable name="currentLocale" select="upper-case(replace(normalize-space(@locale), '^#', ''))"/>
 			<xsl:variable name="ptLocale" select="$language[upper-case(replace(normalize-space(@id), '^#', ''))=string($currentLocale)]"/>
-			<xsl:variable name="id" select="upper-case(java:twoCharLangCode($ptLocale/gmd:languageCode/gmd:LanguageCode/@codeListValue))"/>
+			<xsl:variable name="id" select="upper-case($ptLocale/gmd:languageCode/gmd:LanguageCode/@codeListValue)"/>
 			<xsl:apply-templates select="@*"/>
 			<xsl:if test="$id != '' and ($currentLocale='' or @locale!=concat('#', $id)) ">
 				<xsl:attribute name="locale">
