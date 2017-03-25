@@ -61,12 +61,19 @@
           };
 
           var addWMSToMap = function(link, md) {
-            var layerName = $filter('gnLocalized')(link.title);
-            if (layerName) {
-              gnMap.addWmsFromScratch(gnSearchSettings.viewerMap,
-                 link.url, layerName, false, md);
-            } else {
+            var isServiceLink =
+              gnSearchSettings.mapProtocols.services.indexOf(link.protocol) > -1;
+
+            if (isServiceLink) {
               gnMap.addOwsServiceToMap(link.url, 'WMS');
+            } else {
+              var layerName = $filter('gnLocalized')(link.title);
+              if (layerName) {
+                gnMap.addWmsFromScratch(gnSearchSettings.viewerMap,
+                  link.url, layerName, false, md);
+              } else {
+                gnMap.addOwsServiceToMap(link.url, 'WMS');
+              }
             }
 
             gnSearchLocation.setMap();
@@ -74,12 +81,19 @@
 
 
           var addWFSToMap = function(link, md) {
-            var ftName = $filter('gnLocalized')(link.title);
-            if (ftName) {
-              gnMap.addWfsFromScratch(gnSearchSettings.viewerMap,
-                 link.url, ftName, false, md);
+            var isServiceLink =
+              gnSearchSettings.mapProtocols.services.indexOf(link.protocol) > -1;
+
+            if (isServiceLink) {
+              gnMap.addOwsServiceToMap(link.url, 'WMS');
             } else {
-              gnMap.addOwsServiceToMap(link.url, 'WFS');
+              var ftName = $filter('gnLocalized')(link.title);
+              if (ftName) {
+                gnMap.addWfsFromScratch(gnSearchSettings.viewerMap,
+                  link.url, ftName, false, md);
+              } else {
+                gnMap.addOwsServiceToMap(link.url, 'WFS');
+              }
             }
             gnSearchLocation.setMap();
           };
