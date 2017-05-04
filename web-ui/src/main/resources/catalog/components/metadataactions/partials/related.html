@@ -36,23 +36,57 @@
            data-ng-if="mainType.indexOf('MD') == 0">
           {{::r.title | gnLocalized: lang | striptags | characters:150}}
         </p>
+
         <p class="text-muted"
            data-ng-if="mainType === 'WMS'">
-        <span data-translate=""
+        <span data-ng-show="isLayerProtocol(r.protocol)"
+              data-translate=""
               data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
           wmsLinkDetails</span>
+
+          <span data-ng-show="!isLayerProtocol(r.protocol)"
+                data-translate=""
+                data-translate-values="{url:'{{r.url}}'}">
+          wmsServiceLinkDetails</span>
         </p>
+
         <p class="text-muted"
            data-ng-if="r.protocol === 'OGC:WFS'">
         <span data-translate=""
               data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
           wfsLinkDetails</span>
         </p>
+        <div data-ng-if="r.protocol === 'OGC:WFS'"
+          data-gn-no-map-wfs-download=""
+          data-typename="{{r.title | gnLocalized: lang}}"
+          data-url="{{r.url}}">
+        </div>
+
+        <p class="text-muted"
+           data-ng-if="r.protocol === 'OGC:WFS-1.0.0-http-get-capabilities'">
+        <span data-translate=""
+              data-translate-values="{url:'{{r.url}}'}">
+          wfsServiceLinkDetails</span>
+        </p>
+        <div data-ng-if="r.protocol === 'OGC:WFS-1.0.0-http-get-capabilities'"
+             data-gn-no-map-wfs-download=""
+             data-typename=""
+             data-url="{{r.url}}">
+        </div>
+
         <p class="text-muted"
            data-ng-if="mainType === 'WCS'">
         <span data-translate=""
               data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
           wcsLinkDetails</span>
+        </p>
+
+        <p class="text-muted"
+           data-ng-if="mainType === 'ATOM'">
+          <span data-translate=""
+                data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
+            atomLinkDetails
+          </span>
         </p>
 
         <p class="text-muted"

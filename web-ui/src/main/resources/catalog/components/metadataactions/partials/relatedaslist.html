@@ -1,0 +1,126 @@
+<div class="gn-related-resources"
+     data-ng-if="relationFound">
+  <h2>{{title}}</h2>
+
+  <div class=""
+       data-ng-repeat="(type, items) in relations track by $index"
+       data-ng-if="type && type !== 'thumbnails'">
+
+    <div
+
+
+    <div class="row list-group-item gn-related-item"
+         data-ng-repeat="r in items track by $index"
+         data-ng-init="mainType = config.getType(r, type);">
+      <div class="col-md-12">
+        <!-- Display description if available -->
+        <h4 data-ng-if="(mainType === 'WMS'
+                          || mainType === 'WMTS'
+                          || mainType === 'WFS'
+                          || mainType === 'WCS'
+                          || mainType === 'SOS'
+                          || mainType.indexOf('LINK') === 0
+                          || mainType === 'ATOM')
+                          && r.description.length > 0">
+          {{r.description | gnLocalized: lang | striptags | characters:150}}
+        </h4>
+        <div ng-switch on="mainType">
+          <div ng-switch-when="WMS">
+            <span data-translate=""
+                  data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
+                  wmsLinkDetails
+            </span>
+
+            <div
+              data-gn-wms-download="r.title"
+              data-layer-name="{{r.title | gnLocalized: lang}}"
+              data-url="{{r.url}}"
+              data-md="md">
+            </div>
+          </div>
+          <div ng-switch-when="WFS">
+            <span data-translate=""
+                  data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
+                  wfsLinkDetails</span>
+            <div
+                 data-gn-no-map-wfs-download=""
+                 data-typename="{{r.title | gnLocalized: lang}}"
+                 data-url="{{r.url}}">
+            </div>
+          </div>
+          <div ng-switch-when="WMTS">
+            <span data-translate=""
+                  data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
+                  wmtsLinkDetails</span>
+                  <div
+                    data-gn-wmts-download="r.title"
+                    data-layer-name="{{r.title | gnLocalized: lang}}"
+                    data-url="{{r.url}}"
+                    data-md="md">
+                  </div>
+          </div>
+          <div ng-switch-when="SOS">
+            <span data-translate=""
+                  data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
+                  sosLinkDetails</span>
+          </div>
+          <div ng-switch-when="WCS">
+            <span data-translate=""
+                  data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
+                  wcsLinkDetails</span>
+            </div>
+          <div ng-switch-when="ATOM">
+            <span data-translate=""
+                  data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
+                  atomLinkDetails
+            </span>
+          </div>
+
+          <div ng-switch-when="DB">
+            <span data-translate=""
+                  data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
+                  databaseLayerDetails
+            </span>
+          </div>
+
+          <div ng-switch-when="FILE">
+            <span data-translate=""
+                data-translate-values="{url:'{{r.url}}', name:'{{r.title | gnLocalized: lang}}'}">
+                fileLayerDetails
+            </span>
+          </div>
+
+          <div ng-switch-default>
+
+              <p class="text-muted"
+                 data-ng-if="mainType.indexOf('MD') == 0 && r.id">
+                <a href="#/metadata/{{r.id}}">
+                  {{(r.title | gnLocalized: lang) }}
+                </a> ({{(config.getLabel(mainType, type)) | translate}})<br/>
+                {{(r.description | gnLocalized: lang | striptags | words:35)}}
+                <a href="#/metadata/{{r.id}}" data-translate="">More</a>
+              </p>
+
+              <p class="text-muted"
+                 data-ng-if="mainType.indexOf('MD') == -1">
+                <span data-translate="">otherLinkDetails</span><br/>
+                <a href="{{r.url}}" target="_blank">
+                  {{r.url}} </a>
+              </p>
+
+          </div>
+        </div>
+
+        <button type="button"
+                class="btn btn-default"
+                data-ng-show="hasAction(mainType) && ['WMS','WMTS','WFS'].indexOf(mainType)==-1"
+                data-ng-click="config.doAction(mainType, r, md)">
+
+        <span class="visible-lg-*">
+          {{::(config.getLabel(mainType, type)) | translate}}
+        </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
