@@ -1,6 +1,6 @@
 <div class="gn-related-resources"
      data-ng-if="relationFound">
-  <h2>{{::title}}</h2>
+  <h2>{{::title}} sdsadsa</h2>
 
   <div class=""
        data-ng-repeat="(type, items) in relations track by $index"
@@ -16,11 +16,11 @@
       </div>
       <div class="col-xs-7">
         <!-- WMS & WFS contains layer name in title -->
-        <h4 data-ng-if="mainType !== 'WMS' &&
+        <h4 data-ng-if="((mainType === 'WMS' || mainType === 'WFS') &&
+                        !isLayerProtocol(r.protocol)) &&
                       mainType !== 'WCS' &&
                       mainType !== 'LINKDOWNLOAD' &&
-                      mainType !== 'LINK' &&
-                      r.protocol !== 'OGC:WFS' ">
+                      mainType !== 'LINK'">
           {{::(r.title | gnLocalized: lang) || r.url}}
         </h4>
         <!-- Display description if available -->
@@ -51,24 +51,24 @@
         </p>
 
         <p class="text-muted"
-           data-ng-if="r.protocol === 'OGC:WFS'">
+           data-ng-if="mainType === 'WFS' && isLayerProtocol(r.protocol)">
         <span data-translate=""
               data-translate-values="{url:'{{r.url}}', layer:'{{r.title | gnLocalized: lang}}'}">
           wfsLinkDetails</span>
         </p>
-        <div data-ng-if="r.protocol === 'OGC:WFS'"
+        <div data-ng-if="mainType === 'WFS' && isLayerProtocol(r.protocol)"
           data-gn-no-map-wfs-download=""
           data-typename="{{r.title | gnLocalized: lang}}"
           data-url="{{r.url}}">
         </div>
 
         <p class="text-muted"
-           data-ng-if="r.protocol === 'OGC:WFS-1.0.0-http-get-capabilities'">
+           data-ng-if="mainType === 'WFS' && !isLayerProtocol(r.protocol)">
         <span data-translate=""
               data-translate-values="{url:'{{r.url}}'}">
           wfsServiceLinkDetails</span>
         </p>
-        <div data-ng-if="r.protocol === 'OGC:WFS-1.0.0-http-get-capabilities'"
+        <div data-ng-if="mainType === 'WFS' && !isLayerProtocol(r.protocol)"
              data-gn-no-map-wfs-download=""
              data-typename=""
              data-url="{{r.url}}">
