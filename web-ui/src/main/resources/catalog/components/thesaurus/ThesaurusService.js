@@ -27,8 +27,9 @@
   var module = angular.module('gn_thesaurus_service', []);
 
   module.factory('Keyword', function() {
-    function Keyword(k) {
+    function Keyword(k, lang) {
       this.props = $.extend(true, {}, k);
+      this.value =  this.props.values[lang];
       this.label = this.getLabel();
       this.tagClass = 'label label-info gn-line-height';
     };
@@ -37,7 +38,7 @@
         return this.props.uri;
       },
       getLabel: function() {
-        return this.props.value['#text'] || this.props.value;
+        return  this.value || this.props.value['#text'] || this.props.value;
       }
     };
 
@@ -70,9 +71,11 @@
           '$rootScope',
           '$http',
           'gnUrlUtils',
+          'gnLangs',
           'Keyword',
           'Thesaurus',
-          function($q, $rootScope, $http, gnUrlUtils, Keyword, Thesaurus) {
+          function($q, $rootScope, $http, gnUrlUtils, gnLangs,
+                   Keyword, Thesaurus) {
             var getKeywordsSearchUrl = function(filter,
                 thesaurus, lang, max, typeSearch) {
               return gnUrlUtils.append('../api/registries/vocabularies/search',
@@ -92,7 +95,7 @@
               var listOfKeywords = [];
               angular.forEach(data, function(k) {
                 if (k.value) {
-                  listOfKeywords.push(new Keyword(k));
+                  listOfKeywords.push(new Keyword(k, gnLangs.current));
                 }
               });
 
