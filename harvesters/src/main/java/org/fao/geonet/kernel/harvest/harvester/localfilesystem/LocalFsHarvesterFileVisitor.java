@@ -28,6 +28,7 @@ import com.google.common.collect.Sets;
 
 import jeeves.server.context.ServiceContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.fao.geonet.Logger;
 import org.fao.geonet.constants.Geonet;
@@ -157,7 +158,12 @@ class LocalFsHarvesterFileVisitor extends SimpleFileVisitor<Path> {
 
                 if (schema != null) {
                     try {
-                        params.getValidate().validate(dataMan, context, xml);
+                        Integer groupIdVal = null;
+                        if (StringUtils.isNotEmpty(params.getOwnerIdGroup())) {
+                            groupIdVal = Integer.parseInt(params.getOwnerIdGroup());
+                        }
+
+                        params.getValidate().validate(dataMan, context, xml, groupIdVal);
                     } catch (Exception e) {
                         log.debug("Cannot validate XML from file " + filePath + ", ignoring. Error was: " + e.getMessage());
                         result.doesNotValidate++;

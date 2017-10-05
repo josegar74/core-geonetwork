@@ -25,44 +25,30 @@ package org.fao.geonet.kernel;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
-
 import org.fao.geonet.ApplicationContextHolder;
 import org.fao.geonet.constants.Edit;
 import org.fao.geonet.constants.Geonet;
-import org.fao.geonet.domain.MetadataValidation;
-import org.fao.geonet.domain.MetadataValidationId;
-import org.fao.geonet.domain.MetadataValidationStatus;
-import org.fao.geonet.domain.Schematron;
-import org.fao.geonet.domain.SchematronCriteria;
-import org.fao.geonet.domain.SchematronCriteriaGroup;
-import org.fao.geonet.domain.SchematronRequirement;
+import org.fao.geonet.domain.*;
 import org.fao.geonet.kernel.schema.MetadataSchema;
 import org.fao.geonet.repository.SchematronCriteriaGroupRepository;
 import org.fao.geonet.repository.SchematronRepository;
 import org.fao.geonet.utils.Log;
-import org.fao.geonet.utils.Xml;
 import org.jdom.Element;
-import org.jdom.filter.ElementFilter;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static org.fao.geonet.kernel.schema.MetadataSchema.SCHEMATRON_DIR;
+import java.util.*;
 
 /**
- * Class Handles validating a metadata against the applicable schematrons.
+ * Class Handles validating a external metadata to insert against the applicable schematrons.
  *
- * @author Jesse on 4/1/2015.
+ * @author Jose García
  */
-public class SchematronValidator extends AbstractSchematronValidator {
+public class SchematronValidatorExternalMd extends AbstractSchematronValidator {
 
-    public Element applyCustomSchematronRules(String schema, int metadataId, Element md,
-                                              String lang, List<MetadataValidation> validations) {
+    public Element applyCustomSchematronRules(String schema, Element md,
+                                              String lang, List<MetadataValidation> validations, Integer groupOwnerId) {
+
         SchemaManager schemaManager = ApplicationContextHolder.get().getBean(SchemaManager.class);
 
         MetadataSchema metadataSchema = schemaManager.getSchema(schema);
@@ -70,10 +56,10 @@ public class SchematronValidator extends AbstractSchematronValidator {
 
         Element schemaTronXmlOut = new Element("schematronerrors", Edit.NAMESPACE);
         try {
-            List<ApplicableSchematron> applicableSchematron = getApplicableSchematronList(metadataId, md, metadataSchema);
+            List<ApplicableSchematron> applicableSchematron = getApplicableSchematronList(md, metadataSchema, groupOwnerId);
 
             for (ApplicableSchematron applicable : applicableSchematron) {
-                runSchematron(lang, schemaDir, validations, schemaTronXmlOut, metadataId, md, applicable);
+                runSchematron(lang, schemaDir, validations, schemaTronXmlOut, -1, md, applicable);
             }
         } catch (Throwable e) {
             Element errorReport = new Element("schematronVerificationError", Edit.NAMESPACE);
@@ -88,10 +74,12 @@ public class SchematronValidator extends AbstractSchematronValidator {
         return schemaTronXmlOut;
     }
 
+
     @VisibleForTesting
-    List<ApplicableSchematron> getApplicableSchematronList(final int metadataId,
-                                                           final Element md,
-                                                           final MetadataSchema metadataSchema) {
+    List<ApplicableSchematron> getApplicableSchematronList( final Element md,
+                                                           final MetadataSchema metadataSchema,
+                                                           final Integer groupOwnerId) {
+
         List<ApplicableSchematron> applicableSchematron = Lists.newArrayList();
         SchematronRepository schematronRepository = ApplicationContextHolder.get().getBean(SchematronRepository.class);
 
@@ -101,8 +89,7 @@ public class SchematronValidator extends AbstractSchematronValidator {
 
         //Loop through all xsl files
         for (Schematron schematron : schematronList) {
-            final ApplicableSchematron applicable = getApplicableSchematron(metadataId, md, metadataSchema, schematron);
-
+            final ApplicableSchematron applicable = getApplicableSchematron(md, metadataSchema, schematron, groupOwnerId);
 
             if (applicable.requirement != SchematronRequirement.DISABLED) {
                 if (Log.isDebugEnabled(Geonet.DATA_MANAGER)) {
@@ -115,11 +102,12 @@ public class SchematronValidator extends AbstractSchematronValidator {
         return applicableSchematron;
     }
 
+
     @VisibleForTesting
-    ApplicableSchematron getApplicableSchematron(final int metadataId,
-                                                 final Element md,
+    ApplicableSchematron getApplicableSchematron(final Element md,
                                                  final MetadataSchema metadataSchema,
-                                                 final Schematron schematron) {
+                                                 final Schematron schematron,
+                                                 final Integer groupOwnerId) {
         //it contains absolute path to the xsl file
         final ConfigurableApplicationContext applicationContext = ApplicationContextHolder.get();
         SchematronCriteriaGroupRepository criteriaGroupRepository = applicationContext.getBean(SchematronCriteriaGroupRepository.class);
@@ -133,7 +121,7 @@ public class SchematronValidator extends AbstractSchematronValidator {
             List<SchematronCriteria> criteriaList = criteriaGroup.getCriteria();
             boolean apply = false;
             for (SchematronCriteria criteria : criteriaList) {
-                boolean tmpApply = criteria.accepts(applicationContext, metadataId, md, metadataSchema.getSchemaNS());
+                boolean tmpApply = criteria.accepts(applicationContext, md, metadataSchema.getSchemaNS(), groupOwnerId);
 
                 if (!tmpApply) {
                     apply = false;
@@ -155,4 +143,7 @@ public class SchematronValidator extends AbstractSchematronValidator {
         }
         return new ApplicableSchematron(requirement, schematron);
     }
+
+
+
 }

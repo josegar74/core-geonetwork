@@ -24,6 +24,7 @@ package org.fao.geonet.kernel.harvest.harvester.webdav;
 
 import jeeves.server.context.ServiceContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.Logger;
 import org.fao.geonet.constants.Geonet;
@@ -344,7 +345,12 @@ class Harvester extends BaseAligner implements IHarvester<HarvestResult> {
             dataMan.autodetectSchema(md);
 
             try {
-                params.getValidate().validate(dataMan, context, md);
+                Integer groupIdVal = null;
+                if (StringUtils.isNotEmpty(params.getOwnerIdGroup())) {
+                    groupIdVal = Integer.parseInt(params.getOwnerIdGroup());
+                }
+
+                params.getValidate().validate(dataMan, context, md, groupIdVal);
                 return (Element) md.detach();
             } catch (Exception e) {
                 log.info("Skipping metadata that does not validate. Path is : " + rf.getPath());
