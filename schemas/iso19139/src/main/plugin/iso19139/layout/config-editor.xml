@@ -2151,6 +2151,13 @@
                    fieldset="false"
                    transformations="to-iso19139-keyword-with-anchor"/>
       </thesaurusList>
+
+      To display the thesaurus items as checkboxes (useful for small thesaurus):
+
+      <thesaurusList>
+        <thesaurus key="external.theme.inspire-theme"
+                   widgetMode="checkboxes" />
+      </thesaurusList>
       -->
 
       <thesaurusList>

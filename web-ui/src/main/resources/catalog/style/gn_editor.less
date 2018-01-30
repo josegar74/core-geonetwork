@@ -490,6 +490,17 @@ form.gn-editor {
       margin-right: 0px;
   }
 
+  // columns
+  .columns-2 {
+    columns: 2;
+    column-gap: 2em;
+    .checkbox {
+      -webkit-column-break-inside: avoid;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+  }
+
 }
 
 .gn-autocomplete-list {

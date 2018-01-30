@@ -802,6 +802,7 @@ eg. only 2 INSPIRE themes.
             <xs:attribute name="orderById" type="xs:boolean" use="optional"/>
             <xs:attribute name="fieldset" type="xs:string" use="optional" fixed="false"/>
             <xs:attribute name="transformations" type="xs:string" use="optional"/>
+            <xs:attribute name="widgetMode" type="xs:string" use="optional" />
           </xs:complexType>
         </xs:element>
       </xs:sequence>

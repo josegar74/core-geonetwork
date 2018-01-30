@@ -187,6 +187,7 @@
            replace: true,
            transclude: true,
            scope: {
+             mode: '@gnKeywordSelector',
              elementRef: '@',
              thesaurusKey: '@',
              keywords: '@',
@@ -432,7 +433,11 @@
                  scope.$watch('results', getSnippet);
                  scope.$watch('selected', getSnippet);
 
-                 initTagsInput();
+                 if (scope.mode === 'tagsinput') {
+                   initTagsInput();
+                 } else if (scope.mode === 'checkboxes') {
+                   initCheckboxes();
+                 }
                } else if (scope.invalidKeywordMatch) {
                  // invalidate element ref to not trigger
                  // an update of the record with an invalid
@@ -446,7 +451,14 @@
                gnThesaurusService.getKeywords(scope.filter,
                scope.thesaurusKey, gnLangs.current, scope.max)
                 .then(function(listOfKeywords) {
-                 // Remove from search already selected keywords
+                  if (scope.mode === 'checkboxes') {
+                    // fill array with all keywords
+                    scope.allKeywords = listOfKeywords;
+
+                    initCheckboxes();
+                  }
+
+                  // Remove from search already selected keywords
                  scope.results = $.grep(listOfKeywords, function(n) {
                    var alreadySelected = true;
                    if (scope.selected.length !== 0) {
@@ -458,6 +470,41 @@
                  });
                });
              };
+
+             // function for the selected state of the checkbox
+             scope.toggleSelection = function($event) {
+
+               // Update selection and snippet
+               if ($event.currentTarget.checked) {
+                 // ----- checkbox is selected
+                 scope.selected.push(this.keyword);
+                 scope.results.splice(this.keyword, 1);
+               } else {
+                 // ----- checkbox is unselected
+                 scope.selected.splice(this.keyword, 1);
+                 scope.results.push(this.keyword);
+               }
+               getSnippet();
+             };
+
+             // Init checkboxes and the pre-check when needed
+             var initCheckboxes = function() {
+
+               $timeout(function() {
+
+                 // select the checkbox when needed by looping through the list
+                 // with selected keywords
+                 angular.forEach(scope.selected, function(k) {
+
+                   // select the checkbox based on its label
+                   $("input:checkbox[value='" + k.label + "']")
+                   .prop('checked', true);
+
+                 });
+
+               });
+             };
+
              scope.setTransformation = function(t) {
                $timeout(function() {
                  scope.currentTransformation = t;

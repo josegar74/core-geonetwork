@@ -215,8 +215,13 @@
               * 'tagsinput' and maxTags = 1 for only one tag
               * 'multiplelist' for multiple selection list
         -->
-        <xsl:variable name="widgetMode" select="'tagsinput'"/>
-        <xsl:variable name="maxTags"
+        <xsl:variable name="widgetMode"
+                      as="xs:string"
+                      select="if ($thesaurusConfig/@widgetMode)
+                              then $thesaurusConfig/@widgetMode
+                              else 'tagsinput'"/>
+
+         <xsl:variable name="maxTags"
                       as="xs:string"
                       select="if ($thesaurusConfig/@maxtags)
                               then $thesaurusConfig/@maxtags

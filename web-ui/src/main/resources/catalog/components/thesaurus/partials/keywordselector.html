@@ -7,8 +7,42 @@
     </button>
   </div>
 
-  <span data-ng-show="!invalidKeywordMatch">
-    <div class="row">
+  <span data-ng-show="!invalidKeywordMatch" ng-switch="mode">
+    <div class="row" data-ng-switch-when="checkboxes">
+      <div class="col-sm-9 col-sm-offset-2 columns-2"
+           data-ng-class="maxTags && selected.length == maxTags ? 'gn-maxtags' : ''"
+           title="{{selected.length}}/{{maxTagsLabel}} {{'tagsAllowed' | translate}}">
+        <div data-ng-repeat="keyword in allKeywords | orderBy: 'label'" id="checkboxes_{{elementRef}}" class="checkbox">
+          <label>
+            <input type="checkbox"
+                   value="{{keyword.label}}"
+                   data-ng-click="toggleSelection($event);">
+                   {{keyword.label}}
+          </label>
+        </div>
+      </div>
+      <div class="col-sm-1">
+        <!-- TODO: improve transformation drop down is duplicated -->
+        <div class="btn-group pull-right"
+             data-ng-show="transformationLists.length > 1">
+          <button type="button" class="btn btn-link dropdown-toggle pull-right"
+                  data-toggle="dropdown">
+            <i class="fa fa-cog"/>
+            <span class="caret"/>
+          </button>
+          <ul class="dropdown-menu">
+            <li role="presentation" class="dropdown-header" data-translate="">keywordInsertMode</li>
+            <li data-ng-repeat="tr in transformationLists"
+                data-ng-class="isCurrent(tr) ? 'disabled' : ''">
+              <a href="" data-ng-click="setTransformation(tr)"
+                 title="{{(tr + '-help') | translate}}">{{tr | translate}}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" data-ng-switch-when="tagsinput">
       <label class="col-sm-2 control-label">
         {{thesaurusTitle}}
       </label>
