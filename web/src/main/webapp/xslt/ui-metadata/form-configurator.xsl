@@ -25,6 +25,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:gn-fn-metadata="http://geonetwork-opensource.org/xsl/functions/metadata"
                 xmlns:gn="http://www.fao.org/geonetwork"
+                xmlns:gco="http://www.isotc211.org/2005/gco"
+                xmlns:gmd="http://www.isotc211.org/2005/gmd"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:saxon="http://saxon.sf.net/"
                 extension-element-prefixes="saxon"
@@ -424,6 +426,8 @@
               </template>
             </xsl:variable>
 
+            <xsl:message>$currentNode: <xsl:value-of select="name($currentNode)" /></xsl:message>
+
             <xsl:variable name="keyValues">
               <xsl:call-template name="build-key-value-configuration">
                 <xsl:with-param name="template" select="$template"/>
@@ -494,6 +498,9 @@
               </template>
             </xsl:variable>
 
+            <xsl:message>$currentNode2: <xsl:value-of select="name($currentNode)" /></xsl:message>
+
+
             <xsl:call-template name="render-element-template-field">
               <xsl:with-param name="name" select="$strings/*[name() = $name]"/>
               <xsl:with-param name="id" select="$id"/>
@@ -547,7 +554,18 @@
     <xsl:param name="currentNode" as="node()?"/>
     <xsl:param name="readonly"/>
 
+    <xsl:message>
+      build-key-value-configuration currentNode: <xsl:copy-of select="name($currentNode)" />
+    </xsl:message>
+
     <xsl:for-each select="$template/values/key">
+     <!--<xsl:message>
+        build-key-value-configuration key: <xsl:copy-of select="@label" />
+      </xsl:message>
+      <xsl:message>
+        build-key-value-configuration key: <xsl:copy-of select="@xpath" />
+      </xsl:message>-->
+
       <field name="{@label}">
         <xsl:if test="$readonly = 'true'">
           <readonly>true</readonly>
@@ -559,9 +577,37 @@
             <xsl:with-param name="in" select="concat('/', @xpath)"/>
           </saxon:call-template>
         </xsl:variable>
-        <value>
+
+
+        <xsl:message>
+          $matchingNodeValue: <xsl:copy-of select="$matchingNodeValue" />
+        </xsl:message>
+
+        <xsl:choose>
+          <xsl:when test="not($matchingNodeValue//gmd:PT_FreeText)">
+            <value>
+              <xsl:value-of select="normalize-space($matchingNodeValue)"/>
+            </value>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="$matchingNodeValue//gco:CharacterString">
+              <value ref="{gn:element/@ref}">
+                <xsl:value-of select="normalize-space(.)"/>
+              </value>
+            </xsl:for-each>
+
+            <xsl:for-each select="$matchingNodeValue//gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString">
+              <value ref="{gn:element/@ref}" lang="{substring-after(@locale, '#')}">
+                <xsl:value-of select="normalize-space(.)"/>
+              </value>
+            </xsl:for-each>
+          </xsl:otherwise>
+
+        </xsl:choose>
+
+        <!--<value>
           <xsl:value-of select="normalize-space($matchingNodeValue)"/>
-        </value>
+        </value>-->
 
         <!--
         Directive attribute are usually string but could be an XPath

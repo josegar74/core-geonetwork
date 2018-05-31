@@ -323,6 +323,8 @@
       <name ancestor="gmd:thesaurusName">gmd:code</name>
       <name ancestor="gmd:aggregateDataSetIdentifier">gmd:code</name>
       <name ancestor="gmd:CI_Citation">gmd:code</name>
+
+      <name>gmd:electronicMailAddress</name>
     </exclude>
   </multilingualFields>
 
@@ -416,7 +418,6 @@
 
   <!-- View configuration -->
   <views>
-    <!--Turn on INSPIRE according to system settings -->
     <view name="inspire" upAndDownControlHidden="true" displayIfServiceInfo="/settings/system/inspire/enable='true'">
       <sidePanel>
         <directive data-gn-onlinesrc-list=""/>
@@ -430,6 +431,119 @@
       </sidePanel>
 
       <tab id="inspire" default="true" mode="flat">
+        <section name="metadataSection">
+          <field name="metadataPointOfContact" templateModeOnly="true"
+                 notDisplayedIfMissing="true"
+                 xpath="/gmd:MD_Metadata/gmd:contact" del=".">
+            <template>
+              <values readonlyIf="count(@xlink:href) > 0">
+                <key label="organisationName"
+                     tooltip="gmd:organisationName"
+                     xpath="gmd:CI_ResponsibleParty/gmd:organisationName"/>
+                <key label="electronicMailAddress"
+                     tooltip="gmd:electronicMailAddress"
+                     xpath="gmd:CI_ResponsibleParty/gmd:contactInfo/
+                    gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString"
+                     use="email"/>
+                <key label="role"
+                     tooltip="gmd:role"
+                     xpath="gmd:CI_ResponsibleParty/gmd:role/gmd:CI_RoleCode/@codeListValue">
+                  <codelist name="gmd:CI_RoleCode"/>
+                </key>
+              </values>
+              <snippet>
+                <gmd:contact>
+                  <gmd:CI_ResponsibleParty>
+                    <gn:copy select="gmd:individualName"/>
+                    <gmd:organisationName>
+                      <gco:CharacterString> {{organisationName}}</gco:CharacterString>
+                      <gn:copy select="gmd:PT_FreeText"/>
+                    </gmd:organisationName>
+                    <gn:copy select="gmd:positionName"/>
+                    <gmd:contactInfo>
+                      <gmd:CI_Contact>
+                        <gn:copy select="gmd:phone"/>
+                        <gmd:address>
+                          <gmd:CI_Address>
+                            <gn:copy select="gmd:deliveryPoint"/>
+                            <gn:copy select="gmd:city"/>
+                            <gn:copy select="gmd:administrativeArea"/>
+                            <gn:copy select="gmd:postalCode"/>
+                            <gn:copy select="gmd:country"/>
+                            <gmd:electronicMailAddress>
+                              <gco:CharacterString>{{electronicMailAddress}}</gco:CharacterString>
+                              <gn:copy select="gmd:PT_FreeText"/>
+                            </gmd:electronicMailAddress>
+                          </gmd:CI_Address>
+                        </gmd:address>
+                        <gn:copy select="gmd:onlineResource"/>
+                        <gn:copy select="gmd:hoursOfService"/>
+                        <gn:copy select="gmd:contactInstructions"/>
+                      </gmd:CI_Contact>
+                    </gmd:contactInfo>
+                    <gmd:role>
+                      <gmd:CI_RoleCode
+                        codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode"
+                        codeListValue="{{role}}"/>
+                    </gmd:role>
+                  </gmd:CI_ResponsibleParty>
+                </gmd:contact>
+              </snippet>
+            </template>
+          </field>
+
+          <action type="add" name="metadataPointOfContact" btnClass="fa fa-user-plus"
+                  or="contact"
+                  in="/gmd:MD_Metadata">
+            <template>
+              <snippet>
+                <gmd:contact>
+                  <gmd:CI_ResponsibleParty>
+                    <gmd:organisationName gco:nilReason="missing">
+                      <gco:CharacterString/>
+                    </gmd:organisationName>
+                    <gmd:contactInfo>
+                      <gmd:CI_Contact>
+                        <gmd:address>
+                          <gmd:CI_Address>
+                            <gmd:electronicMailAddress gco:nilReason="missing">
+                              <gco:CharacterString/>
+                            </gmd:electronicMailAddress>
+                          </gmd:CI_Address>
+                        </gmd:address>
+                      </gmd:CI_Contact>
+                    </gmd:contactInfo>
+                    <gmd:role>
+                      <gmd:CI_RoleCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode"
+                                       codeListValue="pointOfContact"/>
+                    </gmd:role>
+                  </gmd:CI_ResponsibleParty>
+                </gmd:contact>
+              </snippet>
+            </template>
+          </action>
+
+          <field xpath="/gmd:MD_Metadata/gmd:fileIdentifier"/>
+
+          <field xpath="/gmd:MD_Metadata/gmd:dateStamp"/>
+        </section>
+      </tab>
+
+    </view>
+    <!--Turn on INSPIRE according to system settings -->
+    <view name="inspireDISABLED" upAndDownControlHidden="true" displayIfServiceInfo="/settings/system/inspire/enable='true'">
+      <sidePanel>
+        <directive data-gn-onlinesrc-list=""/>
+        <directive gn-geo-publisher=""
+                   data-ng-if="gnCurrentEdit.geoPublisherConfig"
+                   data-config="{{gnCurrentEdit.geoPublisherConfig}}"
+                   data-lang="lang"/>
+        <directive data-gn-validation-report=""/>
+        <directive data-gn-suggestion-list=""/>
+        <directive data-gn-need-help="user-guide/describing-information/creating-metadata.html"/>
+      </sidePanel>
+
+      <tab id="inspireDISABLED" default="true" mode="flat">
         <section name="identificationInfo">
           <!-- Metadata ID -->
           <field

@@ -27,7 +27,7 @@
                 xmlns:gn-fn-metadata="http://geonetwork-opensource.org/xsl/functions/metadata"
                 xmlns:java-xsl-util="java:org.fao.geonet.util.XslUtil"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:saxon="http://saxon.sf.net/" version="2.0"
+                xmlns:saxon="http://saxon.sf.net/" version="2.0" xmlns:xls="http://www.w3.org/1999/XSL/Transform"
                 extension-element-prefixes="saxon" exclude-result-prefixes="#all">
   <!-- Build the form for creating HTML elements. -->
 
@@ -653,23 +653,118 @@
                       </xsl:for-each>
                     </div>
                   </xsl:when>
+
+                  <!--<xsl:when test="not(@use) and not($editorConfig/multilingualFields/exclude[name='']">
+
+                  </xsl:when>-->
                   <xsl:otherwise>
+
                     <xsl:variable name="keyIndex" select="position()"/>
-                    <input class="form-control"
-                           type="{if (@use) then @use else 'text'}"
-                           value="{if ($keyValues) then $keyValues/field[$keyIndex]/value/text() else ''}"
-                           id="{$id}_{@label}"
-                           data-gn-field-tooltip="{$schema}|{@tooltip}">
-                      <xsl:if test="$helper">
-                        <!-- hide the form field if helper is available, the
-                          value is set by the directive which provide customized
-                          forms -->
-                        <xsl:attribute name="class" select="'hidden'"/>
-                      </xsl:if>
-                      <xsl:if test="$readonly = 'true'">
-                        <xsl:attribute name="disabled"/>
-                      </xsl:if>
-                    </input>
+
+                    <!-- TODO: Change to add a new attribute for the element name instead of using tooltip attribute -->
+                    <xsl:variable name="fieldName" select="$template/values/key[$keyIndex]/@tooltip" />
+                    <xsl:variable name="isMultilingual" select="count($editorConfig/editor/multilingualFields/exclude[name = $fieldName]) = 0" />
+
+                    <xsl:message>
+                      TEMPLATE FIELD: <xsl:value-of select="$keyIndex" />  -
+                      <xsl:value-of select="$fieldName" /> -
+                      <xsl:value-of select="$isMultilingual" /> -
+                      <xsl:value-of select="$metadataIsMultilingual" />
+                    </xsl:message>
+
+                    <xsl:choose>
+                      <xsl:when test="not(@use) and $isMultilingual and $metadataIsMultilingual">
+                        <p>MULTILINGUAL TEMPLATE FIELD DIRECTIVE</p>
+
+                        <xsl:for-each select="$keyValues/field[$keyIndex]">
+                          <p>Field name: <xls:value-of select="@name" /></p>
+                          <p>Value(s):</p>
+                          <ul>
+                          <xsl:for-each select="value">
+                            <li>Element ref: <xsl:value-of select="@ref" />, lang: <xsl:value-of select="@lang" />, value: <xsl:value-of select="." /></li>
+                          </xsl:for-each>
+                          </ul>
+                        </xsl:for-each>
+
+                        <xsl:for-each select="$keyValues/field[$keyIndex]">
+                          <div>
+                            <xsl:attribute name="data-gn-multilingual-field"
+                                           select="$metadataOtherLanguagesAsJson"/>
+                            <xsl:attribute name="data-main-language" select="$metadataLanguage"/>
+                            <xsl:attribute name="data-expanded" select="false()"/>
+
+                            <xsl:for-each select="value">
+                              <xsl:sort select="@lang"/>
+                              <xsl:if test="@lang != ''">
+                                <input class="form-control"
+                                       type="text"
+                                       id="gn-field-{@ref}"
+                                       name="_lang_FR_{@ref}"
+                                       lang="{@lang}"
+                                       value="{.}"/>
+
+                                <!-- TODO: Review use this template, so textarea can be supported ... -->
+                                <!--<xsl:call-template name="render-form-field">
+                                  <xsl:with-param name="name" select="@ref"/>
+                                  <xsl:with-param name="lang" select="@lang"/>
+                                  <xsl:with-param name="value" select="."/>
+                                  <xsl:with-param name="type" select="$type"/>
+                                  <xsl:with-param name="tooltip" select="$tooltip"/>
+                                  <xsl:with-param name="isRequired" select="$isRequired"/>
+                                  <xsl:with-param name="isReadOnly" select="$isReadOnly"/>
+                                  <xsl:with-param name="isDisabled" select="$isDisabled"/>
+                                  <xsl:with-param name="editInfo" select="$editInfo"/>
+                                  <xsl:with-param name="parentEditInfo" select="$parentEditInfo"/>
+                                  &lt;!&ndash;  Helpers can't be provided for all languages
+                                  <xsl:with-param name="listOfValues" select="$listOfValues"/>
+                                  &ndash;&gt;
+                                  <xsl:with-param name="checkDirective"
+                                                  select="upper-case(@lang) = $mainLangCode or normalize-space(@lang) = ''"/>
+                                </xsl:call-template>-->
+                              </xsl:if>
+                            </xsl:for-each>
+                          </div>
+                        </xsl:for-each>
+
+                        <!-- Field used by gnTemplateField to replace the template content {{}} -->
+                        <!-- TODO: Should be filled with multilingual snippet -->
+
+                          <xsl:variable name="multilingualValues">
+                            <xsl:for-each select="$keyValues/field[$keyIndex]">
+                              <xsl:for-each select="value[@lang]">
+                                <xsl:value-of select="@ref" />:::<xsl:value-of select="@lang" />:::<xsl:value-of select="." />
+                                <xsl:if test="position() != last()">,</xsl:if>
+                              </xsl:for-each>
+                            </xsl:for-each>
+                          </xsl:variable>
+                          <input class="form-control"
+                                 type="text"
+                                 value="{$multilingualValues}"
+                                 id="{$id}_{@label}" />
+
+                        <!--<xsl:message>MULTILINGUAL TEMPLATE DIRECTIVE: <xsl:copy-of select="$keyValues" /></xsl:message>-->
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <p>NO MULTILINGUAL TEMPLATE FIELD</p>
+
+                        <input class="form-control"
+                               type="{if (@use) then @use else 'text'}"
+                               value="{if ($keyValues) then $keyValues/field[$keyIndex]/value/text() else ''}"
+                               id="{$id}_{@label}"
+                               data-gn-field-tooltip="{$schema}|{@tooltip}">
+                          <xsl:if test="$helper">
+                            <!-- hide the form field if helper is available, the
+                              value is set by the directive which provide customized
+                              forms -->
+                            <xsl:attribute name="class" select="'hidden'"/>
+                          </xsl:if>
+                          <xsl:if test="$readonly = 'true'">
+                            <xsl:attribute name="disabled"/>
+                          </xsl:if>
+                        </input>
+                      </xsl:otherwise>
+                    </xsl:choose>
+
                   </xsl:otherwise>
                 </xsl:choose>
 
@@ -704,12 +799,43 @@
                 </xsl:for-each>
               </xsl:if>
 
+
+              <xsl:variable name="dataValues">
+                <xsl:for-each select="$template/values/key">
+                  <xsl:variable name="keyIndex" select="position()"/>
+
+                  <xsl:variable name="fieldName" select="$template/values/key[$keyIndex]/@tooltip" />
+                  <xsl:variable name="isMultilingual" select="count($editorConfig/editor/multilingualFields/exclude[name = $fieldName]) = 0" />
+
+                  <xsl:variable name="fieldValue">
+                    <xsl:choose>
+                      <xsl:when test="$isMultilingual">
+                        <xsl:for-each select="$keyValues/field[$keyIndex]">
+                          <xsl:for-each select="value[@lang]">
+                            <xsl:value-of select="@ref" />:::<xsl:value-of select="@lang" />:::<xsl:value-of select="." />
+                            <xsl:if test="position() != last()">,</xsl:if>
+                          </xsl:for-each>
+                        </xsl:for-each>
+                      </xsl:when>
+
+                      <xsl:otherwise>
+                        <xsl:for-each select="$keyValues/field[$keyIndex]">
+                          <xsl:value-of select="." />
+                        </xsl:for-each>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:variable>
+
+                  <xsl:value-of select="$fieldValue" /><xsl:if test="position() != last()">$$$</xsl:if>
+                </xsl:for-each>
+              </xsl:variable>
+
               <textarea class="form-control gn-debug"
                         name="{$id}"
                         data-gn-template-field="{$id}"
                         data-keys="{string-join($template/values/key/@label, '$$$')}"
                         data-values="{if ($keyValues and count($keyValues/*) > 0)
-                          then string-join($keyValues/field/value, '$$$') else ''}">
+                          then $dataValues else ''}">
                 <xsl:if test="$isMissingLabel != ''">
                   <xsl:attribute name="data-not-set-check" select="$tagId"/>
                 </xsl:if>
