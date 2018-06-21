@@ -32,11 +32,16 @@ import org.apache.commons.lang.StringUtils;
 import org.fao.geonet.ApplicationContextHolder;
 import org.fao.geonet.api.API;
 import org.fao.geonet.api.ApiUtils;
+import org.fao.geonet.api.tools.i18n.LanguageUtils;
+import org.fao.geonet.api.users.model.PasswordResetDto;
 import org.fao.geonet.api.users.model.UserDto;
-import org.fao.geonet.constants.Params;
+import org.fao.geonet.api.users.validation.PasswordResetDtoValidator;
+import org.fao.geonet.api.users.validation.UserDtoValidator;
 import org.fao.geonet.domain.*;
 import org.fao.geonet.exceptions.UserNotFoundEx;
 import org.fao.geonet.kernel.DataManager;
+import org.fao.geonet.kernel.setting.SettingManager;
+import org.fao.geonet.kernel.setting.Settings;
 import org.fao.geonet.repository.GroupRepository;
 import org.fao.geonet.repository.SortUtils;
 import org.fao.geonet.repository.UserGroupRepository;
@@ -45,12 +50,14 @@ import org.fao.geonet.repository.UserSavedSelectionRepository;
 import org.fao.geonet.repository.specification.UserGroupSpecs;
 import org.fao.geonet.repository.specification.UserSpecs;
 import org.fao.geonet.util.PasswordUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -72,6 +79,8 @@ import static org.springframework.data.jpa.domain.Specifications.where;
     description = "User operations")
 @Controller("users")
 public class UsersApi {
+    @Autowired
+    LanguageUtils languageUtils;
 
     @ApiOperation(
         value = "Get users",
@@ -266,6 +275,8 @@ public class UsersApi {
         @RequestBody
             UserDto userDto,
         @ApiIgnore
+            BindingResult bindingResult,
+        @ApiIgnore
             ServletRequest request,
         @ApiIgnore
             HttpSession httpSession
@@ -274,6 +285,11 @@ public class UsersApi {
         UserSession session = ApiUtils.getUserSession(httpSession);
         Profile myProfile = session.getProfile();
         UserRepository userRepository = ApplicationContextHolder.get().getBean(UserRepository.class);
+
+
+        Locale locale = languageUtils.parseAcceptLanguage(request.getLocales());
+        ResourceBundle messages = ResourceBundle.getBundle("org.fao.geonet.api.Messages", locale);
+
 
         if (profile == Profile.Administrator) {
             checkIfAtLeastOneAdminIsEnabled(userDto, userRepository);
@@ -287,17 +303,14 @@ public class UsersApi {
                     + " max profile permitted is: " + myProfile);
         }
 
-        if (StringUtils.isEmpty(userDto.getUsername())) {
-            throw new IllegalArgumentException(Params.USERNAME
-                + " is a required parameter for "
-                + Params.Operation.NEWUSER + " " + "operation");
+        // Validate userDto data
+        UserDtoValidator userValidator = new UserDtoValidator();
+        userValidator.validate(userDto, bindingResult);
+        String errorMessage = ApiUtils.processRequestValidation(bindingResult, messages);
+        if (StringUtils.isNotEmpty(errorMessage)) {
+            throw new IllegalArgumentException(errorMessage);
         }
 
-        List<User> existingUsers = userRepository.findByUsernameIgnoreCase(userDto.getUsername());
-        if (!existingUsers.isEmpty()) {
-            throw new IllegalArgumentException("Users with username "
-                + userDto.getUsername() + " ignore case already exists");
-        }
 
         List<GroupElem> groups = new LinkedList<>();
 
@@ -439,22 +452,26 @@ public class UsersApi {
         )
         @PathVariable
             Integer userIdentifier,
-        @ApiParam(
-            value = "Password to change."
-        )
-        @RequestParam(value = Params.PASSWORD) String password,
-        @ApiParam(
-            value = "Password to change (repeat)."
-        )
-        @RequestParam(value = Params.PASSWORD + "2") String password2,
+        @RequestBody
+            PasswordResetDto passwordResetDto,
+        @ApiIgnore
+            BindingResult bindingResult,
         @ApiIgnore
             ServletRequest request,
         @ApiIgnore
             HttpSession httpSession
     ) throws Exception {
 
-        if (!password.equals(password2)) {
-            throw new IllegalArgumentException("Passwords should be equal");
+        Locale locale = languageUtils.parseAcceptLanguage(request.getLocales());
+        ResourceBundle messages = ResourceBundle.getBundle("org.fao.geonet.api.Messages", locale);
+
+
+        // Validate passwordResetDto data
+        PasswordResetDtoValidator passwordResetValidator = new PasswordResetDtoValidator();
+        passwordResetValidator.validate(passwordResetDto, bindingResult);
+        String errorMessage = ApiUtils.processRequestValidation(bindingResult, messages);
+        if (StringUtils.isNotEmpty(errorMessage)) {
+            throw new IllegalArgumentException(errorMessage);
         }
 
         UserSession session = ApiUtils.getUserSession(httpSession);
@@ -473,7 +490,7 @@ public class UsersApi {
         }
 
         String passwordHash = PasswordUtil.encoder(ApplicationContextHolder.get()).encode(
-            password);
+            passwordResetDto.getPassword());
         user.getSecurity().setPassword(passwordHash);
         user.getSecurity().getSecurityNotifications().remove(UserSecurityNotification.UPDATE_HASH_REQUIRED);
         userRepository.save(user);

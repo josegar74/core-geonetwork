@@ -39,9 +39,9 @@
    */
   module.controller('GnUserGroupController', [
     '$scope', '$routeParams', '$http', '$rootScope',
-    '$translate', '$timeout',
+    '$translate', '$timeout', 'gnConfig',
     function($scope, $routeParams, $http, $rootScope,
-        $translate, $timeout) {
+        $translate, $timeout, gnConfig) {
 
       $scope.searchObj = {
         params: {
@@ -99,6 +99,16 @@
       $scope.isLoadingUsers = false;
       $scope.isLoadingGroups = false;
 
+      $scope.passwordMinLength =
+        Math.min(gnConfig['system.security.passwordEnforcement.minLength'], 6);
+      $scope.passwordMaxLength =
+        Math.max(gnConfig['system.security.passwordEnforcement.maxLength'], 6);
+      $scope.usePattern = gnConfig['system.security.passwordEnforcement.usePattern'];
+
+      if ($scope.usePattern) {
+        $scope.passwordPattern = new RegExp(
+          gnConfig['system.security.passwordEnforcement.pattern']);
+      }
 
       // This is to force IE11 NOT to cache json requests
       if (!$http.defaults.headers.get) {
@@ -287,17 +297,14 @@
 
         $http.post('../api/users/' + $scope.userSelected.id +
             '/actions/forget-password',
-            $.param(params),
-            {
-              headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-            })
+            params)
             .success(function(data) {
               $scope.resetPassword1 = null;
               $scope.resetPassword2 = null;
               $('#passwordResetModal').modal('hide');
             }).error(function(data) {
               alert('Error occurred while resetting password: ' +
-                  data.error.message);
+                  data.description);
             });
 
       };
@@ -491,12 +498,20 @@
             data)
             .then(
             function(r) {
-              $scope.unselectUser();
-              loadUsers();
-              $rootScope.$broadcast('StatusUpdated', {
-                msg: $translate.instant('userUpdated'),
-                timeout: 2,
-                type: 'success'});
+              if (r.status === 204) {
+                $scope.unselectUser();
+                loadUsers();
+                $rootScope.$broadcast('StatusUpdated', {
+                  msg: $translate.instant('userUpdated'),
+                  timeout: 2,
+                  type: 'success'});
+              } else {
+                $rootScope.$broadcast('StatusUpdated', {
+                  title: $translate.instant('userUpdateError'),
+                  error: r.data,
+                  timeout: 0,
+                  type: 'danger'});
+              }
             },
             function(r) {
               $rootScope.$broadcast('StatusUpdated', {
