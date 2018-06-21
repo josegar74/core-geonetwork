@@ -35,13 +35,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.fao.geonet.ApplicationContextHolder;
 import org.fao.geonet.api.exception.ResourceNotFoundException;
 import org.fao.geonet.api.tools.i18n.LanguageUtils;
@@ -65,6 +65,8 @@ import jeeves.constants.Jeeves;
 import jeeves.server.UserSession;
 import jeeves.server.context.ServiceContext;
 import jeeves.server.dispatchers.ServiceManager;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 
 /**
  * API utilities mainly to deal with parameters.
@@ -261,5 +263,50 @@ public class ApiUtils {
         try (OutputStream out = Files.newOutputStream(outFile)) {
             ImageIO.write(bimg, type, out);
         }
+    }
+
+
+    /**
+     * Process request validation, returnin an string with the validation errors.
+     *
+     * @param bindingResult
+     * @param messages
+     */
+    public static String processRequestValidation(BindingResult bindingResult, ResourceBundle messages) {
+        if (bindingResult.hasErrors()) {
+            List<ObjectError> errorList = bindingResult.getAllErrors();
+
+            StringBuilder sb = new StringBuilder();
+            Iterator<ObjectError> it = errorList.iterator();
+            while (it.hasNext()) {
+                ObjectError err = it.next();
+                String msg = "";
+                for(int i = 0; i < err.getCodes().length; i++) {
+                    try {
+                        msg = messages.getString(err.getCodes()[i]);
+
+                        if (StringUtils.isNotEmpty(msg)) {
+                            break;
+                        }
+                    } catch (MissingResourceException ex) {
+                        // Ignore
+                    }
+                }
+
+                if (StringUtils.isEmpty(msg)) {
+                    msg = err.getDefaultMessage();
+                }
+
+                sb.append(msg);
+                if (it.hasNext()) {
+                    sb.append(", ");
+                }
+            }
+
+            return sb.toString();
+        } else {
+            return "";
+        }
+
     }
 }

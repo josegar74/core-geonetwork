@@ -21,12 +21,15 @@
 //===   Rome - Italy. email: geonetwork@osgeo.org
 //==============================================================================
 
+
 package org.fao.geonet.api.users;
 
 import org.fao.geonet.ApplicationContextHolder;
 import org.fao.geonet.api.API;
 import org.fao.geonet.api.ApiUtils;
 import org.fao.geonet.api.tools.i18n.LanguageUtils;
+import org.fao.geonet.api.users.validation.PasswordUpdateParameterValidator;
+import org.fao.geonet.api.users.validation.UserDtoValidator;
 import org.fao.geonet.domain.User;
 import org.fao.geonet.kernel.security.ldap.LDAPConstants;
 import org.fao.geonet.kernel.setting.SettingManager;
@@ -41,6 +44,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,9 +55,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,6 +63,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jeeves.server.context.ServiceContext;
+import springfox.documentation.annotations.ApiIgnore;
 
 @EnableWebMvc
 @Service
@@ -95,7 +99,10 @@ public class PasswordApi {
             required = true)
         @RequestBody
             PasswordUpdateParameter passwordAndChangeKey,
-        HttpServletRequest request)
+        @ApiIgnore
+            BindingResult bindingResult,
+        @ApiIgnore
+            HttpServletRequest request)
         throws Exception {
         Locale locale = languageUtils.parseAcceptLanguage(request.getLocales());
         ResourceBundle messages = ResourceBundle.getBundle("org.fao.geonet.api.Messages", locale);
@@ -117,7 +124,6 @@ public class PasswordApi {
             ), HttpStatus.PRECONDITION_FAILED);
         }
 
-
         // construct expected change key - only valid today
         String scrambledPassword = user.getPassword();
         Calendar cal = Calendar.getInstance();
@@ -132,6 +138,14 @@ public class PasswordApi {
                 passwordAndChangeKey.getChangeKey(), username
             ), HttpStatus.PRECONDITION_FAILED);
         }
+
+        PasswordUpdateParameterValidator passwordValidator = new PasswordUpdateParameterValidator();
+        passwordValidator.validate(passwordAndChangeKey, bindingResult);
+        String errorMessage = ApiUtils.processRequestValidation(bindingResult, messages);
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(errorMessage)) {
+            return new ResponseEntity<>(errorMessage, HttpStatus.PRECONDITION_FAILED);
+        }
+
 
         user.getSecurity().setPassword(PasswordUtil.encode(context, passwordAndChangeKey.getPassword()));
         userRepository.save(user);
