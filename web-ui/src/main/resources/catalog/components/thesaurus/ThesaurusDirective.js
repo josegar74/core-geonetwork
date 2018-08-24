@@ -62,6 +62,7 @@
              mode: '@gnThesaurusSelector',
              elementName: '@',
              elementRef: '@',
+             parentElementRef: '@',
              domId: '@',
              selectorOnly: '@',
              transformation: '@',

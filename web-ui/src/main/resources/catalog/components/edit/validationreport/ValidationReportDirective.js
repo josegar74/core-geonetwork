@@ -55,6 +55,17 @@
                 scope.hasSuccess = false;
                 scope.loading = true;
 
+                var addErrorMsg = function(el, msg) {
+                  var isDiv = (el.get(0).tagName.toLowerCase() == 'div');
+
+                  if (isDiv) {
+                    el.append(msg);
+                  } else {
+                    el.after(msg);
+                  }
+                };
+
+
                 gnValidation.get().then(function(response) {
                   var optional = [];
                   var ruleTypes = response.data.report;
@@ -75,6 +86,46 @@
                       scope.numberOfRules +=
                           pat.rules ? pat.rules.length : 0;
                     });
+
+
+                    if (ruleType.id != 'xsd') {
+                      for (var i = 0; i < ruleType.patterns.pattern.length; i++) {
+                        var p = ruleType.patterns.pattern[i];
+
+                        for (var j = 0; j < p.rules.rule.length; j++) {
+                          var r = p.rules.rule[j];
+                          console.log("Rule ref: " + r.ref + ", msg: " + r.msg);
+                          var ref = r.ref.replace("#_", "");
+
+                          var msg = "<p class='text-danger'><strong>" + ref + " - " + r.msg + "</strong></p>";
+                          msg = "<p class='text-danger'><strong>" + r.msg + "</strong></p>";
+
+                          var el = $('#gn-field-' + ref);
+
+
+                          if ((el != null) && (el.length == 1)) {
+                            addErrorMsg(el, msg);
+
+                          } else {
+                            var el = $('#gn-el-' + ref);
+
+                            if ((el != null) && (el.length == 1)) {
+                              addErrorMsg(el, msg);
+
+                            } else {
+                              var el = $( "[data-gn-field-validationid='" + ref + "']" )
+
+                              if ((el != null) && (el.length == 1)) {
+                                addErrorMsg(el, msg);
+                              }
+                            }
+                          }
+
+
+                        }
+
+                      }
+                    }
                   });
 
                   scope.ruleTypes = scope.ruleTypes.concat(optional);

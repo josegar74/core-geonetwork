@@ -218,6 +218,7 @@
                 <xsl:if test="count($listOfValues/*) > 0">
                   <xsl:call-template name="render-form-field-helper">
                     <xsl:with-param name="elementRef" select="concat('_', $editInfo/@ref)"/>
+                    <xsl:with-param name="parentElementRef" select="$editInfo/@parent"/>
                     <!-- The @rel attribute in the helper may define a related field
                     to update. Check the related element of the current element
                     which should be in the sibbling axis. -->
@@ -560,6 +561,8 @@
                               select="if ($keyValues) then $keyValues/field[@name = $valueLabelKey]/codelist else ''"/>
                 <xsl:variable name="readonly"
                               select="if ($keyValues) then $keyValues/field[@name = $valueLabelKey]/readonly else ''"/>
+                <xsl:variable name="idKey"
+                              select="if ($keyValues) then $keyValues/field[@name = $valueLabelKey]/id else ''"/>
 
                 <!-- Only display label if more than one key to match -->
                 <xsl:if test="count($template/values/key) > 1">
@@ -677,6 +680,7 @@
                   <xsl:variable name="elementName" select="concat($id, '_', @label)"/>
                   <xsl:call-template name="render-form-field-helper">
                     <xsl:with-param name="elementRef" select="$elementName"/>
+                    <xsl:with-param name="parentElementRef" select="$parentRef"/>
                     <xsl:with-param name="relatedElement" select="if ($helper/@rel)
                       then concat($elementName, '_', substring-after($helper/@rel, ':'))
                       else ''"/>
@@ -992,7 +996,7 @@
     <xsl:choose>
       <xsl:when test="$type = 'textarea'">
         <textarea class="form-control {if ($lang) then 'hidden' else ''}"
-                  id="gn-field-{$editInfo/@ref}" name="_{$name}"
+                  id="gn-field-{$editInfo/@parent}" name="_{$name}"
                   data-gn-autogrow="">
           <xsl:if test="$isRequired">
             <xsl:attribute name="required" select="'required'"/>
@@ -1076,6 +1080,7 @@
               <xsl:with-param name="valueToEdit" select="$valueToEdit"/>
               <xsl:with-param name="name" select="$name"/>
               <xsl:with-param name="tooltip" select="$tooltip"/>
+              <xsl:with-param name="parentlementRef" select="$editInfo/@parent"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
@@ -1117,8 +1122,12 @@
           <xsl:element name="{if ($isTextareaDirective) then 'textarea' else 'input'}">
             <xsl:attribute name="class"
                            select="concat('form-control ', if ($lang) then 'hidden' else '')"/>
-            <xsl:attribute name="id"
-                           select="concat('gn-field-', $editInfo/@ref)"/>
+            <!--<xsl:attribute name="id"
+                           select="concat('gn-field-', $editInfo/@ref)"/>-->
+            <xsl:if test="not($hasHelper and not($isDisabled))">
+              <xsl:attribute name="id"
+                             select="concat('gn-field-', $editInfo/@parent)"/>
+            </xsl:if>
             <xsl:attribute name="name"
                            select="concat('_', $name)"/>
             <xsl:if test="$isDirective">
@@ -1176,6 +1185,7 @@
 
       <xsl:call-template name="render-form-field-helper">
         <xsl:with-param name="elementRef" select="concat('_', $editInfo/@ref)"/>
+        <xsl:with-param name="parentElementRef" select="$editInfo/@parent"/>
         <!-- The @rel attribute in the helper may define a related field
         to update. Check the related element of the current element
         which should be in the sibbling axis. -->
@@ -1205,7 +1215,9 @@
     <xsl:param name="valueToEdit"/>
     <xsl:param name="name"/>
     <xsl:param name="tooltip"/>
-    <select class="" id="gn-field-{$elementRef}" name="_{$name}">
+    <xsl:param name="parentlementRef"></xsl:param>
+
+    <select class="" id="gn-field-{$elementRef}" name="_{$name}"  data-gn-field-validationid="{$parentlementRef}">
       <xsl:if test="$isRequired">
         <xsl:attribute name="required" select="'required'"/>
       </xsl:if>
@@ -1244,6 +1256,7 @@
 
   <xsl:template name="render-form-field-helper">
     <xsl:param name="elementRef" as="xs:string"/>
+    <xsl:param name="parentElementRef" as="xs:string"/>
     <xsl:param name="relatedElement" as="xs:string" required="no" select="''"/>
     <xsl:param name="relatedElementRef" as="xs:string" required="no" select="''"/>
     <xsl:param name="dataType" as="xs:string" required="no" select="'text'"/>
@@ -1261,6 +1274,7 @@
     <div
       data-gn-editor-helper="{$listOfValues/@editorMode}"
       data-ref="{$elementRef}"
+      data-parent-ref="{$parentElementRef}"
       data-type="{$dataType}"
       data-related-element="{if ($listOfValues/@rel != '')
       then $relatedElement else ''}"

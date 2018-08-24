@@ -563,6 +563,10 @@
           <xsl:value-of select="normalize-space($matchingNodeValue)"/>
         </value>
 
+        <id>
+          <xsl:value-of select="$matchingNodeValue/*/gn:element/@ref"/>
+        </id>
+
         <!--
         Directive attribute are usually string but could be an XPath
         to evaluate. In that case, the attribute starts with eval#.

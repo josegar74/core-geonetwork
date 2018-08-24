@@ -246,6 +246,7 @@
         <div data-gn-keyword-selector="{$widgetMode}"
              data-metadata-id="{$metadataId}"
              data-element-ref="{concat('_X', ../gn:element/@ref, '_replace')}"
+             data-parent-element-ref="{gmd:keyword[1]/gn:element/@ref}"
              data-thesaurus-title="{if ($thesaurusConfig/@fieldset = 'false') then $thesaurusTitle else ''}"
              data-thesaurus-key="{$thesaurusKey}"
              data-keywords="{$keywords}"

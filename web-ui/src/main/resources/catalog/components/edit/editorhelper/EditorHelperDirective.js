@@ -47,6 +47,7 @@
         scope: {
           mode: '@gnEditorHelper',
           ref: '@',
+          parentRef: '@',
           type: '@',
           relatedElement: '@',
           relatedAttr: '@',
