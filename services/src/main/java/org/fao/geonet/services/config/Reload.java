@@ -35,6 +35,7 @@ import org.jdom.Element;
 
 import java.nio.file.Path;
 
+@Deprecated
 public class Reload implements Service {
 
     public void init(Path appPath, ServiceConfig params) throws Exception {

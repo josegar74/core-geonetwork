@@ -41,7 +41,7 @@ import java.nio.file.Path;
 /**
  * Force rebuild Lucene index
  */
-
+@Deprecated
 public class IndexRebuild implements Service {
     private ServiceConfig _config;
 

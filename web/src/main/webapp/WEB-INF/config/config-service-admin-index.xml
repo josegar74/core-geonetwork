@@ -24,14 +24,14 @@
 
 <geonet>
   <services package="org.fao.geonet">
-    <service name="admin.index.rebuild">
+    <service name="admin.index.rebuild" deprecated="true">
       <documentation>
         Service to force a complete rebuild of Lucene index
       </documentation>
       <class name=".services.metadata.IndexRebuild"/>
     </service>
 
-    <service name="admin.index.rebuildxlinks">
+    <service name="admin.index.rebuildxlinks" deprecated="true">
       <documentation>
         Service to clear all cached xlinks and rebuild index for metadata records with xlinks
       </documentation>
@@ -48,7 +48,7 @@
     </service>
 
 
-    <service name="admin.index.config.reload">
+    <service name="admin.index.config.reload" deprecated="true">
       <documentation>Reload Lucene configuration. If changes to the index
         configuration was made, user should rebuild the index.
       </documentation>

@@ -432,7 +432,7 @@
       checkIsIndexing();
 
       $scope.rebuildIndex = function() {
-        return $http.get('admin.index.rebuild?reset=yes')
+        return $http.put('../api/site/index/rebuild?reset=true')
             .success(function(data) {
               checkIsIndexing();
             })
@@ -462,7 +462,7 @@
       };
 
       $scope.optimizeIndex = function() {
-        return $http.get('admin.index.optimize')
+        return $http.put('../api/site/index/optimize')
             .success(function(data) {
               $rootScope.$broadcast('StatusUpdated', {
                 msg: $translate.instant('indexOptimizationInProgress'),
@@ -480,7 +480,7 @@
       };
 
       $scope.reloadLuceneConfig = function() {
-        return $http.get('admin.index.config.reload')
+        return $http.put('../api/site/index/reload')
             .success(function(data) {
               $rootScope.$broadcast('StatusUpdated', {
                 msg: $translate.instant('luceneConfigReloaded'),
@@ -497,7 +497,7 @@
       };
 
       $scope.clearXLinkCache = function() {
-        return $http.get('admin.index.rebuildxlinks')
+        return $http.put('../api/site/index/rebuild?xlinks=true')
             .success(function(data) {
               $rootScope.$broadcast('StatusUpdated', {
                 msg: $translate.instant('xlinkCacheCleared'),

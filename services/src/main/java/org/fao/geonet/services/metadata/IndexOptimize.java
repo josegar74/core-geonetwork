@@ -40,7 +40,7 @@ import java.nio.file.Path;
 /**
  * Force optimize Lucene index
  */
-
+@Deprecated
 public class IndexOptimize implements Service {
     //--------------------------------------------------------------------------
     //---

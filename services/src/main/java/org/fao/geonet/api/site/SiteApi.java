@@ -43,11 +43,11 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import jeeves.constants.Jeeves;
+import jeeves.server.ServiceConfig;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.fao.geonet.ApplicationContextHolder;
-import org.fao.geonet.GeonetContext;
-import org.fao.geonet.NodeInfo;
-import org.fao.geonet.SystemInfo;
+import org.fao.geonet.*;
 import org.fao.geonet.api.API;
 import org.fao.geonet.api.ApiParams;
 import org.fao.geonet.api.ApiUtils;
@@ -66,6 +66,7 @@ import org.fao.geonet.kernel.DataManager;
 import org.fao.geonet.kernel.GeonetworkDataDirectory;
 import org.fao.geonet.kernel.datamanager.IMetadataManager;
 import org.fao.geonet.kernel.search.EsSearchManager;
+import org.fao.geonet.kernel.search.LuceneConfig;
 import org.fao.geonet.kernel.search.SearchManager;
 import org.fao.geonet.kernel.setting.SettingInfo;
 import org.fao.geonet.kernel.setting.SettingManager;
@@ -77,7 +78,9 @@ import org.fao.geonet.repository.specification.MetadataSpecs;
 import org.fao.geonet.resources.Resources;
 import org.fao.geonet.utils.FilePathChecker;
 import org.fao.geonet.utils.IO;
+import org.fao.geonet.utils.Log;
 import org.fao.geonet.utils.ProxyInfo;
+import org.jdom.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -755,5 +758,88 @@ public class SiteApi {
             }
             return list;
         }
+    }
+
+
+    @ApiOperation(
+        value = "ReloadIndexConfiguration",
+        notes = "",
+        nickname = "reloadIndexConfiguration")
+    @RequestMapping(
+        path = "/index/reload",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        method = RequestMethod.PUT)
+    @PreAuthorize("hasRole('Administrator')")
+    @ResponseBody
+    public HttpEntity reloadIndexConfiguration() {
+        ApplicationContext applicationContext = ApplicationContextHolder.get();
+
+        ServiceConfig handlerConfig = applicationContext.getBean(ServiceConfig.class);
+        String luceneConfigXmlFile = handlerConfig
+            .getMandatoryValue(Geonet.Config.LUCENE_CONFIG);
+
+        LuceneConfig lc = applicationContext.getBean(LuceneConfig.class);
+        lc.configure(luceneConfigXmlFile);
+
+        Log.info(Geonet.GEONETWORK,
+            "  - Lucene configuration is: " + lc.toString());
+
+        return new HttpEntity<>(HttpStatus.OK);
+    }
+
+
+    @ApiOperation(
+        value = "RebuildIndex",
+        notes = "",
+        nickname = "rebuildIndex")
+    @RequestMapping(
+        path = "/index/rebuild",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        method = RequestMethod.PUT)
+    @PreAuthorize("hasRole('Administrator')")
+    @ResponseBody
+    public JSONObject rebuildIndex(
+        @ApiParam(required = false)
+            boolean reset,
+        @ApiParam(required = false)
+            boolean fromSelection,
+        @ApiParam(required = false)
+            boolean xlinks,
+        @ApiIgnore
+        HttpServletRequest request
+    ) throws Exception {
+        ApplicationContext applicationContext = ApplicationContextHolder.get();
+        ServiceContext context = ApiUtils.createServiceContext(request);
+
+        SearchManager searchMan = applicationContext.getBean(SearchManager.class);
+
+        boolean info = searchMan.rebuildIndex(context, xlinks, reset, fromSelection ? "metadata" : null);
+
+        JSONObject response = new JSONObject();
+        response.put("status", (info ? "true" : "false"));
+        return response;
+    }
+
+
+    @ApiOperation(
+        value = "IndexOptimize",
+        notes = "",
+        nickname = "indexOptimize")
+    @RequestMapping(
+        path = "/index/optimize",
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        method = RequestMethod.PUT)
+    @PreAuthorize("hasRole('Administrator')")
+    @ResponseBody
+    public JSONObject indexOptimize() {
+        ApplicationContext applicationContext = ApplicationContextHolder.get();
+
+        SearchManager searchMan = applicationContext.getBean(SearchManager.class);
+
+        boolean info = searchMan.optimizeIndex();
+
+        JSONObject response = new JSONObject();
+        response.put("status", (info ? "true" : "false"));
+        return response;
     }
 }
