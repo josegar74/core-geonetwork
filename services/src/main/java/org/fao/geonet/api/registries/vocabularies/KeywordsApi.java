@@ -37,21 +37,20 @@ import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import jeeves.constants.Jeeves;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fao.geonet.ApplicationContextHolder;
+import org.fao.geonet.Constants;
 import org.fao.geonet.GeonetContext;
 import org.fao.geonet.api.API;
 import org.fao.geonet.api.ApiParams;
@@ -60,16 +59,14 @@ import org.fao.geonet.api.exception.ResourceNotFoundException;
 import org.fao.geonet.api.exception.WebApplicationException;
 import org.fao.geonet.api.tools.i18n.LanguageUtils;
 import org.fao.geonet.constants.Geonet;
+import org.fao.geonet.domain.userfeedback.Keyword;
+import org.fao.geonet.exceptions.TermNotFoundException;
 import org.fao.geonet.kernel.GeonetworkDataDirectory;
 import org.fao.geonet.kernel.KeywordBean;
 import org.fao.geonet.kernel.Thesaurus;
 import org.fao.geonet.kernel.ThesaurusManager;
 import org.fao.geonet.kernel.search.KeywordsSearcher;
-import org.fao.geonet.kernel.search.keyword.KeywordSearchParamsBuilder;
-import org.fao.geonet.kernel.search.keyword.KeywordSearchType;
-import org.fao.geonet.kernel.search.keyword.KeywordSort;
-import org.fao.geonet.kernel.search.keyword.SortDirection;
-import org.fao.geonet.kernel.search.keyword.XmlParams;
+import org.fao.geonet.kernel.search.keyword.*;
 import org.fao.geonet.kernel.setting.SettingManager;
 import org.fao.geonet.languages.IsoLanguagesMapper;
 import org.fao.geonet.lib.Lib;
@@ -91,12 +88,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -444,6 +437,252 @@ public class KeywordsApi {
         final Element transform = Xml.transform(root, convertXsl);
 
         return transform;
+    }
+
+
+    /**
+     * Gets the keyword relations.
+     *
+     * @param conceptId the keyword id
+     * @param sThesaurusName the thesaurus name
+     * @param relationType the relations to retrieve
+     * @param request the request
+     * @return the keyword relations.
+     * @throws Exception the exception
+     */
+    @ApiOperation(
+        value = "Get keyword relations",
+        nickname = "getKeywordRelated",
+        notes = "Retrieve other keywords related by a relation type (narrower/broader/relation) to the keyword provided."
+    )
+    @RequestMapping(
+        path = "/keyword/related/{relationType}",
+        method = RequestMethod.GET)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Related keywords."),
+    })
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public String getKeywordRelated(
+        @ApiParam(
+            value = "Relation type.",
+            required = true)
+        @PathVariable
+            KeywordRelation relationType,
+        @ApiParam(
+            value = "Keyword identifier or list of keyword identifiers comma separated.",
+            required = true)
+        @RequestParam (name = "id")
+            String conceptId,
+        @ApiParam(
+            value = "Thesaurus name.",
+            required = true)
+        @RequestParam (name = "thesaurus")
+            String sThesaurusName,
+        @ApiIgnore
+        HttpServletRequest request
+
+    ) throws Exception {
+        ServiceContext context = ApiUtils.createServiceContext(request);
+
+        ThesaurusManager thesaurusMan = context.getBean(ThesaurusManager.class);
+        KeywordsSearcher searcher = new KeywordsSearcher(context, thesaurusMan);
+
+        KeywordRelation relationTypeToSearch = relationType.opposite();
+
+        searcher.searchForRelated(conceptId, sThesaurusName, relationTypeToSearch,
+            KeywordSort.defaultLabelSorter(SortDirection.DESC), context.getLanguage());
+
+        // Build response
+        Element response = new Element(Jeeves.Elem.RESPONSE);
+        response.setAttribute("relation", relationType.name().toLowerCase());
+        response.setAttribute("to", conceptId);
+        response.addContent(searcher.getXmlResults());
+
+        return Xml.getJSON(response);
+    }
+
+
+    /**
+     * Gets the thesaurus top concepts.
+     *
+     * @param sThesaurusName the thesaurus name.
+     * @param language the language to return the results.
+     * @param request the request
+     * @return the thesaurus top concepts.
+     * @throws Exception the exception
+     */
+    @ApiOperation(
+        value = "Get keyword top concepts",
+        nickname = "getTopConcepts",
+        notes = "Search the thesaurus for all concepts listed in the concept schema as top concepts (ie " +
+            "skos:hasTopConcept). Return a confected concept uri and preferred label with top concepts as " +
+            "narrower concepts."
+    )
+    @RequestMapping(
+        path = "/topConcepts",
+        method = RequestMethod.GET)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Thesaurus top concepts."),
+        @ApiResponse(code = 404, message = ApiParams.API_RESPONSE_RESOURCE_NOT_FOUND)
+    })
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public String getTopConcepts(
+        @ApiParam(
+            value = "Thesaurus name.",
+            required = true)
+        @RequestParam (name = "thesaurus")
+            String sThesaurusName,
+        @ApiParam(
+            value = "Language.",
+            required = true)
+        @RequestParam (name = "lang")
+            String language,
+        @ApiIgnore
+            HttpServletRequest request
+
+    ) throws Exception {
+        ServiceContext context = ApiUtils.createServiceContext(request);
+
+        ThesaurusManager thesaurusMan = context.getBean(ThesaurusManager.class);
+
+        Thesaurus thesaurus = thesaurusMan.getThesaurusByName(sThesaurusName);
+        if (thesaurus == null) {
+            // Thesaurus does not exist
+            throw new ResourceNotFoundException(String.format(
+                "Thesaurus with identifier '%s' not found in the catalogue. Should be one of: %s",
+                sThesaurusName,
+                thesaurusManager.getThesauriMap().keySet().toString()
+            ));
+        }
+
+        String langForThesaurus = thesaurus.getIsoLanguageMapper().iso639_2_to_iso639_1(language);
+
+        KeywordsSearcher searcher = null;
+
+        // perform the search for the top concepts of the concept scheme
+        searcher = new KeywordsSearcher(context, thesaurusMan);
+
+        Element response = new Element("descKeys");
+        try {
+            searcher.searchTopConcepts(sThesaurusName, langForThesaurus);
+
+            KeywordBean topConcept = new KeywordBean(thesaurus.getIsoLanguageMapper());
+            topConcept.setThesaurusInfo(thesaurus);
+            topConcept.setValue("topConcepts", langForThesaurus);
+            topConcept.setUriCode(sThesaurusName);
+            Element root = KeywordsSearcher.toRawElement(response, topConcept);
+
+            Element keywordType = new Element("narrower");
+            for (KeywordBean kbr : searcher.getResults()) {
+                keywordType.addContent(kbr.toElement("eng", context.getLanguage()));
+            }
+            root.addContent(keywordType);
+        } catch (TermNotFoundException ignored) {
+            // No top concept in thesaurus. Return empty element
+        }
+
+        return Xml.getJSON(response);
+    }
+
+
+    /**
+     * Returns a keyword from a thesaurus with narrower, broader and related concepts filled out.
+     * Keyword and related concepts are returned in raw format.
+     *
+     * @param conceptId the keyword id
+     * @param sThesaurusName the thesaurus name
+     * @param language the language to return the results.
+     * @param request the request
+     * @return the keyword with all relations.
+     * @throws Exception the exception
+     */
+    @ApiOperation(
+        value = "Get keyword with all relations.",
+        nickname = "getKeywordByIdAsConcept",
+        notes = "Retrieve the keyword with all relations."
+    )
+    @RequestMapping(
+        path = "/keyword/withRelations",
+        method = RequestMethod.GET)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Related keywords."),
+    })
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public String getKeywordByIdAsConcept(
+        @ApiParam(
+            value = "Keyword identifier or list of keyword identifiers comma separated.",
+            required = true)
+        @RequestParam (name = "id")
+            String conceptId,
+        @ApiParam(
+            value = "Thesaurus name.",
+            required = true)
+        @RequestParam (name = "thesaurus")
+            String sThesaurusName,
+        @ApiParam(
+            value = "Language.",
+            required = true)
+        @RequestParam (name = "lang")
+            String language,
+        @ApiIgnore
+            HttpServletRequest request
+
+    ) throws Exception {
+        ServiceContext context = ApiUtils.createServiceContext(request);
+
+        ThesaurusManager thesaurusMan = context.getBean(ThesaurusManager.class);
+
+        Thesaurus thesaurus = thesaurusMan.getThesaurusByName(sThesaurusName);
+        if (thesaurus == null) {
+            throw new ResourceNotFoundException(String.format(
+                "Thesaurus with identifier '%s' not found in the catalogue. Should be one of: %s",
+                sThesaurusName,
+                thesaurusMan.getThesauriMap().keySet().toString()
+            ));
+        }
+
+        String langForThesaurus = thesaurus.getIsoLanguageMapper().iso639_2_to_iso639_1(language);
+
+        KeywordsSearcher searcher = null;
+
+        Element root = null;
+
+        if (conceptId == null) {
+            root = new Element("descKeys");
+        } else {
+            // perform the search for the specified concept by uri
+            searcher = new KeywordsSearcher(context, thesaurusMan);
+            KeywordBean kb = null;
+
+            kb = searcher.searchById(conceptId, sThesaurusName, langForThesaurus);
+            if (kb == null) {
+                root = new Element("descKeys");
+            } else {
+                root = KeywordsSearcher.toRawElement(new Element("descKeys"), kb);
+
+                // now get the narrower, broader and related/equal concepts and
+                // place them in the result tree
+                for (KeywordRelation relationType : KeywordRelation.values()) {
+                    searcher = new KeywordsSearcher(context, thesaurusMan);
+
+                    KeywordRelation relationTypeToSearch = relationType.opposite();
+
+                    searcher.searchForRelated(conceptId, sThesaurusName, relationTypeToSearch,
+                        KeywordSort.defaultLabelSorter(SortDirection.DESC), language);
+                    // build response for each request type
+                    Element keywordType = new Element(relationType.name().toLowerCase());
+                    for (KeywordBean kbr : searcher.getResults()) {
+                        keywordType.addContent(kbr.toElement(context.getLanguage()));
+                    }
+                    root.addContent(keywordType);
+                }
+            }
+        }
+
+        return Xml.getJSON(root);
     }
 
 
@@ -1016,4 +1255,72 @@ public class KeywordsApi {
 
         return parsedParams;
     }
-}
+
+
+    /**
+     * Delete thesaurus keyword.
+     *
+     * @param thesaurus the thesaurus
+     * @param request the request
+     * @return the element
+     * @throws Exception the exception
+     */
+    @ApiOperation(
+        value = "Delete a thesaurus keyword",
+        nickname = "deleteThesaurus",
+        notes = "Delete a thesaurus."
+    )
+    @RequestMapping(
+        value = "/{thesaurus:.+}/keyword",
+        method = RequestMethod.DELETE)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Thesaurus deleted."),
+        @ApiResponse(code = 403, message = ApiParams.API_RESPONSE_NOT_ALLOWED_ONLY_ADMIN),
+    })
+    @PreAuthorize("hasRole('Administrator')")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteThesaurusKeyword(
+        @ApiParam(
+            value = "Thesaurus to remove the keyword.",
+            required = true)
+        @PathVariable(value = "thesaurus")
+            String thesaurus,
+        @ApiParam(
+                value = "Keyword identifier to remove.",
+                required = false)
+        @RequestParam(name = "id", required = false)
+            String code,
+        @ApiIgnore
+        HttpServletRequest request
+    ) throws Exception {
+
+        ServiceContext context = ApiUtils.createServiceContext(request);
+
+        UserSession session = context.getUserSession();
+
+        // Retrieve thesaurus
+        Thesaurus th = thesaurusManager.getThesaurusByName(thesaurus);
+
+        // Optional keyword info - if none, selection is used
+        if ("".equals(code)) {
+            KeywordsSearcher searcher = (KeywordsSearcher) session
+                .getProperty(Geonet.Session.SEARCH_KEYWORDS_RESULT);
+            List<?> keywords = searcher.getSelectedKeywordsInList();
+
+            Iterator<?> iter = keywords.iterator();
+            while (iter.hasNext()) {
+                KeywordBean keyword = (KeywordBean) iter.next();
+                th.removeElement(keyword);
+            }
+
+        } else {
+            th.removeElement(code);
+        }
+    }
+
+    @InitBinder
+    public void initBinder(final WebDataBinder webdataBinder) {
+        webdataBinder.registerCustomEditor(KeywordRelation.class, new KeywordRelationConverter());
+    }
+ }

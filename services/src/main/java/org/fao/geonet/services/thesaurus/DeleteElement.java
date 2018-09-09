@@ -49,6 +49,7 @@ import java.util.List;
  *
  * Access is restricted
  */
+@Deprecated
 public class DeleteElement implements Service {
     public void init(Path appPath, ServiceConfig params) throws Exception {
     }

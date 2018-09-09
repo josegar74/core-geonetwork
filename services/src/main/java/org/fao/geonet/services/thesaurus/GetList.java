@@ -40,6 +40,7 @@ import java.nio.file.Path;
  *
  * @author mcoudert
  */
+@Deprecated
 public class GetList implements Service {
     public void init(Path appPath, ServiceConfig params) throws Exception {
     }

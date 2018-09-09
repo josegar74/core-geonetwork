@@ -221,7 +221,8 @@
           filename: '',
           defaultNamespace: 'http://www.mysite.org/thesaurus',
           dname: 'theme',
-          type: 'local'
+          type: 'local',
+          activated: 'y'
         };
 
         $scope.registryUrl = '';
@@ -269,15 +270,13 @@
        * and refresh the list.
        */
       $scope.createThesaurus = function() {
-        var xml = '<request>' +
-            '<tname>' + $scope.thesaurusSelected.title + '</tname>' +
-            '<fname>' + $scope.thesaurusSelected.filename + '</fname>' +
-            '<tns>' + $scope.thesaurusSelected.defaultNamespace + '</tns>' +
-            '<dname>' + $scope.thesaurusSelected.dname + '</dname>' +
-            '<type>local</type></request>';
-        $http.post('thesaurus.update', xml, {
-          headers: {'Content-type': 'application/xml'}
-        })
+        $http.post('../api/registries/vocabularies',
+          $scope.thesaurusSelected
+          /*$.param($scope.thesaurusSelected) ,
+          {
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+          }*/
+         )
             .success(function(data) {
               $scope.thesaurusSelected = null;
               $('#thesaurusModal').modal('hide');
@@ -390,10 +389,9 @@
        * use it in the metadata editor.
        */
       $scope.enableThesaurus = function() {
-        $http.get('thesaurus.enable?_content_type=json' +
-                '&ref=' + $scope.thesaurusSelected.key +
-                '&activated=' +
-                    ($scope.thesaurusSelected.activated == 'y' ? 'n' : 'y')
+        $http.put('../api/registries/vocabularies/' +
+          $scope.thesaurusSelected.key +
+          "?enable=" + ($scope.thesaurusSelected.activated == 'y' ? 'false' : 'true')
         ).success(function(data) {
           $scope.thesaurusSelected.activated = data.activated;
         });
@@ -430,10 +428,9 @@
       searchRelation = function(k) {
         $scope.keywordSelectedRelation = {};
         $.each(relationTypes, function(index, value) {
-          $http.get('thesaurus.keyword.links?_content_type=json&' +
-              'request=' + value +
-                      '&thesaurus=' + $scope.thesaurusSelected.key +
-                      '&id=' + encodeURIComponent(k.uri))
+          $http.get('../api/registries/vocabularies/keyword/related/' +
+            value + '?thesaurus=' + $scope.thesaurusSelected.key +
+            '&id=' + encodeURIComponent(k.uri))
               .success(function(data) {
                 $scope.keywordSelectedRelation[value] = data.descKeys;
               });
@@ -598,8 +595,8 @@
       };
       $scope.confirmDeleteKeyword = function() {
         var k = $scope.keywordToDelete;
-        $http.get('thesaurus.keyword.remove?pThesaurus=' + k.thesaurusKey +
-            '&id=' + encodeURIComponent(k.uri))
+        $http.delete('../api/registries/vocabularies/' +
+          $scope.thesaurusSelected.key + '/keyword?id=' + encodeURIComponent(k.uri))
             .success(function(data) {
               searchThesaurusKeyword();
             })
@@ -674,8 +671,8 @@
        * Load the list of thesaurus from the server
        */
       function loadThesaurus() {
-        $http.get('thesaurus?_content_type=json').success(function(data) {
-          $scope.thesaurus = data[0];
+        $http.get('../api/registries/vocabularies').success(function(data) {
+          $scope.thesaurus = data;
         }).error(function(data) {
           $rootScope.$broadcast('StatusUpdated', {
             title: $translate.instant('thesaurusListError'),

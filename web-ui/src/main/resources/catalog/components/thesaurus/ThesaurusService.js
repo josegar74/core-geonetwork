@@ -113,7 +113,7 @@
             var getTopConcept = function(thesaurus) {
               var defer = $q.defer();
               var url = gnUrlUtils.append(
-                  'thesaurus.topconcept?_content_type=json',
+                '../api/registries/vocabularies/topConcept',
                   gnUrlUtils.toKeyValue({
                     thesaurus: thesaurus
                   })
@@ -138,7 +138,7 @@
             function getConcept(thesaurus, keywordUris) {
               var defer = $q.defer();
               var url = gnUrlUtils.append(
-                  'thesaurus.concept?_content_type=json',
+                '../api/registries/vocabularies/keyword/withRelations',
                   gnUrlUtils.toKeyValue({
                     thesaurus: thesaurus,
                     id: keywordUris instanceof Array ?

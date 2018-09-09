@@ -46,6 +46,7 @@ import java.nio.file.Path;
  *
  * @author sppigot
  */
+@Deprecated
 public class GetTopConcept implements Service {
     public void init(Path appPath, ServiceConfig params) throws Exception {
     }

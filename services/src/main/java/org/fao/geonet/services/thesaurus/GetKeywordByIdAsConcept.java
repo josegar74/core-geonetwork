@@ -51,6 +51,7 @@ import java.nio.file.Path;
  *
  * @author sppigot - taken from GetKeywordById and GetNarrowerBroader
  */
+@Deprecated
 public class GetKeywordByIdAsConcept implements Service {
     public void init(Path appPath, ServiceConfig params) throws Exception {
     }

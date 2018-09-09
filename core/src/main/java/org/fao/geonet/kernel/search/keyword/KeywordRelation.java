@@ -23,6 +23,8 @@
 
 package org.fao.geonet.kernel.search.keyword;
 
+import java.util.Arrays;
+
 /**
  * Keywords can be related by ID.  This class represents that relation and has common types as
  * static constants
@@ -64,5 +66,18 @@ public enum KeywordRelation {
     public String toString() {
         return name;
     }
+
+
+    public static KeywordRelation fromValue(String value) {
+        for (KeywordRelation relation : values()) {
+            if (relation.name().equalsIgnoreCase(value)) {
+                return relation;
+            }
+        }
+        throw new IllegalArgumentException(
+            "Unknown enum type " + value + ", Allowed values are " + Arrays.toString(values()));
+    }
+
+
 
 }

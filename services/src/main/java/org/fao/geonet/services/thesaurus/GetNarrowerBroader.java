@@ -44,7 +44,7 @@ import java.nio.file.Path;
 /**
  * Returns a list of keywords given a list of thesaurus
  */
-
+@Deprecated
 public class GetNarrowerBroader implements Service {
     public void init(Path appPath, ServiceConfig params) throws Exception {
     }

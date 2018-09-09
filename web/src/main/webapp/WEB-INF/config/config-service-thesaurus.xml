@@ -24,7 +24,7 @@
 
 <geonet>
   <services package="org.fao.geonet">
-    <service name="thesaurus">
+    <service name="thesaurus" deprecated="true">
       <documentation>
         <![CDATA[
         Get list of all available thesaurus.
@@ -69,7 +69,7 @@
     </service>
 
 
-    <service name="thesaurus.update">
+    <service name="thesaurus.update" deprecated="true">
       <documentation><![CDATA[
         Create a new thesaurus.
 
@@ -102,7 +102,7 @@
     </service>
 
 
-    <service name="thesaurus.enable">
+    <service name="thesaurus.enable" deprecated="true">
       <documentation><![CDATA[
         Enable a thesaurus or not. If disabled, it will not be proposed
         in metadata editor.
@@ -116,7 +116,7 @@
     </service>
 
 
-    <service name="thesaurus.topconcept" type="xml">
+    <service name="thesaurus.topconcept" type="xml" deprecated="true">
       <documentation><![CDATA[
         Return top concept from a thesaurus.
 
@@ -131,7 +131,7 @@
       <error sheet="../xslt/error/error-json.xsl"/>
     </service>
 
-    <service name="thesaurus.concept" type="xml">
+    <service name="thesaurus.concept" type="xml" deprecated="true">
       <documentation><![CDATA[
         Return one keyword with narrower, broader and equal links as a single
 				concept.
@@ -165,7 +165,7 @@
     </service>
 
 
-    <service name="thesaurus.keyword.links">
+    <service name="thesaurus.keyword.links" deprecated="true">
       <documentation><![CDATA[
         Get related/narrower/broader terms for a keyword.
 
@@ -207,7 +207,7 @@
       <error sheet="../xslt/error/error-json.xsl"/>
     </service>
 
-    <service name="thesaurus.keyword.remove">
+    <service name="thesaurus.keyword.remove" deprecated="true">
       <documentation><![CDATA[
         Remove one or more concepts from a thesaurus
         ]]>

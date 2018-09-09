@@ -45,6 +45,7 @@ import java.nio.file.Path;
 /**
  * For editing : adds a tag to a thesaurus. Access is restricted
  */
+@Deprecated
 public class Add extends NotInReadOnlyModeService {
     public void init(Path appPath, ServiceConfig params) throws Exception {
     }

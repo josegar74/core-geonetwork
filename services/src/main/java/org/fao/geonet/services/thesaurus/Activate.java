@@ -46,6 +46,7 @@ import java.nio.file.Path;
  * Activate a thesaurus. Parameters: <ul> <li>fname: thesaurus identifier</li> <li>activated: "y" or
  * "n"</li> </ul>
  */
+@Deprecated
 public class Activate implements Service {
     public void init(Path appPath, ServiceConfig params) throws Exception {
     }
