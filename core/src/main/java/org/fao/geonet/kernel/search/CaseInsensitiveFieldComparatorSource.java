@@ -25,6 +25,7 @@ package org.fao.geonet.kernel.search;
 
 import java.io.IOException;
 import java.text.Collator;
+import java.util.Locale;
 
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.SortedDocValues;
@@ -34,6 +35,9 @@ import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.packed.PackedInts.Reader;
+import org.fao.geonet.ApplicationContextHolder;
+import org.fao.geonet.languages.IsoLanguagesMapper;
+import org.fao.geonet.web.DefaultLanguage;
 
 /**
  * TODO: it may be relevant to use http://lucene.apache.org/core/4_9_0/analyzers-common/org/apache/lucene/collation/CollationKeyAnalyzer.html
@@ -93,7 +97,15 @@ public class CaseInsensitiveFieldComparatorSource extends FieldComparatorSource 
             values = new String[numHits];
             this.field = field;
             this.searchLang = searchLang;
-            this.collator = Collator.getInstance();
+
+            IsoLanguagesMapper langMapper = ApplicationContextHolder.get().getBean(IsoLanguagesMapper.class);
+            DefaultLanguage defaultLanguage = ApplicationContextHolder.get().getBean(DefaultLanguage.class);
+            String langForLocale = langMapper.iso639_2_to_iso639_1(searchLang, defaultLanguage.getLanguage());
+
+            Locale localeForCollector = Locale.forLanguageTag(langForLocale);
+
+            this.collator =  (localeForCollector != null)?
+                Collator.getInstance(localeForCollector):Collator.getInstance();
         }
 
         @Override
