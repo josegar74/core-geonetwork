@@ -84,6 +84,7 @@ public class Settings {
     public static final String SYSTEM_CSW_ENABLEWHENINDEXING = "system/csw/enabledWhenIndexing";
     public static final String SYSTEM_CSW_CONTACT_ID = "system/csw/contactId";
     public static final String SYSTEM_CSW_METADATA_PUBLIC = "system/csw/metadataPublic";
+    public static final String SYSTEM_CSW_STRICT_CITE = "system/csw/strictCite";
     public static final String SYSTEM_USERSELFREGISTRATION_ENABLE = "system/userSelfRegistration/enable";
     public static final String SYSTEM_USERSELFREGISTRATION_RECAPTCHA_ENABLE = "system/userSelfRegistration/recaptcha/enable";
     public static final String SYSTEM_USERSELFREGISTRATION_RECAPTCHA_PUBLICKEY = "system/userSelfRegistration/recaptcha/publickey";

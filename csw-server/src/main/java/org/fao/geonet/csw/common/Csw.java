@@ -73,8 +73,11 @@ public final class Csw {
     public static final String SECTION_SP = "ServiceProvider";
     public static final String SECTION_OM = "OperationsMetadata";
     public static final String SECTION_FC = "Filter_Capabilities";
+    public static final String SECTION_SC = "Scalar_Capabilities";
+    public static final String SECTION_CO = "ComparisonOperators";
 
     public static final String OPERATION = "Operation";
+    public static final String COMPARISON_OPERATOR = "ComparisonOperator";
 
     public static final String OUTPUT_FORMAT_APPLICATION_XML = "application/xml";
 

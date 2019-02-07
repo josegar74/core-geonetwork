@@ -114,8 +114,9 @@ public class GetCapabilities extends AbstractOperation implements CatalogService
         checkAcceptVersions(request);
 
         GeonetContext gc = (GeonetContext) context.getHandlerContext(Geonet.CONTEXT_NAME);
-        boolean inspireEnabled = gc.getBean(SettingManager.class).getValueAsBool(Settings.SYSTEM_INSPIRE_ENABLE, false);
-
+        SettingManager sm = gc.getBean(SettingManager.class);
+        boolean inspireEnabled = sm.getValueAsBool(Settings.SYSTEM_INSPIRE_ENABLE, false);
+        boolean isStrictCite = sm.getValueAsBool(Settings.SYSTEM_CSW_STRICT_CITE, false);
 
         //--- return capabilities
 
@@ -198,6 +199,10 @@ public class GetCapabilities extends AbstractOperation implements CatalogService
 
             handleSections(request, capabilities);
 
+            if (isStrictCite) {
+                processStrictCite(capabilities);
+            }
+
             //
             // in read-only mode, remove publication services from capabilities
             //
@@ -212,6 +217,34 @@ public class GetCapabilities extends AbstractOperation implements CatalogService
 
             throw new NoApplicableCodeEx("Cannot load/process capabilities");
         }
+    }
+
+
+    private Element processStrictCite(Element capabilities) {
+        Element filterCapabilities = capabilities.getChild(Csw.SECTION_FC, Csw.NAMESPACE_OGC);
+        Element lessThanOrEqualToEl = null;
+        Element greaterThanOrEqualToEl = null;
+
+        if (filterCapabilities != null) {
+
+            Element comparisonOperators = filterCapabilities.getChild(Csw.SECTION_SC, Csw.NAMESPACE_OGC).
+                getChild(Csw.SECTION_CO, Csw.NAMESPACE_OGC);
+
+            for (Element operator : (List<Element>) comparisonOperators.getChildren()) {
+                if (operator.getText().equals("LessThanOrEqualTo")) {
+                    lessThanOrEqualToEl = operator;
+                } else if (operator.getText().equals("GreaterThanOrEqualTo")) {
+                    greaterThanOrEqualToEl = operator;
+                }
+            }
+            if (lessThanOrEqualToEl != null) {
+                comparisonOperators.removeContent(lessThanOrEqualToEl);
+            }
+            if (greaterThanOrEqualToEl != null) {
+                comparisonOperators.removeContent(greaterThanOrEqualToEl);
+            }
+        }
+        return capabilities;
     }
 
     /**
@@ -575,7 +608,8 @@ public class GetCapabilities extends AbstractOperation implements CatalogService
         Map<String, Namespace> typenames = _schemaManager.getHmSchemasTypenames();
         List<Element> operations = op.getChildren("Parameter", Csw.NAMESPACE_OWS);
         for (Element operation : operations) {
-            if ("typeNames".equals(operation.getAttributeValue("name"))) {
+            if (("typeName".equals(operation.getAttributeValue("name"))) ||
+                ("typeNames".equals(operation.getAttributeValue("name")))) {
                 for (Map.Entry<String, Namespace> entry : typenames.entrySet()) {
                     String typeName = entry.getKey();
                     Namespace ns = entry.getValue();

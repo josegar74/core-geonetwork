@@ -59,10 +59,6 @@
         <ows:Value>OperationsMetadata</ows:Value>
         <ows:Value>Filter_Capabilities</ows:Value>
       </ows:Parameter>
-      <ows:Constraint name="PostEncoding">
-        <ows:Value>XML</ows:Value>
-        <ows:Value>SOAP</ows:Value>
-      </ows:Constraint>
     </ows:Operation>
     <ows:Operation name="DescribeRecord">
       <ows:DCP>
@@ -75,13 +71,10 @@
         <ows:Value>application/xml</ows:Value>
       </ows:Parameter>
       <ows:Parameter name="schemaLanguage">
-        <ows:Value>http://www.w3.org/TR/xmlschema-1/</ows:Value>
+        <ows:Value>http://www.w3.org/XML/Schema</ows:Value>
       </ows:Parameter>
       <ows:Parameter name="outputSchema"/>
-      <ows:Constraint name="PostEncoding">
-        <ows:Value>XML</ows:Value>
-        <ows:Value>SOAP</ows:Value>
-      </ows:Constraint>
+      <ows:Parameter name="typeName"/>
     </ows:Operation>
     <ows:Operation name="GetDomain">
       <ows:DCP>
@@ -113,10 +106,6 @@
         <ows:Value>FILTER</ows:Value>
         <ows:Value>CQL_TEXT</ows:Value>
       </ows:Parameter>
-      <ows:Constraint name="PostEncoding">
-        <ows:Value>XML</ows:Value>
-        <ows:Value>SOAP</ows:Value>
-      </ows:Constraint>
     </ows:Operation>
     <ows:Operation name="GetRecordById">
       <ows:DCP>
@@ -139,10 +128,6 @@
         <ows:Value>summary</ows:Value>
         <ows:Value>full</ows:Value>
       </ows:Parameter>
-      <ows:Constraint name="PostEncoding">
-        <ows:Value>XML</ows:Value>
-        <ows:Value>SOAP</ows:Value>
-      </ows:Constraint>
     </ows:Operation>
     <ows:Operation name="Transaction">
       <ows:DCP>
@@ -164,7 +149,7 @@
       </ows:Parameter>
     </ows:Operation>
     <ows:Parameter name="service">
-      <ows:Value>http://www.opengis.net/cat/csw/2.0.2</ows:Value>
+      <ows:Value>CSW</ows:Value>
     </ows:Parameter>
     <ows:Parameter name="version">
       <ows:Value>2.0.2</ows:Value>
@@ -173,6 +158,7 @@
       <ows:Value>http://www.isotc211.org/2005/gmd</ows:Value>
     </ows:Constraint>
     <ows:Constraint name="PostEncoding">
+      <ows:Value>XML</ows:Value>
       <ows:Value>SOAP</ows:Value>
     </ows:Constraint>
 
@@ -201,10 +187,7 @@
       <inspire_com:Conformity>
         <inspire_com:Specification
           xsi:type="inspire_com:citationInspireInteroperabilityRegulation_eng">
-          <inspire_com:Title>COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010
-            implementing Directive 2007/2/EC of the European Parliament and of the Council as
-            regards interoperability of spatial data sets and services
-          </inspire_com:Title>
+          <inspire_com:Title>COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards interoperability of spatial data sets and services</inspire_com:Title>
           <inspire_com:DateOfPublication>2010-12-08</inspire_com:DateOfPublication>
           <inspire_com:URI>OJ:L:2010:323:0011:0102:EN:PDF</inspire_com:URI>
           <inspire_com:ResourceLocator>
